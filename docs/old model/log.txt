@@ -1,0 +1,3 @@
+01/27/2019 - Model created
+		   - Objective: Analyze whether multiscale can reduce the number of cells required to learn a task
+		   - OBS: we could use something similar to: https://www.youtube.com/watch?v=sj8Sg8qnjOg&t=600s to locate place cells (did not work)

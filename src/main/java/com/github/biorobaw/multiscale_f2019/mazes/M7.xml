@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="us-ascii"?>
+
+<world>
+	<boundingRect>
+		<x>-1.2</x>
+		<y>-1.6</y>
+		<w>2.4</w>
+		<h>3.2</h>
+	</boundingRect>
+	
+	<mazeElement>
+		<name>Rectangle</name>
+		<params>
+			<x1>-1.1</x1>
+			<x2>1.1</x2>
+			<y1>-1.5</y1>
+			<y2>1.5</y2>
+		</params>
+	</mazeElement>
+
+	<wall>
+		<x1>-1.1</x1><y1>-0.32</y1>
+		<x2>0.35</x2><y2>-0.32</y2>
+	</wall>
+	
+	<wall>
+		<x1>-1.1</x1><y1>0.32</y1>
+		<x2>0.35</x2><y2>0.32</y2>
+	</wall>
+	
+	<wall>
+		<x1>0.35</x1><y1>-0.32</y1>
+		<x2>0.35</x2><y2>0.32</y2>
+	</wall>
+	
+	
+	<wall>
+		<x1>0.65</x1><y1>-032</y1>
+		<x2>1.1</x2><y2>-0.32</y2>
+	</wall>
+	
+	<wall>
+		<x1>0.65</x1><y1>0.32</y1>
+		<x2>1.1</x2><y2>0.32</y2>
+	</wall>
+	
+	<wall>
+		<x1>0.65</x1><y1>-0.32</y1>
+		<x2>0.65</x2><y2>0.32</y2>
+	</wall>
+	
+	<feeder>
+			<id>1</id>
+			<x>-0.6</x> 
+			<y>0.72</y> 
+	</feeder>
+	
+	
+	
+	<startPositions>
+		<pos>1.0,0.45,0</pos>
+		<pos>-0.9,-0.55,0</pos>
+	</startPositions>
+
+	<floor>
+		<r>4</r>
+		<h>0</h>
+		<cr>0</cr>
+		<cg>0</cg>
+		<cb>0</cb>
+		<x>0</x>
+		<y>0</y>
+		<z>-.075</z>
+	</floor>	
+
+	
+	<!-- Views -->
+	<topview>
+		<x>0</x>
+		<y>0</y>
+		<z>8</z>
+	</topview>
+
+	
+</world>
+

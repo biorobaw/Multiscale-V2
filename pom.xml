@@ -5,4 +5,31 @@
   <version>0.0.1-SNAPSHOT</version>
   <name>Multiscale-F2019</name>
   <description>This project contains the extension of the multiscale model, developed in fall 2019.</description>
+  
+  <properties>
+		<maven.compiler.source>10</maven.compiler.source>
+		<maven.compiler.target>10</maven.compiler.target>
+  </properties>
+  
+  
+  
+  
+  
+  <dependencies>
+  	<dependency>
+  		<groupId>com.github.biorobaw</groupId>
+  		<artifactId>scs</artifactId>
+  		<version>4.0.0-SNAPSHOT</version>
+  	</dependency>
+	<dependency>
+	    <groupId>org.nd4j</groupId>
+	    <artifactId>nd4j-native-platform</artifactId>
+	    <version>1.0.0-beta4</version>
+	</dependency>
+	<dependency>
+		<groupId>micronsl</groupId>
+		<artifactId>micronsl</artifactId>
+		<version>2.1.0-SNAPSHOT</version>
+	</dependency>
+  </dependencies>
 </project>
