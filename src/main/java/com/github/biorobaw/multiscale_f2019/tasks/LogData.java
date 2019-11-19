@@ -1,7 +1,7 @@
 package com.github.biorobaw.multiscale_f2019.tasks;
 
 import com.github.biorobaw.scs.experiment.Experiment;
-import com.github.biorobaw.scs.utils.BinaryFile;
+import com.github.biorobaw.scs.utils.files.BinaryFile;
 
 import edu.usf.micronsl.port.twodimensional.sparse.Float2dSparsePort;
 

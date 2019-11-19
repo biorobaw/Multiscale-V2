@@ -59,7 +59,7 @@ public class ValueTraceDrawer  extends Drawer {
 		int coords[][] = s.scale(centers);
 		
 		int r = radius;
-		if(distanceOption==1) r = s.scaleDistanceX(minDist);
+		if(distanceOption==1) r = Math.round(s.scaleDistanceX(minDist));
 		int d = 2*r;
 
 		

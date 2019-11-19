@@ -3,6 +3,8 @@ package com.github.biorobaw.multiscale_f2019.model.modules.b_state;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.github.biorobaw.multiscale_f2019.model.MultiscaleModel1;
+import com.github.biorobaw.scs.utils.Debug;
 import com.vividsolutions.jts.geom.Coordinate;
 
 import edu.usf.micronsl.module.Module;
@@ -130,7 +132,7 @@ public class TesselatedPlaceCellLayer extends Module {
 	 * @param distToWall The distance to the closest wall
 	 */
 	public void run(Coordinate pos, float distanceToClosestWall) {
-
+		MultiscaleModel1.tics[0] = Debug.tic();
 		if (!active) {
 			activationPort.clearBlock();
 			totalActivation.set(0);
@@ -174,6 +176,7 @@ public class TesselatedPlaceCellLayer extends Module {
 //					System.out.println("Numeric error");
 //			}
 		}
+		MultiscaleModel1.tocs[1] = Debug.toc(MultiscaleModel1.tics[0]);
 
 	}
 

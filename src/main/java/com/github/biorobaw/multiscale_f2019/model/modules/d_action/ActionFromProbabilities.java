@@ -1,6 +1,6 @@
 package com.github.biorobaw.multiscale_f2019.model.modules.d_action;
 
-import com.github.biorobaw.scs.utils.RandomSingleton;
+import com.github.biorobaw.scs.utils.math.RandomSingleton;
 
 import edu.usf.micronsl.module.Module;
 import edu.usf.micronsl.port.onedimensional.array.Float1dPortArray;

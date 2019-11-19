@@ -9,8 +9,8 @@ import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import com.github.biorobaw.scs.experiment.Experiment;
 import com.github.biorobaw.scs.simulation.object.RobotProxy;
 import com.github.biorobaw.scs.simulation.scripts.Script;
-import com.github.biorobaw.scs.utils.RandomSingleton;
-import com.github.biorobaw.scs.utils.XML;
+import com.github.biorobaw.scs.utils.files.XML;
+import com.github.biorobaw.scs.utils.math.RandomSingleton;
 
 
 public class SetInitialPosition implements Script{

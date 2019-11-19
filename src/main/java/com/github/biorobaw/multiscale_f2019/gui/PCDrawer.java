@@ -62,7 +62,7 @@ public class PCDrawer extends Drawer {
 		
 		
 		int coords[][][] = s.scale(topLeftCoord,rows,cols);
-		int diam = s.scaleDistanceX(diameter);
+		int diam = (int)Math.round(s.scaleDistanceX(diameter));
 		
 		
 		//draw base rings

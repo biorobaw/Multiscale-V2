@@ -3,10 +3,11 @@
 
 <experiment>
 
-	<variables seed="1008" PROJECT="com.github.biorobaw.multiscale_f2019" />
+	<variables seed="1008" PROJECT="com.github.biorobaw.multiscale_f2019" numActions="8"/>
 	
-	<display class="$(SCS).gui.displays.NoDisplay"
-		window="-2,-2,4,4" syncDisplay="false" />
+	<!-- SCSDisplay vs NoDisplay -->
+	<display class="$(SCS).gui.displays.SCSDisplay"
+		window="-2,-2,4,4" syncDisplay="truek " />
 		
 	<simulator
 		class="$(SCS).simulation.scs_simulator.SCSSimulator"
@@ -15,15 +16,16 @@
 	<maze class="$(SCS).maze.Maze"
 		  file="$(mazeFile)" />
 
-	<template id="model" 
-		numActions="8" 
+	<template id="model"
+    class="$(PROJECT).model.MultiscaleModel2"
+		numActions="$(numActions)" 
 		mazeWidth="2.2"
 		mazeHeight="3.0"
 		
 		pcSizes="$(pcSizes)"
 		numPCx="$(numPCx)"
 		traces="$(traces)"
-    pc_bin_size="0.1"
+    	pc_bin_size="0.04"
 		
 		discountFactor="0.999"
 		learningRate="0.6"
@@ -34,13 +36,14 @@
 		<robot_proxy class="$(SCS).robot.proxies.SCSRobotProxy"/>
 		<module class="$(SCS).robot.modules.localization.GlobalLocalization"/>
 		<module class="$(SCS).robot.modules.FeederModule" 
-				max_feeding_distance="0.1"/><!-- feeding distance is optional, defaults to 0.1m -->	  
+				max_feeding_distance="0.1"/><!-- feeding distance is optional, defaults to 0.1m -->	
+		<module class="$(SCS).robot.modules.distance_sensing.SCSWallDistanceSensors"
+			 	num_sensors="$(numActions)"/>  
 	</template>
 
 	<groups>
 		<g1 trials="t1">
-			<sub_1 template="model" 
-					   class="$(PROJECT).model.MultiscaleModel1">
+			<sub_1 template="model" >
 					   <robot template="robot"/>
 			</sub_1>
 		</g1>

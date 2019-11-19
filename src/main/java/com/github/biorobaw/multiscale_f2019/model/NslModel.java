@@ -6,7 +6,6 @@ import java.util.stream.IntStream;
 
 import com.github.biorobaw.multiscale_f2019.gui.PCDrawer;
 import com.github.biorobaw.multiscale_f2019.gui.PolarDataDrawer;
-import com.github.biorobaw.multiscale_f2019.gui.RuntimesDrawer;
 import com.github.biorobaw.multiscale_f2019.gui.VDrawer;
 import com.github.biorobaw.multiscale_f2019.gui.ValueTraceDrawer;
 import com.github.biorobaw.multiscale_f2019.model.modules.a_input.DistancesInputModule;
@@ -28,20 +27,18 @@ import com.github.biorobaw.multiscale_f2019.tasks.SetInitialPosition;
 import com.github.biorobaw.scs.experiment.Experiment;
 import com.github.biorobaw.scs.gui.Display;
 import com.github.biorobaw.scs.gui.DrawPanel;
-import com.github.biorobaw.scs.gui.displays.SCSDisplay;
 import com.github.biorobaw.scs.gui.drawer.CycleDataDrawer;
 import com.github.biorobaw.scs.gui.drawer.FeederDrawer;
 import com.github.biorobaw.scs.gui.drawer.PathDrawer;
 import com.github.biorobaw.scs.gui.drawer.RobotDrawer;
+import com.github.biorobaw.scs.gui.drawer.RuntimesDrawer;
 import com.github.biorobaw.scs.gui.drawer.WallDrawer;
 import com.github.biorobaw.scs.gui.utils.GuiUtils;
-import com.github.biorobaw.scs.maze.Maze;
 import com.github.biorobaw.scs.robot.Robot;
 import com.github.biorobaw.scs.robot.commands.TranslateXY;
 import com.github.biorobaw.scs.robot.modules.FeederModule;
 import com.github.biorobaw.scs.robot.modules.localization.GlobalLocalization;
-import com.github.biorobaw.scs.simulation.SimulationControl;
-import com.github.biorobaw.scs.utils.XML;
+import com.github.biorobaw.scs.utils.files.XML;
 import com.vividsolutions.jts.geom.Coordinate;
 
 import edu.usf.micronsl.module.math.SumFloat0dModule;
@@ -429,7 +426,7 @@ public class NslModel extends edu.usf.micronsl.Model{
 			subAte.set(fm.ate());
 			
 			
-			GlobalLocalization gl = robot.getModule("GlobalLocalization");
+			GlobalLocalization gl = robot.getModule("slam");
 			var p = gl.getPosition();
 			pos.set(new Coordinate(p.getX(),p.getY()));
 			
@@ -450,7 +447,7 @@ public class NslModel extends edu.usf.micronsl.Model{
 
 			chosenAction = actionSelection.getOutport().get();
 			actionTaken.set(chosenAction);
-			probDrawer.setArrowDirection(chosenAction);
+//			probDrawer.setArrowDirection(chosenAction);
 			
 			// perform action
 			float tita = chosenAction*2*(float)Math.PI/numActions;
@@ -482,7 +479,7 @@ public class NslModel extends edu.usf.micronsl.Model{
 		// ============ GRAPHIC INTERFACE =====================
 
 		public void setDisplay() {
-
+			
 			Display d = Experiment.get().display;
 
 			//add cycle info to universe panel
@@ -589,15 +586,6 @@ public class NslModel extends edu.usf.micronsl.Model{
 			d.addDrawer("runtimes", "runtimes", runtimes);
 			
 			
-			
-//			pathDrawer = new PathDrawer( lRobot);
-//			pathDrawer.setColor(Color.red);
-			
-
-//			d.addPanel(new DrawPanel(300, 300), "panel4", 1, 1, 1, 1);
-//			d.addPanel(new DrawPanel(300, 300), "panel5", 0, 2, 1, 1);
-//			d.addPanel(new DrawPanel(300, 300), "panel6", 1, 2, 1, 1);
-//			d.addPanel(new DrawPanel(300, 300), "panel7", 0, 3, 1, 1);
 
 		}
 
