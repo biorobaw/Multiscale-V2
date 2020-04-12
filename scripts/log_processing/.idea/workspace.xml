@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="451903f7-a952-4ba0-a69c-9842addfddf0" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/../../.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../../.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../python/.idea/development.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../python/.idea/encodings.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../python/.idea/libraries/R_User_Library.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../python/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../python/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../python/.idea/workspace.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../python/ModelPlotter.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../python/plotAllConfigs.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../python/plotArticleFigures.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../python/plotCalibTraces.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../python/plotConfig.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../python/processAllConfigs.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../python/processCalibTraces.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../python/processConfig.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../python/pythonUtils/BinaryFiles.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../python/pythonUtils/MazeParser.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../python/pythonUtils/MissingFiles.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../python/pythonUtils/VariableLoader.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../python/pythonUtils/evaluation.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/configs/singleSizeConfigSet1.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/configs/singleSizeConfigSet2.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/experiments/experiment_1.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/experiments/experiment_2.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/gui/PCDrawer.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/gui/PolarDataDrawer.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/gui/VDrawer.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/gui/ValueTraceDrawer.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/gui2/GUI2.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/gui2/drawers/PCDrawer.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/gui2/drawers/PolarDataDrawer.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/gui2/drawers/VDrawer.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/mazes/M0.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/mazes/M1.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/mazes/M2.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/mazes/M3.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/mazes/M4.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/mazes/M5.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/mazes/M6.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/mazes/M7.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/mazes/MazeMetrics.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/mazes/mazeDescriptions" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/mazes/mazeMetrics.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/model/MultiscaleModel1.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/model/MultiscaleModel2.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/model/NslModel.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/model/modules/a_input/DistancesInputModule.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/model/modules/b_state/EligibilityTraces.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/model/modules/b_state/ExponentialPlaceCell.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/model/modules/b_state/PlaceCell.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/model/modules/b_state/TesselatedPlaceCellLayer.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/model/modules/c_rl/ProportionalValueSingleBlockMatrix.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/model/modules/c_rl/ProportionalVotesSingleBlockMatrix.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/model/modules/c_rl/QErrorModule.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/model/modules/c_rl/Reward.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/model/modules/c_rl/UpdateQModule.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/model/modules/c_rl/UpdateVModule.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/model/modules/c_rl/VErrorModule.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/model/modules/d_action/ActionBiasModule.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/model/modules/d_action/ActionFromProbabilities.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/model/modules/d_action/Softmax.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/model/modules/d_action/WallGateModule.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/model/modules2/a_input/Affordances.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/model/modules2/b_state/EligibilityTraces.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/model/modules2/b_state/PlaceCellBins.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/model/modules2/b_state/PlaceCells.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/model/modules2/d_action/MotionBias.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/tasks/LogData.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/multiscale_f2019/tasks/SetInitialPosition.java" beforeDir="false" />
+    </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/ModelPlotter.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="242">
+              <caret line="11" column="59" selection-start-line="11" selection-start-column="59" selection-end-line="11" selection-end-column="59" />
+              <folding>
+                <element signature="e#0#36#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/processConfig.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="264">
+              <caret line="12" column="47" selection-start-line="12" selection-start-column="47" selection-end-line="12" selection-end-column="47" />
+              <folding>
+                <element signature="e#0#11#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pythonUtils/MazeParser.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="193">
+              <caret line="53" column="14" selection-start-line="53" selection-start-column="4" selection-end-line="53" selection-end-column="14" />
+              <folding>
+                <element signature="e#0#34#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>ET</find>
+      <find>maze_width</find>
+    </findStrings>
+    <replaceStrings>
+      <replace />
+    </replaceStrings>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/BinaryFiles.py" />
+        <option value="$PROJECT_DIR$/plot.py" />
+        <option value="$PROJECT_DIR$/pythonUtils/MazeParser.py" />
+        <option value="$PROJECT_DIR$/ModelPlotter.py" />
+        <option value="$PROJECT_DIR$/processConfig.py" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="-8" />
+    <option name="y" value="-8" />
+    <option name="width" value="1616" />
+    <option name="height" value="876" />
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectView">
+    <navigator proportions="" version="1">
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="ProjectPane" />
+      <pane id="Scope" />
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="last_opened_file_path" value="$USER_HOME$/AppData/Local/Programs/Python/Python37" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager" selected="Python.plotMazesAndSampleLayers">
+    <configuration name="plotMazesAndSampleLayers" type="PythonConfigurationType" factoryName="Python">
+      <module name="development" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="C:\Users\bucef\AppData\Local\Programs\Python\Python37\python.exe" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ModelPlotter.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="plotMultiscaleMemory" type="PythonConfigurationType" factoryName="Python">
+      <module name="development" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="D:\JavaWorkspaceSCS\scs\logs\multiscale_memory\development\venv\Scripts\python.exe" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/plot.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Python.plotMultiscaleMemory" />
+      <item itemvalue="Python.plotMazesAndSampleLayers" />
+    </list>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="451903f7-a952-4ba0-a69c-9842addfddf0" name="Default Changelist" comment="" />
+      <created>1550358901937</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1550358901937</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="TodoView">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="-8" y="-8" width="1616" height="876" extended-state="6" />
+    <editor active="true" />
+    <layout>
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.81637716" visible="true" weight="0.17934094" />
+      <window_info id="Structure" order="1" sideWeight="0.18362282" side_tool="true" visible="true" weight="0.17934094" />
+      <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.45760432" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" weight="0.32974428" />
+      <window_info anchor="bottom" id="Version Control" order="7" />
+      <window_info anchor="bottom" id="Terminal" order="8" weight="0.32839838" />
+      <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
+      <window_info anchor="bottom" id="Python Console" order="10" weight="0.2907133" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="R Graphics" order="3" />
+      <window_info anchor="right" id="R Packages" order="4" />
+    </layout>
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/BinaryFiles.py" />
+    <entry file="file://$PROJECT_DIR$/plot.py" />
+    <entry file="file://$PROJECT_DIR$/pythonUtils/MazeParser.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="193">
+          <caret line="53" column="14" selection-start-line="53" selection-start-column="4" selection-end-line="53" selection-end-column="14" />
+          <folding>
+            <element signature="e#0#34#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ModelPlotter.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="242">
+          <caret line="11" column="59" selection-start-line="11" selection-start-column="59" selection-end-line="11" selection-end-column="59" />
+          <folding>
+            <element signature="e#0#36#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/processConfig.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="264">
+          <caret line="12" column="47" selection-start-line="12" selection-start-column="47" selection-end-line="12" selection-end-column="47" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>

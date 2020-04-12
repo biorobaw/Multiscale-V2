@@ -1,0 +1,3 @@
+runLevel	experiment	group	mazeFile	numStartingPositions	numEpisodes	pcSizes	numPCx	traces	config	subName	display
+3	./multiscalemodel/src/edu/usf/ratsim/model/pablo/multiscale_memory/experiments/experiment.xml	Control	multiscalemodel/src/edu/usf/ratsim/model/pablo/multiscale_memory/mazes/M3.xml	2	7000	0.04	40	0.7 	c0	0	true
+#num cells = ceil((1.1/r+1)sqrt(2)-1):  0.04 = 40. 0.08=20  0.24 0.36=5

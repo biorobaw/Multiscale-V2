@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="us-ascii"?>
+	
+<experiment>
+
+	
+	 <!-- load will load the subject (indicated by the input to the program) as saved after the specified episode  of the specified  trial-->
+	<!-- <load>
+		<episode>3624</episode>
+		<trial>Travel</trial>
+		<type>bin</type>
+	</load>  -->
+	
+	<!-- Add variables to define global variables -->
+	<variables>
+	<!--
+		<mazeFile>
+			multiscalemodel/src/edu/usf/ratsim/model/pablo/multiscale_memory/mazes/MorrisMaze.xml
+		</mazeFile>
+		<numEpisodes>500</numEpisodes>
+		<numStartingPositions>2</numStartingPositions> 
+		<traces>0.5</traces>
+	-->
+		
+	</variables>
+	
+	<simulationControls>
+		<!-- <simulationSpeed>9</simulationSpeed> --> <!--speed reference: 5000,3000,2000,1000,500,400,300,100,30,0-->
+		<!-- <display>false</display> --> <!-- controlling it from console input  -->
+		<!-- <seed>3365448354185182426</seed> -->
+		<syncDisplay>false</syncDisplay>
+		<collisionDetection>false</collisionDetection>
+	</simulationControls>
+	
+	<universe>
+		<name>edu.usf.vlwsim.universe.AbsoluteDirectionRobotVirtualUniverse</name>
+		<params>
+			<!-- Distance from which the food is accessible according to the universe -->
+			<closeToFoodThrs>1</closeToFoodThrs>
+			<!-- Delta T step for simulation -->
+			<deltaT>.1</deltaT>
+			<!-- Map file -->
+			<maze>$(mazeFile)</maze>
+			<!-- Display de window or run without GUI -->
+		</params>
+	</universe>
+	
+	<robot>
+		<!-- Robot to use. Use full name of the class -->
+		<name>edu.usf.vlwsim.robot.AbsoluteDirectionVirtualRobot</name>
+		<params>
+			<motionAngles>0, 0.79, 1.57, 2.36, 3.14, 3.93, 4.71, 5.5</motionAngles>
+			<step>.08</step>
+			<maxSenseDistance>2</maxSenseDistance>
+			
+			<!-- Percentual translational noise -->
+			<noise>.0</noise>
+			<!-- Rotation noise added after translation -->
+			<translationRotationNoise>0</translationRotationNoise>
+			<!-- How many steps are projected for obstacle avoidance purpose -->
+			<lookaheadSteps>1</lookaheadSteps>
+			<!-- Half the field of view of the rat -->
+			<halfFieldOfView>4</halfFieldOfView>
+			<!-- How long can the rat see in meters -->
+			<visionDist>10</visionDist>
+			<!-- How far away can the robot eat food. This should be shorter than the universe
+				threshold -->
+			<closeThrs>.1</closeThrs>
+		</params>
+	</robot>
+	
+	<model>
+		<!-- Model implementation -->
+		<name>edu.usf.ratsim.model.pablo.multiscale_memory.MultiscaleModelMemory</name>
+		<params>
+			<!-- subject params: -->
+			<!-- Step length in meters / second -->
+			
+			<numActions>8</numActions> 
+			<step>0.08</step>
+           
+			<mazeWidth>2.2</mazeWidth>  
+			<mazeHeight>3.0</mazeHeight> 
+			           
+			<pcType>exponential</pcType> 	   
+			<pcSizes>$(pcSizes)</pcSizes>	   
+			<numPCx>$(numPCx)</numPCx>
+			<traces>$(traces)</traces>	 
+			
+			           
+			<discountFactor>0.999</discountFactor>
+			<learningRate>0.6</learningRate>
+			<foodReward>1.0</foodReward>
+						
+		</params>
+	</model>
+	
+	
+	<group>
+		<name>Control</name>
+		<numMembers>1</numMembers>
+		<params>
+		</params>
+		<tasks>
+		</tasks>
+	</group>
+
+	
+	<!-- Training trial - Non-delayed cue phase -->
+	<trial>
+		<name>Develop</name>
+		<!-- Groups to apply the trial -->
+		<groups>
+			<group>Control</group>
+		</groups>
+		
+		<!-- Tasks to perform beforehand -->
+		<beforeTrialTasks>
+			<task>
+				<name>edu.usf.experiment.task.feeder.SetAllFeedersPermanentFood</name>
+			</task>
+		</beforeTrialTasks>
+		
+		<!-- Number of episodes -->
+		<numberOfEpisodes>$(numEpisodes)</numberOfEpisodes>
+		
+		
+		<!-- Tasks to perform before each episode -->
+		<beforeEpisodeTasks>
+			<!-- Place the animat in a given place -->
+			<task>
+				<name>edu.usf.ratsim.model.pablo.multiscale_memory.tasks.SetInitialPosition</name>
+				<params>						
+				</params>
+			</task>
+		</beforeEpisodeTasks>
+			
+			
+		<!-- Conditions upon which the episode ends -->
+		<stopConditions>
+			<!-- Timeout cycles -->
+			<condition>
+				<name>edu.usf.experiment.condition.MaxCycles</name>
+				<params>
+					<max>4000</max>
+				</params>
+			</condition>
+
+			<condition>
+				<name>edu.usf.experiment.condition.FoundNFoodStopCond</name>
+				<params>
+					<n>1</n>
+				</params>
+			</condition>
+			
+		</stopConditions>		
+		
+		
+		
+	</trial>
+	
+
+	
+</experiment>

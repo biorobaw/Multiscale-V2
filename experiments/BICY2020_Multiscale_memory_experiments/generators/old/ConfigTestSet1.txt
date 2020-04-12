@@ -1,0 +1,3 @@
+runLevel	experiment	group	mazeFile	numStartingPositions	numEpisodes	pcSizes	numPCx	config	subName
+3	./multiscalemodel/src/edu/usf/ratsim/model/pablo/multiscale_memory/experiments/experiment.xml	Control	multiscalemodel/src/edu/usf/ratsim/model/pablo/multiscale_memory/mazes/M0.xml	7	40000	0.4	9	c0	0
+3	./multiscalemodel/src/edu/usf/ratsim/model/pablo/multiscale_memory/experiments/experiment.xml	Control	multiscalemodel/src/edu/usf/ratsim/model/pablo/multiscale_memory/mazes/M0.xml	7	40000	0.04,0.08,0.12	25,13,9	c1	0
