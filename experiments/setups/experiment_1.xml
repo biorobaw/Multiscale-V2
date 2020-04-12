@@ -6,8 +6,8 @@
 	<variables seed="1008" PROJECT="com.github.biorobaw.scs_models.multiscale_f2019" numActions="8"/>
 	
 	<!-- SCSDisplay vs NoDisplay -->
-	<display class="$(SCS).gui.displays.SCSDisplay"
-		window="-2,-2,4,4" syncDisplay="true " />
+	<display class="$(SCS).gui.displays.NoDisplay"
+		window="-2,-2,4,4" syncDisplay="false " />
 		
 	<simulator
 		class="$(SCS).simulation.scs_simulator.SCSSimulator"

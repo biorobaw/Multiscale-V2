@@ -30,7 +30,7 @@ public class LogData implements Script {
 	@Override
 	public void endEpisode() {
 		// Log steps taken at the end of the episode
-		System.out.println("Logging data...");
+//		System.out.println("Logging data...");
 		
 		var e = Experiment.get();
 		int episode = e.getGlobal("episode");
@@ -45,7 +45,7 @@ public class LogData implements Script {
 		// save logs: cycles per episode, state and action values during last episode
 		
 		
-		System.out.println("Saving log...");
+//		System.out.println("Saving log...");
 		var e = Experiment.get();
 		String logFolder = e.getGlobal("logPath").toString();
 		String ratId	 = e.getGlobal("run_id").toString();

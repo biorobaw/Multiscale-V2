@@ -61,7 +61,7 @@ public class SetInitialPosition implements Script{
 	}
 
 	static private int[] generatePermutation(int size) {
-		System.out.println("Generating permutation...");
+//		System.out.println("Generating permutation...");
 		var random = RandomSingleton.getInstance();
 		var perm = IntStream.range(0, size).toArray();
 		for(int i=size-1; i>0 ;i--) {
