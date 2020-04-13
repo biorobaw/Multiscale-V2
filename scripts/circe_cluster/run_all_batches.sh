@@ -13,7 +13,7 @@ batchSize=$3
 module add apps/python/3.7.0
 
 #create log folder structure:
-python scripts/circe_cluster/python/logFolderGenerator.py ${baseLogFolder} ${configFile}
+python scripts/circe_cluster/logFolderGenerator.py ${baseLogFolder} ${configFile}
 
 
 #store command executed along with commit version and time
