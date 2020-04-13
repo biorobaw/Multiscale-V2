@@ -7,6 +7,7 @@
 #SBATCH -p mri2016
 #SBATCH -o ./slurm/output.%A.%a.out # STDOUT
 
+echo 'in script'
 configFile=$1
 baseLogFolder=$2
 

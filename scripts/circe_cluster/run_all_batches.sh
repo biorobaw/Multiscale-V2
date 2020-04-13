@@ -36,6 +36,7 @@ echo "executing indivs: $fromIndiv to $toIndiv in ($maxBatch + 1) batches of $ba
 
 #execute each line
 #outputFilePattern="${baseLogFolder}/slurmOut/slurm-%A_%a.out"
+echo "sbatch -a 0-$maxBatch ./scripts/circe_cluster/one_batch.sh $configFile $baseLogFolder $batchSize"
 idMessage=`sbatch -a 0-$maxBatch ./scripts/circe_cluster/one_batch.sh $configFile $baseLogFolder $batchSize`
 ratsId=`echo $idMessage | cut -d " " -f 4`
 echo $ratsId
