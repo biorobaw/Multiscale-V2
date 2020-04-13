@@ -2,47 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="451903f7-a952-4ba0-a69c-9842addfddf0" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../../pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/scs_models/multiscale_f2019/old/configs/singleSizeConfigSet1.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/scs_models/multiscale_f2019/old/experiments/experiment_1.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/scs_models/multiscale_f2019/old/gui/PCDrawer.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/scs_models/multiscale_f2019/old/gui/PolarDataDrawer.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/scs_models/multiscale_f2019/old/gui/VDrawer.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/scs_models/multiscale_f2019/old/gui/ValueTraceDrawer.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/scs_models/multiscale_f2019/old/model/MultiscaleModel.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/scs_models/multiscale_f2019/old/model/NslModel.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/scs_models/multiscale_f2019/old/model/modules/a_input/DistancesInputModule.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/scs_models/multiscale_f2019/old/model/modules/b_state/EligibilityTraces.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/scs_models/multiscale_f2019/old/model/modules/b_state/ExponentialPlaceCell.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/scs_models/multiscale_f2019/old/model/modules/b_state/PlaceCell.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/scs_models/multiscale_f2019/old/model/modules/b_state/TesselatedPlaceCellLayer.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/scs_models/multiscale_f2019/old/model/modules/c_rl/ProportionalValueSingleBlockMatrix.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/scs_models/multiscale_f2019/old/model/modules/c_rl/ProportionalVotesSingleBlockMatrix.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/scs_models/multiscale_f2019/old/model/modules/c_rl/QErrorModule.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/scs_models/multiscale_f2019/old/model/modules/c_rl/Reward.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/scs_models/multiscale_f2019/old/model/modules/c_rl/UpdateQModule.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/scs_models/multiscale_f2019/old/model/modules/c_rl/UpdateVModule.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/scs_models/multiscale_f2019/old/model/modules/c_rl/VErrorModule.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/scs_models/multiscale_f2019/old/model/modules/d_action/ActionBiasModule.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/scs_models/multiscale_f2019/old/model/modules/d_action/ActionFromProbabilities.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/scs_models/multiscale_f2019/old/model/modules/d_action/Softmax.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/scs_models/multiscale_f2019/old/model/modules/d_action/WallGateModule.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/scs_models/multiscale_f2019/old/tasks/LogData.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/scs_models/multiscale_f2019/old/tasks/SetInitialPosition.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/scs_models/multiscale_f2019/old2/configs/singleSizeConfigSet1.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/scs_models/multiscale_f2019/old2/experiments/experiment_1.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/scs_models/multiscale_f2019/old2/gui/GUI.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/scs_models/multiscale_f2019/old2/gui/drawers/PCDrawer.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/scs_models/multiscale_f2019/old2/gui/drawers/PolarDataDrawer.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/scs_models/multiscale_f2019/old2/gui/drawers/VDrawer.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/scs_models/multiscale_f2019/old2/model/MultiscaleModel.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/scs_models/multiscale_f2019/old2/model/modules/a_input/Affordances.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/scs_models/multiscale_f2019/old2/model/modules/b_state/EligibilityTraces.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/scs_models/multiscale_f2019/old2/model/modules/b_state/PlaceCellBins.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/scs_models/multiscale_f2019/old2/model/modules/b_state/PlaceCells.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/scs_models/multiscale_f2019/old2/model/modules/d_action/MotionBias.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/scs_models/multiscale_f2019/old2/tasks/LogData.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/github/biorobaw/scs_models/multiscale_f2019/old2/tasks/SetInitialPosition.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
