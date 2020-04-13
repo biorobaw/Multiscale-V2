@@ -5,7 +5,7 @@
 #SBATCH --qos=preempt
 #SBATCH --mem=2000M
 #SBATCH -p mri2016
-#SBATCH -o ./slurm/output.%A.%a.out # STDOUT
+##SBATCH -o ./slurm/output.%A.%a.out # STDOUT
 
 echo 'in script'
 configFile=$1
@@ -30,7 +30,8 @@ java -version
 for i in {0..$maxID}
 do
   configId=`expr $baseID + $i`
-  java -cp target/Multiscale-F2019-1.0.0-SNAPSHOT-jar-with-dependencies.jar -Xmx1500m com.github.biorobaw.scs.Main $configFile $configId $baseDir
+  echo "java -cp target/Multiscale-F2019-1.0.0-SNAPSHOT-jar-with-dependencies.jar -Xmx1500m com.github.biorobaw.scs.Main $configFile $configId $baseDir"
+  java -cp target/Multiscale-F2019-1.0.0-SNAPSHOT-jar-with-dependencies.jar -Xmx1500m com.github.biorobaw.scs.Main $configFile $configId $baseLogFolder
 done
 
 
