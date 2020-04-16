@@ -3,7 +3,7 @@ from baseGenerator import *
 # EXPERIMENT SETUP FIELDS  
 outputFile     = '../experiment3-SaingleSame.csv'           # relative to this folder
 experiment     = 'experiments/setups/experiment_1.xml' # relative to git root folder
-group          = 'Control'
+group          = 'g1'
 ratsPerConfig  = 100
 rat_ids = [i for i in range(ratsPerConfig)]
 

@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="451903f7-a952-4ba0-a69c-9842addfddf0" name="Default Changelist" comment="" />
+    <list default="true" id="451903f7-a952-4ba0-a69c-9842addfddf0" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/../circe_cluster/one_batch.sh" beforeDir="false" afterPath="$PROJECT_DIR$/../circe_cluster/one_batch.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -183,12 +186,12 @@
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1616" height="876" extended-state="6" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.87344915" visible="true" weight="0.17934094" />
-      <window_info id="Structure" order="1" sideWeight="0.12655087" side_tool="true" visible="true" weight="0.17934094" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.87483174" visible="true" weight="0.17934094" />
+      <window_info id="Structure" order="1" sideWeight="0.12516823" side_tool="true" visible="true" weight="0.17934094" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.45760432" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.45760432" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />

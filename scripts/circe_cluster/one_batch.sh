@@ -27,12 +27,27 @@ fi
 
 java -version
 
-for i in {0..$maxID}
+FAILED_IDS=""
+for i in $(seq 0 $maxID)
 do
   configId=`expr $baseID + $i`
-  echo "java -cp target/Multiscale-F2019-1.0.0-SNAPSHOT-jar-with-dependencies.jar -Xmx1500m com.github.biorobaw.scs.Main $configFile $configId $baseDir"
+  echo "SBATCH: running id $configId"
+  echo "---java -cp target/Multiscale-F2019-1.0.0-SNAPSHOT-jar-with-dependencies.jar -Xmx1500m com.github.biorobaw.scs.Main $configFile $configId $baseLogFolder"
   java -cp target/Multiscale-F2019-1.0.0-SNAPSHOT-jar-with-dependencies.jar -Xmx1500m com.github.biorobaw.scs.Main $configFile $configId $baseLogFolder
+  
+  
+  if [ $? -eq 0 ]; then
+      echo SUCCESS
+  else
+      echo FAIL
+      FAILED_IDS="$configId, $FAILED_IDS"
+  fi
+  
 done
+
+if [ -z $FAILED_IDS ]; then
+  echo "FAILED IDS: $FAILED_IDS"
+fi
 
 
 

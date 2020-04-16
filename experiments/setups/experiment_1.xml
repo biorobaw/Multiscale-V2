@@ -3,7 +3,8 @@
 
 <experiment>
 
-	<variables seed="1008" PROJECT="com.github.biorobaw.scs_models.multiscale_f2019" numActions="8"/>
+	<!-- removed seed="1008" from variables -->
+	<variables  PROJECT="com.github.biorobaw.scs_models.multiscale_f2019" numActions="8"/>
 	
 	<!-- SCSDisplay vs NoDisplay -->
 	<display class="$(SCS).gui.displays.NoDisplay"
