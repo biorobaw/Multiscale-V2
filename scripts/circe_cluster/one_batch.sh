@@ -18,7 +18,7 @@ if [ -z "$SLURM_ARRAY_TASK_ID" ]; then
 else
   batchSize=$3
   batchID=$SLURM_ARRAY_TASK_ID
-  baseID=`expr $batchSize * $batchID`
+  baseID=`expr $batchSize \* $batchID`
   maxID=`expr $batchSize - 1`
 fi
 
@@ -31,7 +31,6 @@ FAILED_IDS=""
 for i in $(seq 0 $maxID)
 do
   configId=`expr $baseID + $i`
-  echo "SBATCH: running id $configId"
   echo "---java -cp target/Multiscale-F2019-1.0.0-SNAPSHOT-jar-with-dependencies.jar -Xmx1500m com.github.biorobaw.scs.Main $configFile $configId $baseLogFolder"
   java -cp target/Multiscale-F2019-1.0.0-SNAPSHOT-jar-with-dependencies.jar -Xmx1500m com.github.biorobaw.scs.Main $configFile $configId $baseLogFolder
   
