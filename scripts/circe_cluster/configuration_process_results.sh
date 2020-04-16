@@ -12,5 +12,5 @@ configId=c$SLURM_ARRAY_TASK_ID
 
 echo "configId " $configId
 
-python processConfig.py $baseDir $configId
+python ./scripts/log_processing/processConfig.py $baseDir $configId
 
