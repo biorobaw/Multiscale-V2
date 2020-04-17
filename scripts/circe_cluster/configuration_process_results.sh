@@ -30,3 +30,8 @@ PYTHONUSERBASE=/home/p/pablos/work/pythonlibs
 python ./scripts/log_processing/processConfig.py $baseDir $configId
 
 
+if [ $? -eq 0 ]; then
+    echo SUCCESS
+else
+    echo "FAIL $baseDir $configId"
+fi

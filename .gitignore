@@ -3,3 +3,4 @@
 
 /slurm
 slurm*.out
+*.pyc
