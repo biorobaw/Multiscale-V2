@@ -25,7 +25,7 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/processConfig.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="475">
+            <state relative-caret-position="118">
               <caret line="116" column="25" selection-start-line="116" selection-start-column="25" selection-end-line="116" selection-end-column="25" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
@@ -201,14 +201,13 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1616" height="876" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.87348586" visible="true" weight="0.17934094" />
-      <window_info id="Structure" order="1" sideWeight="0.12651414" side_tool="true" visible="true" weight="0.17934094" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.8329571" visible="true" weight="0.17934094" />
+      <window_info id="Structure" order="1" sideWeight="0.1670429" side_tool="true" visible="true" weight="0.17934094" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.45760432" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.4037685" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -256,7 +255,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/processConfig.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="475">
+        <state relative-caret-position="118">
           <caret line="116" column="25" selection-start-line="116" selection-start-column="25" selection-end-line="116" selection-end-column="25" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
