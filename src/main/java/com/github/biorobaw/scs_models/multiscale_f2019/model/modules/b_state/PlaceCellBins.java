@@ -19,6 +19,7 @@ public class PlaceCellBins {
 	float minx, miny, bin_size; // min bin coordinates and size of bins
 	int xbins, ybins;		   // number of bins in the x and y directions respectively
 	
+	public float averageBinSize = 0;  // average number of elements in a bin
 	
 	PlaceCells pc_bins[][];
 	int active_x_id, active_y_id; // x and y indeces of the active bin
@@ -42,11 +43,15 @@ public class PlaceCellBins {
 		miny = Floats.min(Floats.sub(pcs.ys, pcs.rs));
 		var maxx = Floats.max(Floats.add(pcs.xs, pcs.rs));
 		var maxy = Floats.max(Floats.add(pcs.ys, pcs.rs));
+//		System.out.println("mx,Mx,my,My: " + minx + " " + maxx + " " + miny + " " + maxy);
+		
 		
 		// find how many bins are necessary
 		xbins = (int)Math.ceil((maxx-minx)/bin_size)+1; // we add one for the special case (maxx-minx)%binSize == 0
 		ybins = (int)Math.ceil((maxy-miny)/bin_size)+1; // we add one for the special case (maxy-miny)%binSize == 0
 
+//		System.out.println("bin size: " + bin_size + " " + xbins + " " + ybins);
+		
 		// create the bins
 		pc_bins = new PlaceCells[xbins][ybins];
 
@@ -121,8 +126,9 @@ public class PlaceCellBins {
 					b_ks[k] = pcs.ks[id];
 				}
 				pc_bins[i][j] = new PlaceCells(b_xs, b_ys, b_rs, b_ks, b_ids);
-				
+				averageBinSize+=size;
 			}
+		averageBinSize/=(xbins*ybins);
 	}
 	
 	/**

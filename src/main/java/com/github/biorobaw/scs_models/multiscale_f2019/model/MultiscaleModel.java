@@ -129,8 +129,9 @@ public class MultiscaleModel extends Subject{
 			pcs[i] = new PlaceCells(minX[i], maxX[i], numX[i],minY[i], maxY[i], numY[i], pcSizes[i]);
 			pc_bins[i] = new PlaceCellBins(pcs[i], pc_bin_size);
 			
-			vTraces[i] = new EligibilityTraces(1, pcs[i].num_cells, v_traceDecay[i], 0.05f);
-			qTraces[i] = new QTraces(numActions, pcs[i].num_cells, q_traceDecay[i], 0.05f);
+			float minActivation = 0.07f*0.07f*0.07f /pc_bins[i].averageBinSize;
+			vTraces[i] = new EligibilityTraces(1, pcs[i].num_cells, v_traceDecay[i], minActivation);
+			qTraces[i] = new QTraces(numActions, pcs[i].num_cells, q_traceDecay[i], minActivation);
 			
 			vTable[i] = new float[pcs[i].num_cells];
 			qTable[i] = new float[pcs[i].num_cells][numActions];
@@ -294,6 +295,9 @@ public class MultiscaleModel extends Subject{
 			var pcs = pc_bins[i].active_pcs;
 			vTraces[i].update(pcs.ns, pcs.ids, 0);
 			qTraces[i].update(pcs.ns, pcs.ids, chosenAction, learning_dist);
+//			System.out.println("num non zero pcs: " + pcs.ids.length);
+//			System.out.println("m,M Pc: " + Floats.min(pcs.ns) + " " + Floats.max(pcs.ns) );
+//			System.out.println("m,M T: " + Floats.min(vTraces[i].traces[0]) + " " + Floats.max(vTraces[i].traces[0]));
 		}
 		
 		// perform action
