@@ -13,7 +13,7 @@ def get_list_of_mazes(base_folder):
 
 def load_config_file(base_folder):
     configs = pd.read_csv(base_folder + 'configs.csv', sep='\t')
-    configs = configs.drop(columns=['subName', 'runLevel']).drop_duplicates()
+    configs = configs.drop(columns=['run_id']).drop_duplicates()
     configs['mazeFile'] = configs['mazeFile'].apply(os.path.basename)
     configs['config'] = configs['config'].apply(os.path.basename)
     return configs.set_index(['config'])

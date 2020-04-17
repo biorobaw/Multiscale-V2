@@ -42,7 +42,7 @@ def process_config(base_folder, config):
     config_maze = os.path.basename(configs.loc[config]['mazeFile'])
 
     # find maze metrics
-    maze_metrics = pd.read_csv("mazeMetrics.csv")
+    maze_metrics = pd.read_csv(base_folder + "mazes/mazeMetrics.csv")
     metric_gmean = maze_metrics.groupby('maze')['distance'].apply(stats.gmean).reset_index(name='distance')
     metric_gmean['pos'] = -1
     maze_metrics = maze_metrics.append(metric_gmean, ignore_index=True, sort=True)
