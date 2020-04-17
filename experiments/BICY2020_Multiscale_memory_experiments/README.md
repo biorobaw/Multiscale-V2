@@ -7,6 +7,10 @@ You can check this with the following command:
 
   watch squeue -u USER_NAME
 
+CHECK all executions finished successfully:
+
+  sh ./experiment/BICY2020_Multiscale_memory_experiments/run_all/run_check
+
 Post process all configurations individually:
 
   sh ./experiments/BICY2020_Multiscale_memory_experiments/run_all.sh
@@ -23,3 +27,7 @@ Merge all configurations:
   
   
 Plot 
+
+
+  File summary:
+      plot config plots runtimes for a single configuration (med, 50%, 75%)

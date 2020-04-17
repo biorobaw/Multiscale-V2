@@ -534,29 +534,33 @@ def process_all_configs(folder):
     # runtimes, summaries, summaries_normalized, configs = load_data(base_folder)
     print(folder)
 
+    experiment_name = os.path.basename(os.path.normpath(folder))
     normalized_summaries = load_summaries_normalized(folder)
     all_data = load_runtimes(folder)
     configs_df = load_config_file(folder)
 
-    if folder == os.path.join('singleSizeExperiment', '') or \
-            folder == os.path.join('singleSizeExperiment2', '') or \
-            folder == os.path.join('singleSizeSameNumber', '') or \
-            folder == os.path.join('singleSizeSameNumberMoreEpisodes', ''):
-        plot_single_size(folder, normalized_summaries, all_data, configs_df)
-
-    if folder == os.path.join('singleSizeTracesExperiment', ''):
+    if experiment_name == 'experiment1-traces':
         plot_single_size_traces_experiment(folder, normalized_summaries, all_data, configs_df)
 
-    if folder == os.path.join('twoScalesWithTracesExperiment', '') or \
-            folder == os.path.join('twoScalesNoTracesExperiment', ''):
-        plot_two_scales(folder, normalized_summaries, all_data, configs_df)
+    # if experiment_name == os.path.join('singleSizeExperiment', '') or \
+    #         folder == os.path.join('singleSizeExperiment2', '') or \
+    #         folder == os.path.join('singleSizeSameNumber', '') or \
+    #         folder == os.path.join('singleSizeSameNumberMoreEpisodes', ''):
+    if experiment_name == 'experiment2-singleMin' or \
+            experiment_name == 'experiment3-singleSame':
+        plot_single_size(folder, normalized_summaries, all_data, configs_df)
 
-    if folder == os.path.join('singleSizeVsMazes', ''):
+    if experiment_name == 'experiment4-mazes':
         plot_single_size_vs_mazes(folder, normalized_summaries, all_data, configs_df)
 
-    if folder == os.path.join('memoryReductionExperiment', '') or \
-            folder == os.path.join('memoryReductionExperiment2', ''):
-        plot_memory_reduction_experiment(folder, normalized_summaries, all_data, configs_df)
+    if experiment_name == 'experiment5-twoScales':
+        plot_two_scales(folder, normalized_summaries, all_data, configs_df)
+
+
+
+    # if folder == os.path.join('memoryReductionExperiment', '') or \
+    #         folder == os.path.join('memoryReductionExperiment2', ''):
+    #     plot_memory_reduction_experiment(folder, normalized_summaries, all_data, configs_df)
 
     print('No matches')
 
