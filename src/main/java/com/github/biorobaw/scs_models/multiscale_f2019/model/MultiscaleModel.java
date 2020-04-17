@@ -122,6 +122,7 @@ public class MultiscaleModel extends Subject{
 		qTable = new float[numScales][][];
 		qValues = new float[numActions];
 		
+		float average_active_pcs = 0;
 		for(int i=0; i<numScales; i++) {
 			System.out.println("layer: " 
 						+ minX[i] + " " + maxX[i] + " " + numX[i] + " " 
@@ -129,14 +130,19 @@ public class MultiscaleModel extends Subject{
 			pcs[i] = new PlaceCells(minX[i], maxX[i], numX[i],minY[i], maxY[i], numY[i], pcSizes[i]);
 			pc_bins[i] = new PlaceCellBins(pcs[i], pc_bin_size);
 			
-			float minActivation = 0.07f*0.07f*0.07f /pc_bins[i].averageBinSize;
-			vTraces[i] = new EligibilityTraces(1, pcs[i].num_cells, v_traceDecay[i], minActivation);
-			qTraces[i] = new QTraces(numActions, pcs[i].num_cells, q_traceDecay[i], minActivation);
+			average_active_pcs += pc_bins[i].averageBinSize;
 			
 			vTable[i] = new float[pcs[i].num_cells];
 			qTable[i] = new float[pcs[i].num_cells][numActions];
 			
 		}
+		
+		for(int i=0; i<numScales; i++) {
+			float minActivation = 0.07f*0.07f*0.07f / average_active_pcs;
+			vTraces[i] = new EligibilityTraces(1, pcs[i].num_cells, v_traceDecay[i], minActivation);
+			qTraces[i] = new QTraces(numActions, pcs[i].num_cells, q_traceDecay[i], minActivation);
+		}
+		
 		
 		// Model variables: action selection
 		int numStartingPositions = Integer.parseInt(Experiment.get().getGlobal("numStartingPositions"));

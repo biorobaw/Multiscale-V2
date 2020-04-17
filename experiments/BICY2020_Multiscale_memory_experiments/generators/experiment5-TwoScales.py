@@ -41,7 +41,7 @@ pcs_DF        = reduce(oneXone, [dataFrame(t,s) for t,s in zip(setTitles, combin
 #generate table
                              
 #Combine tables
-noRats = reduce(allXall , [experiment_DF, group_DF, mazes_DF, oneXone(pcs_DF, traces_DF)] )
+noRats = reduce(allXall , [experiment_DF, group_DF, mazes_DF, pcs_DF, traces_DF] )
 noRats = createConfigColumn(noRats)
 noRats['numEpisodes'] = noRats['numStartingPositions']*episodesPerStartingLocation
 
