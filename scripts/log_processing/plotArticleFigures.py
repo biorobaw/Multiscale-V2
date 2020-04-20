@@ -223,7 +223,7 @@ def plot_two_scales(base_folder, summaries_normalized, all_data, configs):
     gmean_data['Scales'] = gmean_data['pcSizes'].astype(str)
 
     # load data from the single size experiment:
-    single_size_folder = os.path.dirname(os.path.normpath('a/b/c/')) + '/experiment5-single/'
+    single_size_folder = os.path.dirname(os.path.normpath(base_folder)) + '/experiment5-single/'
     # single_size_folder = 'singleSizeTraces0Experiment/'
     # if base_folder == 'twoScalesWithTracesExperiment/':
     #     single_size_folder = 'singleSizeExperiment2/'
