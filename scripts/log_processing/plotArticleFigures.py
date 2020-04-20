@@ -3,6 +3,7 @@ from pythonUtils.VariableLoader import *
 from plotnine import *
 from pythonUtils.evaluation import *
 import math
+# from pandasgui import show
 
 """
    This file is to be called after processAllConfigs,
@@ -222,9 +223,10 @@ def plot_two_scales(base_folder, summaries_normalized, all_data, configs):
     gmean_data['Scales'] = gmean_data['pcSizes'].astype(str)
 
     # load data from the single size experiment:
-    single_size_folder = 'singleSizeTraces0Experiment/'
-    if base_folder == 'twoScalesWithTracesExperiment/':
-        single_size_folder = 'singleSizeExperiment2/'
+    single_size_folder = os.path.dirname(os.path.normpath('a/b/c/')) + '/experiment5-single/'
+    # single_size_folder = 'singleSizeTraces0Experiment/'
+    # if base_folder == 'twoScalesWithTracesExperiment/':
+    #     single_size_folder = 'singleSizeExperiment2/'
     single_configs = load_config_file(single_size_folder)
     single_data = load_summaries_normalized(single_size_folder)
     single_data_extended = merge_config_data(single_data, single_configs, ['pcSizes'])
