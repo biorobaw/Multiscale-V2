@@ -4,3 +4,6 @@ logs/
 /slurm
 slurm*.out
 *.pyc
+.idea/
+__pycache__/
+
