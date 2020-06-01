@@ -1,7 +1,7 @@
 #in git root folder execute the following commands:
 
 RUN_ALL="scripts/circe_cluster/run_all_batches.sh"
-EXPERIMENT_FOLDER="experiments/BICY2020_Multiscale_memory_experiments/"
+EXPERIMENT_FOLDER="experiments/BICY2020_modified/"
 LOG_FOLDER="experiments/BICY2020_modified/logs/"
 
 sh $RUN_ALL ${EXPERIMENT_FOLDER}/experiment1-Traces.csv ${LOG_FOLDER}experiment1-traces 100
