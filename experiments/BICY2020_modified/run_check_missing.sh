@@ -4,13 +4,13 @@ CHECK="scripts/log_processing/pythonUtils/MissingFiles.py"
 LOG_FOLDER="experiments/BICY2020_modified/logs/"
 FILE="r#ID-steps.bin"
 
-echo ""
-echo "E1"
-python $CHECK ${LOG_FOLDER}experiment1-traces/     $FILE 100
-
 # echo ""
-# echo "E2"
-# python $CHECK ${LOG_FOLDER}experiment2-singleMin/  $FILE 100
+# echo "E1"
+# python $CHECK ${LOG_FOLDER}experiment1-traces/     $FILE 100
+
+echo ""
+echo "E2"
+python $CHECK ${LOG_FOLDER}experiment2-singleMin/  $FILE 100
 
 # echo ""
 # echo "E3"

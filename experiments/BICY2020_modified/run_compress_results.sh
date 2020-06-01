@@ -4,8 +4,8 @@ cd $1
 
 #list of experiment folder
 EXPERIMENTS=(
-  "experiment1-traces"
-  # "experiment2-singleMin"
+  # "experiment1-traces"
+  "experiment2-singleMin"
   # "experiment3-singleSame"
   # "experiment4-mazes"
   # "experiment5-single"

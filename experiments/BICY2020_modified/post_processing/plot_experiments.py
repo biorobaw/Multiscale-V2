@@ -545,15 +545,15 @@ def process_all_configs(folder):
         plot_single_size_traces_experiment(folder, normalized_summaries, all_data, configs_df)
 
 
-    # if experiment_name == 'experiment2-singleMin' or \
-            # experiment_name == 'experiment3-singleSame':
-        # plot_single_size(folder, normalized_summaries, all_data, configs_df)
+    if experiment_name == 'experiment2-singleMin' or \
+            experiment_name == 'experiment3-singleSame':
+        plot_single_size(folder, normalized_summaries, all_data, configs_df)
 
-    # if experiment_name == 'experiment4-mazes':
-        # plot_single_size_vs_mazes(folder, normalized_summaries, all_data, configs_df)
+    if experiment_name == 'experiment4-mazes':
+        plot_single_size_vs_mazes(folder, normalized_summaries, all_data, configs_df)
 
-    # if experiment_name == 'experiment5-twoScales':
-        # plot_two_scales(folder, normalized_summaries, all_data, configs_df)
+    if experiment_name == 'experiment5-twoScales':
+        plot_two_scales(folder, normalized_summaries, all_data, configs_df)
 
 
 
