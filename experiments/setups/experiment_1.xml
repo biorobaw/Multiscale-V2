@@ -3,11 +3,11 @@
 
 <experiment>
 
-	<!-- removed seed="1008" from variables -->
-	<variables seed="1977393959781007236"  PROJECT="com.github.biorobaw.scs_models.multiscale_f2019" numActions="8"/>
+	<!-- removed seed="1008" from variables, seed="1977393959781007236"-->
+	<variables  PROJECT="com.github.biorobaw.scs_models.multiscale_f2019" numActions="8"/>
 	
 	<!-- SCSDisplay vs NoDisplay -->
-	<display class="$(SCS).gui.displays.SCSDisplay"
+	<display class="$(SCS).gui.displays.NoDisplay"
 		window="-2,-2,4,4" syncDisplay="false " />
 		
 	<simulator
