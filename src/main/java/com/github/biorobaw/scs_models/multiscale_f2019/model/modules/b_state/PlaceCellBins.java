@@ -140,6 +140,11 @@ public class PlaceCellBins {
 	public float activateBin(float x, float y) {
 		active_x_id = (int)Math.floor((x-minx)/bin_size);
 		active_y_id = (int)Math.floor((y-miny)/bin_size);
+		if(active_x_id >= pc_bins.length || active_y_id >= pc_bins[active_x_id].length) {
+			System.out.println("b:  " + active_x_id + "," + active_y_id);
+			System.out.println("m:  " + pc_bins.length + pc_bins[0].length);
+			System.out.println("xy: " + x + " " + y);
+		}
 		active_pcs = pc_bins[active_x_id][active_y_id];
 //		System.out.println("x,y: " + x + " " + y +" " +  active_x_id + " " + active_y_id);
 //		System.out.println("active length: " + active_pcs.num_cells);

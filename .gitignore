@@ -1,5 +1,5 @@
 /target/
-/logs
+logs/
 
 /slurm
 slurm*.out
