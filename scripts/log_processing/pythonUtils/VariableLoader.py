@@ -33,8 +33,8 @@ def load_runtimes(base_folder, configs_folders):
 
 
 def load_normalized_summaries(base_folder, configs_folders):
-    return load_config_variable('/summaryNormalized.pickle', base_folder, configs_folders)
+    return load_config_variable('summaryNormalized.pickle', base_folder, configs_folders)
 
 
 def load_summaries(base_folder, configs_folders):
-    return load_config_variable('/summary.pickle', base_folder, configs_folders)
+    return load_config_variable('summary.pickle', base_folder, configs_folders)

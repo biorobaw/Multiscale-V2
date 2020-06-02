@@ -13,7 +13,7 @@ mazeWidth   = 2.2
 mazeHeight  = 3
 mazes       = ['M0.xml','M1.xml']
 mazesPath   = 'experiments/mazes' # relative to git root folder
-episodesPerStartingLocation = 1000
+episodesPerStartingLocation = 2000
 
     
 # PC RELATED FIELDS
