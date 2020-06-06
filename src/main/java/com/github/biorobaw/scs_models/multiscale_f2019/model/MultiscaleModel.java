@@ -138,7 +138,7 @@ public class MultiscaleModel extends Subject{
 		}
 		
 		for(int i=0; i<numScales; i++) {
-			float minActivation = 0.07f*0.07f*0.07f / average_active_pcs;
+			float minActivation = 0.7f*0.7f*0.7f / average_active_pcs;
 			vTraces[i] = new EligibilityTraces(1, pcs[i].num_cells, v_traceDecay[i], minActivation);
 			qTraces[i] = new QTraces(numActions, pcs[i].num_cells, q_traceDecay[i], minActivation);
 		}
@@ -211,7 +211,7 @@ public class MultiscaleModel extends Subject{
 			for(int i=0; i<numScales; i++) {
 				// update V
 				// v = v + error*learning_rate*trace
-				if(actionWasOptimal || error >0 ) {
+				if(actionWasOptimal || error >0  || true) {
 					var traces = vTraces[i].traces[0];
 					for(var id : vTraces[i].non_zero[0]) {
 						vTable[i][id]+=  error*v_learningRate[i]*traces[id];
