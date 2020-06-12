@@ -1,7 +1,7 @@
 from baseGenerator import *
 
 # EXPERIMENT SETUP FIELDS  
-outputFile     = '../experiment2-SingleMin.csv'           # relative to this folder
+outputFile     = '../experiment3-SingleSame.csv'           # relative to this folder
 experiment     = 'experiments/setups/experiment_1.xml' # relative to git root folder
 group          = 'g1'
 ratsPerConfig  = 100
@@ -13,12 +13,12 @@ mazeWidth   = 2.2
 mazeHeight  = 3
 mazes       = ['M0.xml','M1.xml']
 mazesPath   = 'experiments/mazes' # relative to git root folder
-episodesPerStartingLocation = 10000
+episodesPerStartingLocation = 4000
 
     
 # PC RELATED FIELDS
 pcRadii     = [0.04*i for i in range(1,15)]
-numPCx      = calculate_min_coverage_PCx(mazeWidth, pcRadii)
+numPCx      = [40 for i in range(0,14)]
 traces      = 0.7
 
 
@@ -43,7 +43,8 @@ noRats['numEpisodes'] = noRats['numStartingPositions']*episodesPerStartingLocati
 
 withRats = allXall(noRats,ratIds_DF);
 saveResult(withRats,outputFile)
-saveResult(noRats,'../norats2.csv')
+saveResult(noRats,'../norats3.csv')
+
 
 
 
