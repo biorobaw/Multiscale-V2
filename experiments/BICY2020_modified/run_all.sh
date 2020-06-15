@@ -1,12 +1,13 @@
 #in git root folder execute the following commands:
 
-RUN_ALL="scripts/circe_cluster/run_all_batches.sh"
-EXPERIMENT_FOLDER="experiments/BICY2020_modified"
-LOG_FOLDER=${EXPERIMENT_FOLDER}/logs
+source "experiments/BICY2020_modified/run_set_variables.sh"
 
-sh $RUN_ALL ${EXPERIMENT_FOLDER}/experiment1-Traces.csv ${LOG_FOLDER}experiment1-traces 20
-sh $RUN_ALL ${EXPERIMENT_FOLDER}/experiment2-SingleMin.csv ${LOG_FOLDER}experiment2-singleMin 20
-sh $RUN_ALL ${EXPERIMENT_FOLDER}/experiment3-SingleSame.csv ${LOG_FOLDER}experiment3-singleSame 10
+RUN_ALL="scripts/circe_cluster/run_all_batches.sh"
+
+
+[ -z "$DO_EXPERIMENT_1" ] || sh $RUN_ALL $EXPERIMENT_FOLDER/experiment1-Traces.csv     $LOG_E1 20
+[ -z "$DO_EXPERIMENT_2" ] || sh $RUN_ALL $EXPERIMENT_FOLDER/experiment2-SingleMin.csv  $LOG_E2 20
+[ -z "$DO_EXPERIMENT_3" ] || sh $RUN_ALL $EXPERIMENT_FOLDER/experiment3-SingleSame.csv $LOG_E3 10
 # sh $RUN_ALL ${EXPERIMENT_FOLDER}/experiment4-Mazes.csv ${LOG_FOLDER}experiment4-mazes 100
 # sh $RUN_ALL ${EXPERIMENT_FOLDER}/experiment5-Single.csv ${LOG_FOLDER}experiment5-single 100
 # sh $RUN_ALL ${EXPERIMENT_FOLDER}/experiment5-TwoScales.csv ${LOG_FOLDER}experiment5-twoScales 100

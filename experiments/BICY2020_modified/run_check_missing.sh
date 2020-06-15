@@ -1,20 +1,14 @@
 #in git root folder execute the following commands:
 
+source "experiments/BICY2020_modified/run_set_variables.sh"
+
 CHECK="scripts/log_processing/pythonUtils/MissingFiles.py"
-LOG_FOLDER="experiments/BICY2020_modified/logs/"
 FILE="r#ID-steps.bin"
 
-echo ""
-echo "E1"
-python $CHECK ${LOG_FOLDER}experiment1-traces/     $FILE 100
 
-echo ""
-echo "E2"
-python $CHECK ${LOG_FOLDER}experiment2-singleMin/  $FILE 100
-
-echo ""
-echo "E3"
-python $CHECK ${LOG_FOLDER}experiment3-singleSame/ $FILE 100
+[ -z "$DO_EXPERIMENT_1" ] || ( echo "E1" && python $CHECK $LOG_E1/ $FILE 100 )
+[ -z "$DO_EXPERIMENT_2" ] || ( echo "E2" && python $CHECK $LOG_E2/ $FILE 100 )
+[ -z "$DO_EXPERIMENT_3" ] || ( echo "E3" && python $CHECK $LOG_E3/ $FILE 100 )
 
 # echo ""
 # echo "E4"

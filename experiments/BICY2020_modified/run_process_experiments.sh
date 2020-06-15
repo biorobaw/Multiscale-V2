@@ -1,13 +1,14 @@
 #in git root folder execute the following commands:
 
-RUN_ALL="scripts/log_processing/processAllConfigs.py"
-LOG_FOLDER="experiments/BICY2020_modified/logs/"
+source "experiments/BICY2020_modified/run_set_variables.sh"
+
+PROCESS_ALL="scripts/log_processing/processAllConfigs.py"
+
 
 module add apps/python/3.7.3
-
-python $RUN_ALL ${LOG_FOLDER}experiment1-traces/
-python $RUN_ALL ${LOG_FOLDER}experiment2-singleMin/
-python $RUN_ALL ${LOG_FOLDER}experiment3-singleSame/
-# python $RUN_ALL ${LOG_FOLDER}experiment4-mazes/
-# python $RUN_ALL ${LOG_FOLDER}experiment5-single/
-# python $RUN_ALL ${LOG_FOLDER}experiment5-twoScales/
+[ -z "$DO_EXPERIMENT_1" ] || python $PROCESS_ALL ${LOG_FOLDER}/experiment1-traces/
+[ -z "$DO_EXPERIMENT_2" ] || python $PROCESS_ALL ${LOG_FOLDER}/experiment2-singleMin/
+[ -z "$DO_EXPERIMENT_3" ] || python $PROCESS_ALL ${LOG_FOLDER}/experiment3-singleSame/
+# python $PROCESS_ALL ${LOG_FOLDER}experiment4-mazes/
+# python $PROCESS_ALL ${LOG_FOLDER}experiment5-single/
+# python $PROCESS_ALL ${LOG_FOLDER}experiment5-twoScales/
