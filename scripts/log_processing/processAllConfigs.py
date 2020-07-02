@@ -68,4 +68,4 @@ def process_all_configs(base_folder, location):
 
 if __name__ == '__main__':
     location = -1 if len(sys.argv) < 3 else int(sys.argv[2])
-    process_all_configs(os.path.join(sys.argv[1], ''))
+    process_all_configs(os.path.join(sys.argv[1], ''), location)
