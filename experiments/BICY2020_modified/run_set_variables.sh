@@ -3,9 +3,13 @@
 EXPERIMENT_FOLDER="experiments/BICY2020_modified"
 LOG_FOLDER=$EXPERIMENT_FOLDER/logs
 
-LOG_E1=$LOG_FOLDER/experiment1-traces
-LOG_E2=$LOG_FOLDER/experiment2-singleMin
-LOG_E3=$LOG_FOLDER/experiment3-singleSame
+E1=experiment1-traces
+E2=experiment2-singleMin
+E3=experiment3-singleSame
+
+LOG_E1=$LOG_FOLDER/$E1
+LOG_E2=$LOG_FOLDER/$E2
+LOG_E3=$LOG_FOLDER/$E3
 
 
 
