@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import re
+import numpy as np
 
 
 def get_list_of_configs(base_folder):
@@ -19,12 +20,13 @@ def load_config_file(base_folder):
     return configs.set_index(['config'])
 
 
-def load_config_variable(filename, base_folder, configs_folders):
+def load_config_variable(filename, base_folder, config_folders):
     df = pd.DataFrame()
-    for c in configs_folders:
+    for c in config_folders:
         aux_frame = pd.read_pickle(base_folder + c + '/' + filename)
-        aux_frame['config'] = c
+        aux_frame['config'] = int(c[1:])
         df = df.append(aux_frame)
+    df.config = df.config.astype(np.uint16)
     return df
 
 
@@ -36,5 +38,5 @@ def load_normalized_summaries(base_folder, configs_folders):
     return load_config_variable('summaryNormalized.pickle', base_folder, configs_folders)
 
 
-def load_summaries(base_folder, configs_folders):
-    return load_config_variable('summary.pickle', base_folder, configs_folders)
+def load_summaries(base_folder, config_folders):
+    return load_config_variable('summary.pickle', base_folder, config_folders)
