@@ -26,7 +26,7 @@ PYTHONUSERBASE=/home/p/pablos/work/pythonlibs
 # echo $PYTHONCASEOK
 # echo $PYTHONHOME
 
-python ./scripts/log_processing/processConfig.py $baseDir $configId
+python ./scripts/log_processing/processConfig2.py $baseDir $configId
 
 
 if [ $? -eq 0 ]; then
