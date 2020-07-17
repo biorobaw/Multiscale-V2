@@ -121,7 +121,8 @@ def process_config(base_folder, config):
 
     # create database to store results (delete if it already exists)
     db_name = config_folder + 'config_results.sqlite'
-    os.remove(db_name)
+    if os.path.exists(db_name):
+        os.remove(db_name)
     db = sqlite3.connect(db_name)
 
 

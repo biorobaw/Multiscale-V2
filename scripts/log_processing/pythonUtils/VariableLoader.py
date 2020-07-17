@@ -5,7 +5,8 @@ import numpy as np
 
 
 def get_list_of_configs(base_folder):
-    return [f for f in os.listdir(base_folder) if re.match('c\\d+$', f)]
+    all_configs = [f for f in os.listdir(base_folder) if re.match('c\\d+$', f)]
+    return sorted(all_configs, key = lambda x: int(x[1:]))
 
 
 def get_list_of_mazes(base_folder):
