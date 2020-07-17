@@ -105,7 +105,6 @@ def process_config(base_folder, config):
     t1 = time.time()
 
     # get parameters
-    base_folder = '../../experiments/BICY2020_modified/logs/experiment1-traces'
     base_folder = os.path.join(base_folder, '')
     config_folder = base_folder + config + '/'
     config_number = np.uint8(config[1:])  # drop letter c and parse number
