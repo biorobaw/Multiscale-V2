@@ -7,9 +7,50 @@ from pythonUtils.VariableLoader import *
 import time
 import sqlite3
 from sqlite3 import Error
+import tracemalloc
 
 
+def create_db_and_tables(config_folder):
+    # create database to store results (delete if it already exists)
+    db_name = config_folder + 'config_results.sqlite'
+    if os.path.exists(db_name):
+        os.remove(db_name)
+    db = sqlite3.connect(db_name)
+    cursor = db.cursor()
 
+    # create rat_runtimes
+    cursor.execute(" CREATE TABLE rat_runtimes "
+                   " ( config   INTEGER, "
+                   "   location INTEGER, "
+                   "   episode  INTEGER, "
+                   "   rat      INTEGER, "
+                   "   steps       REAL, "
+                   "   normalized  REAL, "
+                   "   PRIMARY KEY ( config, location, episode, rat ) "
+                   " ) WITHOUT ROWID"
+                   )
+
+    # create rat_summaries and rat_summaries_normalized
+    summary_schema = """
+                     CREATE TABLE {}
+                     ( config   INTEGER,
+                       location INTEGER,
+                       episode  INTEGER,
+                       count    INTEGER,
+                       mean     REAL, 
+                       std      REAL, 
+                       min      REAL, 
+                       [25%]    REAL, 
+                       [50%]    REAL, 
+                       [75%]    REAL, 
+                       max      REAL, 
+                       PRIMARY KEY ( config, location, episode )
+                     ) WITHOUT ROWID
+                     """
+    cursor.execute(summary_schema.format("rat_summaries"))
+    cursor.execute(summary_schema.format("rat_summaries_normalized"))
+
+    return db
 
 
 
@@ -29,29 +70,33 @@ def get_maze_metrics(base_folder, config, step_size):
     maze_metrics['minSteps'] = maze_metrics['distance'] / step_size
     return maze_metrics
 
-def merge_runtimes_from_all_rats(config_folder):
+def merge_runtimes_from_all_rats(config_folder, sample_rate):
     """ Merges the run times of all rats in the config into a pandas data frame"""
-
     # get number of rats and starting locations in this experiment:
     num_locations = np.unique(load_int_vector(config_folder + "r0-steps.bin")).size
-    num_episodes = read_vector_size(config_folder + "r0-steps.bin") // num_locations
+    num_episodes  = read_vector_size(config_folder + "r0-steps.bin") // num_locations
+    episode_ids = np.arange(num_episodes, step=sample_rate, dtype=np.uint16)
+    num_samples_episodes = len(episode_ids)
     num_rats = len(glob.glob(config_folder + "r*-V0.bin"))
 
     # create columns of the final data frame:
-    rat_ids = np.repeat(np.arange(num_rats, dtype=np.uint8), num_locations * num_episodes)
-    episode = np.tile(np.repeat(np.arange(num_episodes, dtype=np.uint16), num_locations), num_rats)
-    locations = np.zeros(num_episodes * num_locations * num_rats, dtype=np.uint8)
-    steps = np.zeros(num_episodes * num_locations * num_rats, dtype=np.float32)
+    rat_ids = np.repeat(np.arange(num_rats, dtype=np.uint8), num_locations * num_samples_episodes)
+    episode = np.tile(np.repeat(episode_ids, num_locations), num_rats)
+    locations = np.zeros(num_samples_episodes * num_locations * num_rats, dtype=np.uint8)
+    steps = np.zeros(num_samples_episodes * num_locations * num_rats, dtype=np.float32)
 
     # load info of each rat
-    append_length = num_episodes * num_locations
+    append_length = num_samples_episodes * num_locations
+    sample_ids = np.arange(num_episodes * num_locations)\
+                   .reshape(-1, num_locations)[episode_ids]\
+                   .reshape(-1)
     file_name = config_folder + "r{}-steps.bin"
     for rat_id in range(0, num_rats):
         r_start = append_length * rat_id
-        r_end = append_length * (rat_id + 1)
+        r_end   = r_start+append_length
         with open(file_name.format(rat_id), 'rb') as file:
-            locations[r_start:r_end] = load_int_vector(file)
-            steps[r_start:r_end] = load_int_vector(file)
+            locations[r_start:r_end] = load_int_vector(file)[sample_ids]
+            steps[r_start:r_end] = load_int_vector(file)[sample_ids]
 
     # create data frame from the columns
     return pd.DataFrame({'location': locations,
@@ -62,8 +107,6 @@ def merge_runtimes_from_all_rats(config_folder):
 
 def process_and_save_runtimes(run_times, location, normalizer, config_folder, config_number, db):
     # save run times
-    #run_times_file_name = 'run_times_l{}.pickle'.format(location)
-    #run_times.to_pickle(config_folder + run_times_file_name)
     run_times = run_times.copy()
     run_times['normalized'] = run_times['steps'] / normalizer
     run_times.to_sql('rat_runtimes', db, if_exists='append', index=False)
@@ -100,7 +143,7 @@ def process_and_save_runtimes(run_times, location, normalizer, config_folder, co
     summary.to_sql('rat_summaries_normalized', db, if_exists='append', index=False)
 
 
-def process_config(base_folder, config):
+def process_config(base_folder, config, sample_rate):
     # tracemalloc.start()
     t1 = time.time()
 
@@ -114,16 +157,13 @@ def process_config(base_folder, config):
     maze_metrics = get_maze_metrics(base_folder, config, step_size)
 
     # merge results from all rats
-    all_run_times = merge_runtimes_from_all_rats(config_folder)
+    all_run_times = merge_runtimes_from_all_rats(config_folder, sample_rate)
     all_run_times.insert(loc=0, column='config', value=config_number)
     all_run_times['normalized'] = np.float32(0)
 
 
-    # create database to store results (delete if it already exists)
-    db_name = config_folder + 'config_results.sqlite'
-    if os.path.exists(db_name):
-        os.remove(db_name)
-    db = sqlite3.connect(db_name)
+    # create database and tables to store results
+    db = create_db_and_tables(config_folder)
 
 
     # divide results according to location and process them
@@ -164,29 +204,19 @@ def process_config(base_folder, config):
 
 
 
-def process_all_configs(base_folder):
-    config_folders = get_list_of_configs(base_folder)
-    # config_folders = ['c'+str(i) for i in range(266, 280)]
-    for config in config_folders:
-        print("processing: ", config)
-        process_config(base_folder, config)
+# def process_all_configs(base_folder):
+#     config_folders = get_list_of_configs(base_folder)
+#     # config_folders = ['c'+str(i) for i in range(266, 280)]
+#     for config in config_folders:
+#         print("processing: ", config)
+#         process_config(base_folder, config)
 
-def create_connection(path):
-    connection = None
-    try:
-        connection = sqlite3.connect(path)
-        print("Connection to SQLite DB successful")
-    except Error as e:
-        print(f"The error '{e}' ocurred")
-
-    return connection
 
 if __name__ == '__main__':
     # argv[1] = base folder
     # argv[2] = config
-    if len(sys.argv) > 2:
-        process_config(sys.argv[1], sys.argv[2])
-    else:
-        process_all_configs(sys.argv[1])
+    # argv[3] = runtime sample rate
+    runtime_sample_rate = int(sys.argv[3]) if len(sys.argv) > 3 else 1
+    process_config(sys.argv[1], sys.argv[2], runtime_sample_rate)
 
 
