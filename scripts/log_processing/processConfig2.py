@@ -27,7 +27,7 @@ def create_db_and_tables(config_folder):
                    "   steps       REAL, "
                    "   normalized  REAL, "
                    "   PRIMARY KEY ( config, location, episode, rat ) "
-                   " ) WITHOUT ROWID"
+                   " ) "  # removed WITHOUT ROWID since sqlite version on circe does not support it
                    )
 
     # create rat_summaries and rat_summaries_normalized
@@ -45,8 +45,9 @@ def create_db_and_tables(config_folder):
                        [75%]    REAL, 
                        max      REAL, 
                        PRIMARY KEY ( config, location, episode )
-                     ) WITHOUT ROWID
-                     """
+                     )   
+                     """  # removed WITHOUT ROWID since sqlite version on circe does not support it
+
     cursor.execute(summary_schema.format("rat_summaries"))
     cursor.execute(summary_schema.format("rat_summaries_normalized"))
 
