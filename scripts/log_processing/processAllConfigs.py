@@ -1,9 +1,10 @@
 import sys
-from pythonUtils.VariableLoader import *
 import sqlite3
 from shutil import copyfile
 import time
 import tracemalloc
+from os.path import join as join_path
+from data_loader import *
 
 
 
@@ -13,17 +14,18 @@ def merge_databases(base_folder):
 
     # load configs
     # base_folder = '../../experiments/BICY2020_modified/logs/experiment1-traces/'
-    db_name_format = base_folder + '{}/config_results.sqlite'
+    configs_folder = join_path(base_folder, 'configs', '')
+    db_name_format = configs_folder + '{}/config_results.sqlite'
     db_experiment_name = base_folder + 'experiment_results.sqlite'
-    config_folders = get_list_of_configs(base_folder)
-    # config_folders = ['c0', 'c0', 'c0', 'c0']
+    config_names = get_list_of_configs(configs_folder)
+    # config_names = ['c0', 'c0', 'c0', 'c0']
 
     # if database exist, delete it
     if os.path.exists(db_experiment_name):
         os.remove(db_experiment_name)
 
     # copy first config database and then open it
-    copyfile(db_name_format.format(config_folders[0]), db_experiment_name)
+    copyfile(db_name_format.format(config_names[0]), db_experiment_name)
     db_experiment = sqlite3.connect(db_experiment_name)
     cursor = db_experiment.cursor()
 
@@ -32,7 +34,7 @@ def merge_databases(base_folder):
     all_tables = cursor.fetchall()
 
     # append dbs from all other configs
-    for config in config_folders[1:]:
+    for config in config_names[1:]:
         t2 = time.time()
         print('Merging config ', config, end =" " )
         db_config_name = db_name_format.format(config)

@@ -1,7 +1,8 @@
 from pythonUtils.MazeParser import *
 from plotnine import *
 import math
-from pythonUtils.VariableLoader import *
+import pandas as pd
+from data_loader import *
 
 # this file defines functionality for:
 #       loading mazes

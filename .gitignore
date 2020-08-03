@@ -3,7 +3,12 @@ logs/
 
 /slurm
 slurm*.out
+
 *.pyc
 .idea/
 __pycache__/
+--mode=client/
+venv/
 
+*.sublime-project
+*.sublime-workspace

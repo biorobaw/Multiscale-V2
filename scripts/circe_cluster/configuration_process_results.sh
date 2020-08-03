@@ -6,7 +6,8 @@
 #SBATCH --mem=2000M
 #SBATCH -p mri2016
 
-baseDir=$1
+baseDir=${1}configs
+sample_rate=$2
 configId=c$SLURM_ARRAY_TASK_ID
 
 echo "configId " $configId
@@ -26,7 +27,7 @@ PYTHONUSERBASE=/home/p/pablos/work/pythonlibs
 # echo $PYTHONCASEOK
 # echo $PYTHONHOME
 
-python ./scripts/log_processing/processConfig2.py $baseDir $configId
+python ./scripts/log_processing/processConfig.py $baseDir $configId $sample_rate
 
 
 if [ $? -eq 0 ]; then

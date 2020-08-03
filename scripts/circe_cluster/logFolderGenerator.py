@@ -24,7 +24,7 @@ def makedirs(dir):
 #create base folder and the rest of the logfolders
 makedirs(baseFolder)
 for folder in  configFolders:
-  makedirs(baseFolder +"/" + folder)
+  makedirs(baseFolder +"/configs/" + folder)
 
 #create mazes and experiments folder
 makedirs(baseFolder+"/experiments")
