@@ -1,6 +1,7 @@
 #in git root folder execute the following commands:
 
 EXPERIMENT_FOLDER="experiments/BICY2020_modified"
+CONFIGS_FOLDER=$EXPERIMENT_FOLDER/config_files
 LOG_FOLDER=$EXPERIMENT_FOLDER/logs
 
 E1=experiment1-traces
