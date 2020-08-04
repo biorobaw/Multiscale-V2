@@ -6,7 +6,7 @@
 #SBATCH --mem=2000M
 #SBATCH -p mri2016
 
-baseDir=${1}configs
+baseDir=$1
 sample_rate=$2
 configId=c$SLURM_ARRAY_TASK_ID
 

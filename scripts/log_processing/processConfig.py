@@ -150,7 +150,7 @@ def process_config(base_folder, config, sample_rate):
 
     # get parameters
     base_folder = os.path.join(base_folder, '')
-    config_folder = base_folder + config + '/'
+    config_folder = os.path.join(base_folder,'configs', config, '')
     config_number = np.uint8(config[1:])  # drop letter c and parse number
     step_size = np.float32(0.08)
 
