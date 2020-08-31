@@ -12,6 +12,7 @@ import com.github.biorobaw.scs.robot.commands.TranslateXY;
 import com.github.biorobaw.scs.robot.modules.FeederModule;
 import com.github.biorobaw.scs.robot.modules.distance_sensing.DistanceSensingModule;
 import com.github.biorobaw.scs.robot.modules.localization.SlamModule;
+import com.github.biorobaw.scs.simulation.SimulationControl;
 import com.github.biorobaw.scs.utils.Debug;
 import com.github.biorobaw.scs.utils.files.XML;
 import com.github.biorobaw.scs.utils.math.DiscreteDistribution;
@@ -53,6 +54,8 @@ public class MultiscaleModel extends Subject{
 	
 	// Model Variables: RL
 	public float[][] vTable;	// v[layer][pc]
+	public float[][] vTableCopy; // a copy made to compare changes between start and end of episode
+	public float     episodeDeltaV; // max abs difference between vTable and vTableCopy
 	public float[][][] qTable;  // q[layer][pc][action]
 	public Float oldStateValue = null;
 	public float[] qValues;
@@ -119,6 +122,7 @@ public class MultiscaleModel extends Subject{
 		qTraces = new QTraces[numScales];
 		
 		vTable = new float[numScales][];
+		vTableCopy = new float[numScales][];
 		qTable = new float[numScales][][];
 		qValues = new float[numActions];
 		
@@ -163,6 +167,11 @@ public class MultiscaleModel extends Subject{
 	@Override
 	public long runModel() {
 		cycles++;
+		
+		
+//		if((Integer)Experiment.get().getGlobal("episode") == 13243)
+//			if((Long)Experiment.get().getGlobal("cycle") == 3056)
+//				SimulationControl.togglePause();
 		
 //		System.out.println("cycle: " + cycles);
 
@@ -341,6 +350,11 @@ public class MultiscaleModel extends Subject{
 		oldStateValue = null;
 		chosenAction = -1;
 		actionWasOptimal = false;
+		
+		
+		// copy state values:
+		for(int i=0; i < numScales; i++)
+			vTableCopy[i] = Floats.copy(vTable[i]);
 				
 	}
 	
@@ -354,6 +368,14 @@ public class MultiscaleModel extends Subject{
 //		System.out.println("instants: "+ Arrays.toString(tocs));
 //		System.out.println("averages: "+ Arrays.toString(averages));
 //		System.out.println("percentual:"+ Arrays.toString(percentual));
+		
+		episodeDeltaV = 0;
+		for(int i=0; i < numScales; i++) {
+			var dif = Floats.sub(vTable[i], vTableCopy[i]);
+			episodeDeltaV = Math.max(episodeDeltaV, Floats.max(Floats.abs(dif,dif)));
+			
+		}
+//		System.out.println(episodeDeltaV);
 		
 	}
 	

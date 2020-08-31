@@ -14,6 +14,7 @@ public class LogData implements Script {
 	int numEpisodes;
 	int startPositions[];
 	int stepsTaken[];
+	float maxDeltaV[];
 	String subject_id = "";
 	
 	public LogData(XML xml) {
@@ -25,6 +26,7 @@ public class LogData implements Script {
 		numEpisodes = Experiment.get().getGlobal("trial_episodes");
 		startPositions = new int[numEpisodes];
 		stepsTaken = new int[numEpisodes];
+		maxDeltaV  = new float[numEpisodes];
 	}
 	
 	@Override
@@ -36,6 +38,10 @@ public class LogData implements Script {
 		int episode = e.getGlobal("episode");
 		startPositions[episode] = SetInitialPosition.getStartIndex();
 		stepsTaken[episode] = (int)(long)e.getGlobal("cycle");
+		
+		var model = (MultiscaleModel)e.getSubject(subject_id);
+		maxDeltaV[episode] = model.episodeDeltaV;
+		
 	}
 	
 	
@@ -67,6 +73,9 @@ public class LogData implements Script {
 			BinaryFile.saveBinaryVector(model.vTable[i], prefix + "V" + i+ ".bin", true);
 			BinaryFile.saveBinaryMatrix(model.qTable[i], num_pcs, numActions , prefix + "Q" + i+ ".bin", true);
 		}
+		
+		// save deltaV
+		BinaryFile.saveBinaryVector(maxDeltaV, prefix + "deltaV.bin", true);
 		
 	}
 	
