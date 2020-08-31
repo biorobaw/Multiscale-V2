@@ -26,7 +26,7 @@ def create_db_and_tables(config_folder):
                    "   rat      INTEGER, "
                    "   steps       REAL, "
                    "   normalized  REAL, "
-                   "   delta_V     REAL, "
+                   "   deltaV      REAL, "
                    "   PRIMARY KEY ( config, location, episode, rat ) "
                    " ) "  # removed WITHOUT ROWID since sqlite version on circe does not support it
                    )
