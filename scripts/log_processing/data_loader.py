@@ -36,6 +36,21 @@ def load_summaries(db, config_indices, location):
     return df
 
 
+def load_deltaV(db, config_indices, location):
+    indices_str = ','.join(map(str, config_indices))
+    df = pd.read_sql_query("select config, location, episode, deltaV "
+                           "from rat_summaries_normalized "
+                           "where config in ({}) "
+                           "AND location = {}"
+                           .format(indices_str, np.uint8(location)), db)
+    # adjust data types to reduce memory size
+    df.config = df.config.astype(np.uint8)
+    df.location = df.location.astype(np.uint8)
+    df.episode = df.episode.astype(np.uint16)
+    df.deltaV = df.deltaV.astype(np.float32)
+    return df
+
+
 def load_episode_runtimes(db, config_indices, location, episode):
     episode = np.uint16(episode)
     indices_str = ','.join(map(str, config_indices))

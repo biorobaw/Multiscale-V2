@@ -1,11 +1,19 @@
 import scikit_posthocs as sp
 from plotnine import *
+import os
+import numpy as np
+from data_loader import *
 
 """
    This file is to be called after processAllConfigs,
    it creates the plots for the multi_scale_memory model 
    that require information from multiple configurations   
 """
+
+
+def make_folder(folder):
+    if not os.path.exists(folder):
+        os.makedirs(folder)
 
 
 def zoom_and_save(plot, ylims, file_name):
@@ -20,7 +28,7 @@ def zoom_and_save(plot, ylims, file_name):
         p = plot
         if lim != 0:
             p = p + coord_cartesian(ylim=(1, lim))
-        ggsave(p, file_name + '-lim{:02d}.pdf'.format(int(lim)), dpi=300)
+        ggsave(p, file_name + '-lim{}.pdf'.format(lim), dpi=300)
 
 
 def plot_time_series(data, x_column, y_column, group_labels, x_title, y_title, legend_title, plot_title, save_name, zoom_levels= [0, 2.5, 5]):
@@ -106,8 +114,51 @@ def plot_statistical_test(df, column, group_names, title, savefile):
     ggsave(p, savefile, dpi=300)
 
 
+def plot_runtimes_boxplots_dunntest(db, configs, location, episode, group_name,
+                                    legend_title, legend_values,  plot_title, save_folder):
+
+    # get config  indices and then get data from db
+    indices = [np.uint8(c[1:]) for c in configs.index]  # config numbers
+    summaries = load_summaries(db, indices, location)
+    runtimes_last_episode = load_episode_runtimes(db, indices, location, episode)
+
+    # prepare save folder
+    save_folder = os.path.join(save_folder , group_name, '')
+    make_folder(save_folder)
+    suffix = '' if group_name == '' else f'_{group_name}'
+
+    # do the actual plotting
+    plot_time_series(summaries, 'episode', 'steps', legend_values,
+                     'episode', 'optimality ratio', legend_title, plot_title,
+                     save_folder + f'runtimes{suffix}', [0, 1.3, 1.8]
+                     )
+
+    plot_box_plot(runtimes_last_episode, 'steps', legend_values,
+                  'trace', 'optimality ratio', plot_title,
+                  save_folder + f'boxplot{suffix}', [0, 1.3, 1.8])
+
+    plot_statistical_test(runtimes_last_episode, 'steps',
+                          dict(zip(indices, legend_values)), plot_title,
+                          save_folder + f'dunnTest{suffix}.pdf')
 
 
+def plot_deltaV(db, configs, location, episode, group_name,
+                    legend_title, legend_values,  plot_title, save_folder):
+
+    # get config  indices and then get data from db
+    indices = [np.uint8(c[1:]) for c in configs.index]  # config numbers
+    deltaV = load_deltaV(db, indices, location)
+
+    # prepare save folder
+    save_folder = os.path.join(save_folder , group_name, '')
+    make_folder(save_folder)
+    suffix = '' if group_name == '' else f'_{group_name}'
+
+    # do the actual plotting
+    plot_time_series(deltaV, 'episode', 'deltaV', legend_values,
+                     'episode', 'deltaV', legend_title, plot_title,
+                     save_folder + f'deltaV{suffix}', [0, 1, 0.1]
+                     )
 
 
 
