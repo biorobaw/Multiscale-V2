@@ -2,7 +2,6 @@
 
 #SBATCH --time=0:10:00
 #SBATCH --cpus-per-task 2 
-#SBATCH --qos=preempt
 #SBATCH --mem=2000M
 #SBATCH -p mri2016
 #SBATCH -o ./slurm/output.%A.%a.out # STDOUT
