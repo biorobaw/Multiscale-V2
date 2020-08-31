@@ -10,7 +10,7 @@ batchSize=$3
 #mvn package
 
 #add python module to circe
-module add apps/python/3.7.0
+module add apps/python/3.7.3
 
 #create log folder structure:
 python scripts/circe_cluster/logFolderGenerator.py ${baseLogFolder} ${configFile}

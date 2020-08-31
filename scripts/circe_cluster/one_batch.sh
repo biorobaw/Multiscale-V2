@@ -11,11 +11,9 @@ baseLogFolder=$2
 
 CMD_ARGS="-cp target/Multiscale-F2019-1.0.0-SNAPSHOT-jar-with-dependencies.jar -Xmx1500m com.github.biorobaw.scs.Main"
 
+module add apps/maven/3.5.0
+module add apps/jdk/11.0.5
 
-#module add apps/jre/1.8.0_121.x86 
-#module unload apps/jre/1.7.0_80.x64
-export JAVA_HOME=~/work/java/jdk-11.0.2
-export PATH=~/work/java/jdk-11.0.2/bin:$PATH
 
 FAILED_IDS=""
 if [ -z "$SLURM_ARRAY_TASK_ID" ]; then

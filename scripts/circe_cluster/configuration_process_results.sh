@@ -11,7 +11,6 @@ configId=c$SLURM_ARRAY_TASK_ID
 
 echo "configId " $configId
 
-module rm apps/python/3.7.0
 module add apps/python/3.7.3
 
 PYTHONUSERBASE=/home/p/pablos/work/pythonlibs
