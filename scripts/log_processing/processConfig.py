@@ -26,6 +26,7 @@ def create_db_and_tables(config_folder):
                    "   rat      INTEGER, "
                    "   steps       REAL, "
                    "   normalized  REAL, "
+                   "   delta_V     REAL, "
                    "   PRIMARY KEY ( config, location, episode, rat ) "
                    " ) "  # removed WITHOUT ROWID since sqlite version on circe does not support it
                    )
@@ -44,6 +45,7 @@ def create_db_and_tables(config_folder):
                        [50%]    REAL, 
                        [75%]    REAL, 
                        max      REAL, 
+                       deltaV   REAL, 
                        PRIMARY KEY ( config, location, episode )
                      )   
                      """  # removed WITHOUT ROWID since sqlite version on circe does not support it
@@ -84,14 +86,16 @@ def merge_runtimes_from_all_rats(config_folder, sample_rate):
     rat_ids = np.repeat(np.arange(num_rats, dtype=np.uint8), num_locations * num_samples_episodes)
     episode = np.tile(np.repeat(episode_ids, num_locations), num_rats)
     locations = np.zeros(num_samples_episodes * num_locations * num_rats, dtype=np.uint8)
-    steps = np.zeros(num_samples_episodes * num_locations * num_rats, dtype=np.float32)
+    steps  = np.zeros(num_samples_episodes * num_locations * num_rats, dtype=np.float32)
+    deltaV = np.zeros(num_samples_episodes * num_locations * num_rats, dtype=np.float32)
 
     # load info of each rat
     append_length = num_samples_episodes * num_locations
-    sample_ids = np.arange(num_episodes * num_locations)\
-                   .reshape(-1, num_locations)[episode_ids]\
-                   .reshape(-1)
+    sample_ids = np.arange(num_episodes * num_locations) \
+        .reshape(-1, num_locations)[episode_ids] \
+        .reshape(-1)
     file_name = config_folder + "r{}-steps.bin"
+    deltaV_file_name = config_folder + "r{}-deltaV.bin"
     for rat_id in range(0, num_rats):
         r_start = append_length * rat_id
         r_end   = r_start+append_length
@@ -99,11 +103,14 @@ def merge_runtimes_from_all_rats(config_folder, sample_rate):
             locations[r_start:r_end] = load_int_vector(file)[sample_ids]
             steps[r_start:r_end] = load_int_vector(file)[sample_ids]
 
+        deltaV[r_start:r_end] = load_float_vector(deltaV_file_name.format(rat_id))
+
     # create data frame from the columns
     return pd.DataFrame({'location': locations,
                          'episode': episode,
                          'rat': rat_ids,
-                         'steps': steps
+                         'steps': steps,
+                         'deltaV': deltaV
                          })
 
 def process_and_save_runtimes(run_times, location, normalizer, config_folder, config_number, db):
@@ -115,13 +122,23 @@ def process_and_save_runtimes(run_times, location, normalizer, config_folder, co
 
     # create a summary
 
+    # summarize run times
     t = time.time()
     summary = run_times[['episode', 'steps']] \
         .groupby(['episode']) \
         .describe() # this takes the most amount of time: approx 1 min
-    print('Summarizing: {}'.format(time.time() - t))
     summary.columns = summary.columns.droplevel()
+
+    # summarize deltaV and add it to summary
+    dV = run_times[['episode', 'deltaV']] \
+        .groupby(['episode'])\
+        .mean()
+    summary = summary.join(dV)
+
+    print('Summarizing: {}'.format(time.time() - t))
     summary = summary.reset_index()
+
+
     # set data types to reduce memory
     summary['count']   = summary['count'].astype(np.uint8)
     summary.episode = summary.episode.astype(np.uint16)
@@ -180,11 +197,17 @@ def process_config(base_folder, config, sample_rate):
         .apply(stats.gmean) \
         .reset_index(name='steps')
     mean_run_times.steps = mean_run_times.steps.astype(np.float32)
+
     normalizer = np.float32(maze_metrics['minSteps'].iloc[-1])
     location = np.uint8(-1)
     mean_run_times['location'] = location
     mean_run_times['config'] = config_number
     # add back location and
+
+    mean_deltaV = all_run_times.groupby(['episode', 'rat'])['deltaV'] \
+        .mean() \
+        .reset_index(name='deltaV')
+    mean_run_times['deltaV'] = mean_deltaV.deltaV.astype(np.float32)
 
     # process aggregated results
     print('processing aggregated results...')
