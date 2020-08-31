@@ -14,6 +14,17 @@ def load_int_vector(file):
         file.close()
     return result
 
+def load_float_vector(file):
+    file_is_str = type(file) is str
+    if file_is_str:
+        file = open(file, 'rb')
+    length = read_vector_size(file)
+    result = np.fromfile(file, dtype=np.float32, count=length)
+
+    if file_is_str:
+        file.close()
+    return result
+
 
 def read_vector_size(file):
     file_is_str = type(file) is str
