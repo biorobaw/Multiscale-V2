@@ -11,7 +11,6 @@ baseLogFolder=$2
 
 CMD_ARGS="-cp target/Multiscale-F2019-1.0.0-SNAPSHOT-jar-with-dependencies.jar -Xmx1500m com.github.biorobaw.scs.Main"
 
-module add apps/maven/3.5.0
 module add apps/jdk/11.0.5
 
 

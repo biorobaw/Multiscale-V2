@@ -103,7 +103,7 @@ def merge_runtimes_from_all_rats(config_folder, sample_rate):
             locations[r_start:r_end] = load_int_vector(file)[sample_ids]
             steps[r_start:r_end] = load_int_vector(file)[sample_ids]
 
-        deltaV[r_start:r_end] = load_float_vector(deltaV_file_name.format(rat_id))
+        deltaV[r_start:r_end] = load_float_vector(deltaV_file_name.format(rat_id))[sample_ids]
 
     # create data frame from the columns
     return pd.DataFrame({'location': locations,
