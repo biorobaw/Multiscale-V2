@@ -2,7 +2,7 @@ import scikit_posthocs as sp
 from plotnine import *
 import os
 import numpy as np
-from data_loader import *
+from .data_loader import *
 
 """
    This file is to be called after processAllConfigs,
