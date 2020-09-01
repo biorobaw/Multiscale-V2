@@ -80,6 +80,9 @@ def plot_scale_experiment(figure_folder, configs, sample_rate, db):
         plot_runtimes_boxplots_dunntest(db, sub_configs, location, last_episode, group_name,
                                         legend_title, legend_values, plot_title, figure_folder)
 
+        plot_deltaV(db, sub_configs, location, last_episode, group_name,
+                    legend_title, legend_values, plot_title, figure_folder)
+
 def plot_experiment(folder):
     # get experiment folder
     folder = os.path.join(sys.argv[1], '')
