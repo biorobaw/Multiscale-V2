@@ -4,7 +4,7 @@ from baseGenerator import *
 outputFile     = '../experiment4-extraAtFeeder.csv'     # relative to this folder
 experiment     = 'experiments/setups/experiment_1.xml'  # relative to git root folder
 group          = 'g1'
-ratsPerConfig  = 25                                     # reduced from 100 to 25
+ratsPerConfig  = 100                                     # reduced from 100 to 25
 rat_ids = [i for i in range(ratsPerConfig)]
 
 
