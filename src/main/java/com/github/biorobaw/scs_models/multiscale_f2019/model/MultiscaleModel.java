@@ -131,7 +131,7 @@ public class MultiscaleModel extends Subject{
 			System.out.println("layer: " 
 						+ minX[i] + " " + maxX[i] + " " + numX[i] + " " 
 						+ minY[i] + " " + maxY[i]+ " " + numY[i] + " " + pcSizes[i]);
-			pcs[i] = new PlaceCells(minX[i], maxX[i], numX[i],minY[i], maxY[i], numY[i], pcSizes[i]);
+			pcs[i] = new PlaceCells(minX[i], maxX[i], numX[i],minY[i], maxY[i], numY[i], pcSizes[i]+0.01f); // added 1 cm to pcs to avoid precision issues
 			pc_bins[i] = new PlaceCellBins(pcs[i], pc_bin_size);
 			
 			average_active_pcs += pc_bins[i].averageBinSize;
@@ -169,9 +169,9 @@ public class MultiscaleModel extends Subject{
 		cycles++;
 		
 		
-//		if((Integer)Experiment.get().getGlobal("episode") == 13243)
-//			if((Long)Experiment.get().getGlobal("cycle") == 3056)
-//				SimulationControl.togglePause();
+		if((Integer)Experiment.get().getGlobal("episode") == 1)
+			if((Long)Experiment.get().getGlobal("cycle") == 115)
+				SimulationControl.togglePause();
 		
 //		System.out.println("cycle: " + cycles);
 
