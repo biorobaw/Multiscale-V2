@@ -37,6 +37,21 @@ public class PlaceCells {
 	
 	public float total_a; // the total activation of the layer (the sum)
 	
+	/**
+	 * A constructor for an empty set of place cells
+	 */
+	public PlaceCells() {
+		xs = new float[] {};
+		xs = new float[] {}; // the x coordinates in the set
+		ys = new float[] {}; // the y coordinates in the set
+		rs = new float[] {}; // the radii of the cells
+		ks = new float[] {}; // the constant part of the pc equation e^(k*d^2) for each cell
+		ids = new int[] {}; // the id associated to each cell in the set
+
+		as  = new float[] {}; // the activation of each cell in the set
+		r2s = new float[] {}; // precalculated r squared values
+		ns  = new float[] {}; // normalized activation
+	}
 	
 	/**
 	 * Create a single layer of tesselated place cells.
@@ -225,7 +240,7 @@ public class PlaceCells {
 	 * The result is stored in the field `as` 
 	 * @param x The robot's current x coordinate
 	 * @param y The robot's current y coordinate
-	 * @return Returns the pointer 'this' to allow chaining functions
+	 * @return Returns the total activation of the set
 	 */
 	public float activate(float x, float y) {
 		total_a = 0;

@@ -16,13 +16,14 @@ public class PlaceCellBins {
 		
 	final static float min_activation = (float)Math.log(0.2); 
 	
-	float minx, miny, bin_size; // min bin coordinates and size of bins
+	float minx, miny, maxx, maxy, bin_size; // min bin coordinates and size of bins
 	int xbins, ybins;		   // number of bins in the x and y directions respectively
 	
 	public float averageBinSize = 0;  // average number of elements in a bin
 	
-	PlaceCells pc_bins[][];
-	int active_x_id, active_y_id; // x and y indeces of the active bin
+	private PlaceCells pc_bins[][];
+	private PlaceCells dummyBin = new PlaceCells();
+	private int active_x_id, active_y_id; // x and y indeces of the active bin
 	public PlaceCells active_pcs;
 	
 	/**
@@ -41,8 +42,8 @@ public class PlaceCellBins {
 		// find min and max coordinates in which pcs are active
 		minx = Floats.min(Floats.sub(pcs.xs, pcs.rs));
 		miny = Floats.min(Floats.sub(pcs.ys, pcs.rs));
-		var maxx = Floats.max(Floats.add(pcs.xs, pcs.rs));
-		var maxy = Floats.max(Floats.add(pcs.ys, pcs.rs));
+		maxx = Floats.max(Floats.add(pcs.xs, pcs.rs));
+		maxy = Floats.max(Floats.add(pcs.ys, pcs.rs));
 //		System.out.println("mx,Mx,my,My: " + minx + " " + maxx + " " + miny + " " + maxy);
 		
 		
@@ -62,9 +63,6 @@ public class PlaceCellBins {
 		for(int i=0; i<xbins; i++)
 			for(int j=0; j<ybins; j++)
 				aux_bins[i][j] = new ArrayList<>();
-		
-		// calculate half the diagonal of the bin
-		float half_bin_diagonal = (float)Math.sqrt(2)*bin_size/2;
 		
 		
 		// add pcs to the bins
@@ -87,20 +85,17 @@ public class PlaceCellBins {
 			if(maxBins[1] >= ybins ) maxBins[1] = ybins-1;
 			
 			for(int i=minBins[0]; i <=maxBins[0] ; i++) {
-				float bx = minx + (i+0.5f)*bin_size; // x coordinate of the bin center
-				float dx = x-bx; 
+				float min_bin_x = minx + i*bin_size;
+				float max_bin_x = min_bin_x + bin_size;
 				
 				for(int j=minBins[1]; j<=maxBins[1]; j++) {
-					float by = miny + (j+0.5f)*bin_size; // y coordinate of the bin center
-					float dy = y-by;
+					float min_bin_y = miny + j*bin_size;
+					float max_bin_y = min_bin_y + bin_size;
 					
-					// Add pc to bin only if its distance to the pc center
-					// is less than its radius + half the bin's diagonal.
-					// This is a simple necessary condition (not sufficient) 
-					// for the intersection between a circle and a square.
-					if( Math.sqrt(dx*dx+dy*dy) <= r + half_bin_diagonal){
+					// if place cell intersects bin, add it
+					if(circleIntersectsRectangle(x, y, r, min_bin_x, max_bin_y, max_bin_x, min_bin_y))
 						aux_bins[i][j].add(id);
-					}
+					
 				}
 				
 			}
@@ -135,17 +130,20 @@ public class PlaceCellBins {
 	 * Computes the activation of all cell in the bin containing the given point
 	 * @param x The point's x cooridnate
 	 * @param y The point's y coordinate
-	 * @return  Returns the x and y indices of the bin
+	 * @return  returs the total activation of the active bin
 	 */
 	public float activateBin(float x, float y) {
-		active_x_id = (int)Math.floor((x-minx)/bin_size);
-		active_y_id = (int)Math.floor((y-miny)/bin_size);
-		if(active_x_id >= pc_bins.length || active_y_id >= pc_bins[active_x_id].length) {
-			System.out.println("b:  " + active_x_id + "," + active_y_id);
-			System.out.println("m:  " + pc_bins.length + pc_bins[0].length);
-			System.out.println("xy: " + x + " " + y);
+		if( minx < x && x < maxx && miny < y && y < maxy ) {
+			active_x_id = (int)Math.floor((x-minx)/bin_size);
+			active_y_id = (int)Math.floor((y-miny)/bin_size);
+			active_pcs = pc_bins[active_x_id][active_y_id];
+		} else {
+			active_x_id = -1;
+			active_y_id = -1;
+			active_pcs  = dummyBin; 
+				
 		}
-		active_pcs = pc_bins[active_x_id][active_y_id];
+//		System.out.println("active " + active_x_id + " " + active_y_id + " " + x + " " + y + pc_bins.length + " " + pc_bins[0].length );
 //		System.out.println("x,y: " + x + " " + y +" " +  active_x_id + " " + active_y_id);
 //		System.out.println("active length: " + active_pcs.num_cells);
 		return active_pcs.activate(x, y);
@@ -160,11 +158,22 @@ public class PlaceCellBins {
 	private int[] getBin(float x, float y) {
 		var xbin = (int)Math.floor((x-minx)/bin_size);
 		var ybin = (int)Math.floor((y-miny)/bin_size);
-		return new int[] {xbin, ybin} ;
+		return new int[] {xbin, ybin} ;			
+		
 	}
 		
 	public void clear() {
 		active_pcs = null;
+	}
+	
+	public boolean circleIntersectsRectangle(float cx, float cy, float radius, float left, float top, float right, float bottom)
+	{
+	   float closestX = (cx < left ? left : (cx > right ? right : cx));
+	   float closestY = (cy < top ? top : (cy > bottom ? bottom : cy));
+	   float dx = closestX - cx;
+	   float dy = closestY - cy;
+
+	   return ( dx * dx + dy * dy ) <= radius * radius;
 	}
 
 }

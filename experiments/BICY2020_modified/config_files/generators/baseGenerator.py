@@ -14,9 +14,9 @@ def get_git_root():
 def dataFrame(colname,values):
   if isinstance(values, list):
     # print(values)
-    return pd.DataFrame({'key':0,colname:values})
+    return pd.DataFrame({'key': 0, colname: values})
   else:
-    return pd.DataFrame({'key':0,colname:[values]})
+    return pd.DataFrame({'key': 0, colname: [values]})
   
 def oneXone(df1,df2):
   return pd.concat([df1,df2.drop('key', axis=1)],axis=1)
