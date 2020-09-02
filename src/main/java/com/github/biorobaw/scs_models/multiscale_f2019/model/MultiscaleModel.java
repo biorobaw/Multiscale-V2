@@ -169,9 +169,11 @@ public class MultiscaleModel extends Subject{
 		cycles++;
 		
 		
-		if((Integer)Experiment.get().getGlobal("episode") == 1)
-			if((Long)Experiment.get().getGlobal("cycle") == 115)
-				SimulationControl.togglePause();
+//		if((Integer)Experiment.get().getGlobal("episode") == 0)
+//			if((Long)Experiment.get().getGlobal("cycle") == 0)
+//				SimulationControl.togglePause();
+//		int a =1;
+//		while(a!=0);
 		
 //		System.out.println("cycle: " + cycles);
 
