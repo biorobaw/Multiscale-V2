@@ -47,6 +47,13 @@ def merge_databases(base_folder):
         print(time.time() - t2)
         cursor.execute("DETACH DATABASE merging")
 
+
+    # add configs table to database
+    configs = load_config_file(base_folder)
+    configs = configs.reset_index()
+    configs.config = configs.config.apply(lambda s: s[1:]).astype(int)
+    configs.to_sql('configs', con=db_experiment, index=False)
+
     print('TOTAL TIME: {}'.format(time.time() - t1))
     current, peak = tracemalloc.get_traced_memory()
     tracemalloc.stop()
