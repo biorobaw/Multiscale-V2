@@ -69,7 +69,7 @@ def generatePC_layers_OLD(mazeWidth, mazeHeight, numPCx, radii):
   h = mazeHeight
   
   proportion = h / w
-  numPCy = [math.floor(nx*proportion) for nx in numPCx]
+  numPCy = [math.ceil(nx*proportion) for nx in numPCx]
   
   
   # see function calculate_min_coverage_PCx for description of symbols

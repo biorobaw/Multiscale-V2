@@ -131,7 +131,7 @@ public class MultiscaleModel extends Subject{
 			System.out.println("layer: " 
 						+ minX[i] + " " + maxX[i] + " " + numX[i] + " " 
 						+ minY[i] + " " + maxY[i]+ " " + numY[i] + " " + pcSizes[i]);
-			pcs[i] = new PlaceCells(minX[i], maxX[i], numX[i],minY[i], maxY[i], numY[i], pcSizes[i]+0.01f); // added 1 cm to pcs to avoid precision issues
+			pcs[i] = new PlaceCells(minX[i], maxX[i], numX[i],minY[i], maxY[i], numY[i], pcSizes[i]); // added 1 cm to pcs to avoid precision issues
 			pc_bins[i] = new PlaceCellBins(pcs[i], pc_bin_size);
 			
 			average_active_pcs += pc_bins[i].averageBinSize;
