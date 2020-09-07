@@ -169,7 +169,7 @@ public class PlaceCellBins {
 	public boolean circleIntersectsRectangle(float cx, float cy, float radius, float left, float top, float right, float bottom)
 	{
 	   float closestX = (cx < left ? left : (cx > right ? right : cx));
-	   float closestY = (cy < top ? top : (cy > bottom ? bottom : cy));
+	   float closestY = (cy > top ? top : (cy < bottom ? bottom : cy));
 	   float dx = closestX - cx;
 	   float dy = closestY - cy;
 
