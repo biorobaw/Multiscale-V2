@@ -60,43 +60,52 @@ def plot_experiment_5_density(figure_folder, configs, sample_rate, db):
     num_episodes = configs['numEpisodes'].max() / configs['numStartingPositions'].max()
     last_episode = -sample_rate % num_episodes
 
-    # plot each scale separately
-    for nx, sub_configs in configs.groupby(['numX']):
-        # get indices and format text for the plots
-        # nx_str = "{0:.2f}".format(scale)  # convert to string and format
-        print('plotting nx: ', nx)
+    # for each maze
+    for maze, maze_configs in configs.groupby(['mazeFile']):
 
-        # plot titles and legends:
+        maze = ntpath.basename(maze)[1:-4]
+        print('plotting maze: ', maze)
 
-        group_name    = f'nx{nx}'
-        legend_title  = 'Traces'
-        legend_values = sub_configs.traces.map("{0:.2f}".format)
-        plot_title    = f"Columns {nx}"
+        maze_figure_folder = figure_folder + maze +'/'
+        make_folder(maze_figure_folder)
 
-        plot_runtimes_boxplots_dunntest(db, sub_configs, location, last_episode, group_name,
-                                    legend_title, legend_values, plot_title, figure_folder)
+        # plot each scale separately
+        for nx, sub_configs in maze_configs.groupby(['numX']):
+            # get indices and format text for the plots
+            # nx_str = "{0:.2f}".format(scale)  # convert to string and format
+            print('plotting nx: ', nx)
 
-        plot_deltaV(db, sub_configs, location, last_episode, group_name,
-                                    legend_title, legend_values, plot_title, figure_folder)
+            # plot titles and legends:
 
-    # plot each scale separately
-    for trace, sub_configs in configs.groupby(['traces']):
-        # get indices and format text for the plots
-        # nx_str = "{0:.2f}".format(scale)  # convert to string and format
-        print('plotting trace: ', trace)
+            group_name    = f'nx{nx}'
+            legend_title  = 'Traces'
+            legend_values = sub_configs.traces.map("{0:.2f}".format)
+            plot_title    = f"Maze {maze[1:]} - Columns {nx}"
 
-        # plot titles and legends:
+            plot_runtimes_boxplots_dunntest(db, sub_configs, location, last_episode, group_name,
+                                        legend_title, legend_values, plot_title, maze_figure_folder)
 
-        group_name = f't{trace}'
-        legend_title = 'Columns'
-        legend_values = sub_configs.traces.map("{0:.1f}".format)
-        plot_title = f"Trace {trace:.1f}"
+            plot_deltaV(db, sub_configs, location, last_episode, group_name,
+                                        legend_title, legend_values, plot_title, maze_figure_folder)
 
-        plot_runtimes_boxplots_dunntest(db, sub_configs, location, last_episode, group_name,
-                                        legend_title, legend_values, plot_title, figure_folder)
+        # plot each scale separately
+        for trace, sub_configs in maze_configs.groupby(['traces']):
+            # get indices and format text for the plots
+            # nx_str = "{0:.2f}".format(scale)  # convert to string and format
+            print('plotting trace: ', trace)
 
-        plot_deltaV(db, sub_configs, location, last_episode, group_name,
-                    legend_title, legend_values, plot_title, figure_folder)
+            # plot titles and legends:
+
+            group_name = f't{trace}'
+            legend_title = 'Columns'
+            legend_values = sub_configs.traces.map("{0:.1f}".format)
+            plot_title = f"Maze {maze[1:]} - Trace {trace:.1f}"
+
+            plot_runtimes_boxplots_dunntest(db, sub_configs, location, last_episode, group_name,
+                                            legend_title, legend_values, plot_title, maze_figure_folder)
+
+            plot_deltaV(db, sub_configs, location, last_episode, group_name,
+                        legend_title, legend_values, plot_title, maze_figure_folder)
 
 def plot_scale_experiment(figure_folder, configs, sample_rate, db):
     """
