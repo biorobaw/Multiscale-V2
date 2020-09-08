@@ -12,7 +12,7 @@ def get_git_root():
   return git_root
 
 def dataFrame(colname,values):
-  if isinstance(values, list):
+  if isinstance(values, list) or isinstance(values, np.ndarray):
     # print(values)
     return pd.DataFrame({'key': 0, colname: values})
   else:

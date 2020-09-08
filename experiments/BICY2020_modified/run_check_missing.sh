@@ -10,6 +10,7 @@ FILE="r#ID-steps.bin"
 [ -z "$DO_EXPERIMENT_2" ] || ( echo "E2" && python $CHECK $LOG_E2/ $FILE 100 )
 [ -z "$DO_EXPERIMENT_3" ] || ( echo "E3" && python $CHECK $LOG_E3/ $FILE 100 )
 [ -z "$DO_EXPERIMENT_4" ] || ( echo "E4" && python $CHECK $LOG_E4/ $FILE 100 )
+[ -z "$DO_EXPERIMENT_5" ] || ( echo "E5" && python $CHECK $LOG_E5/ $FILE 50 )
 
 # echo ""
 # echo "E4"
