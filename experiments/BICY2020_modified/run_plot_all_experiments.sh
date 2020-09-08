@@ -9,6 +9,7 @@ module add apps/python/3.7.3
 [ -z "$DO_EXPERIMENT_2" ] || python $PLOT_EXPERIMENT $LOG_FOLDER/experiment2-singleMin/
 [ -z "$DO_EXPERIMENT_3" ] || python $PLOT_EXPERIMENT $LOG_FOLDER/experiment3-singleSame/
 [ -z "$DO_EXPERIMENT_4" ] || python $PLOT_EXPERIMENT $LOG_FOLDER/experiment4-extraAtFeeder/
+[ -z "$DO_EXPERIMENT_5" ] || python $PLOT_EXPERIMENT $LOG_FOLDER/experiment5-density/
 # python $PLOT_EXPERIMENT ${LOG_FOLDER}experiment4-mazes/
 # python $PLOT_EXPERIMENT ${LOG_FOLDER}experiment5-single/
 # python $PLOT_EXPERIMENT ${LOG_FOLDER}experiment5-twoScales/
