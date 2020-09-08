@@ -66,7 +66,7 @@ def plot_experiment_5_density(figure_folder, configs, sample_rate, db):
         maze = ntpath.basename(maze)[1:-4]
         print('plotting maze: ', maze)
 
-        maze_figure_folder = figure_folder + maze +'/'
+        maze_figure_folder = figure_folder + 'M' + maze +'/'
         make_folder(maze_figure_folder)
 
         # plot each scale separately
@@ -79,8 +79,8 @@ def plot_experiment_5_density(figure_folder, configs, sample_rate, db):
 
             group_name    = f'nx{nx}'
             legend_title  = 'Traces'
-            legend_values = sub_configs.traces.map("{0:.2f}".format)
-            plot_title    = f"Maze {maze[1:]} - Columns {nx}"
+            legend_values = sub_configs.traces.map("{0:.1f}".format)
+            plot_title    = f"Maze {maze} - Columns {nx}"
 
             plot_runtimes_boxplots_dunntest(db, sub_configs, location, last_episode, group_name,
                                         legend_title, legend_values, plot_title, maze_figure_folder)
@@ -96,10 +96,10 @@ def plot_experiment_5_density(figure_folder, configs, sample_rate, db):
 
             # plot titles and legends:
 
-            group_name = f't{trace}'
+            group_name = f't{trace:.1f}'
             legend_title = 'Columns'
-            legend_values = sub_configs.traces.map("{0:.1f}".format)
-            plot_title = f"Maze {maze[1:]} - Trace {trace:.1f}"
+            legend_values = sub_configs.numX.map("{0:.2f}".format)
+            plot_title = f"Maze {maze} - Trace {trace:.1f}"
 
             plot_runtimes_boxplots_dunntest(db, sub_configs, location, last_episode, group_name,
                                             legend_title, legend_values, plot_title, maze_figure_folder)
