@@ -48,6 +48,55 @@ def plot_experiment_traces(figure_folder, configs, sample_rate, db):
         plot_deltaV(db, sub_configs, location, last_episode, group_name,
                                     legend_title, legend_values, plot_title, figure_folder)
 
+def plot_experiment_5_density(figure_folder, configs, sample_rate, db):
+    """ for each scale, grouping by trace value:
+            plot runtimes
+            box plot of last episode
+            dunn test of last episode
+    """
+
+    # PARAMETERS:
+    location = -1  # we will only plot geometric mean data (represented with location -1)
+    num_episodes = configs['numEpisodes'].max() / configs['numStartingPositions'].max()
+    last_episode = -sample_rate % num_episodes
+
+    # plot each scale separately
+    for nx, sub_configs in configs.groupby(['numX']):
+        # get indices and format text for the plots
+        # nx_str = "{0:.2f}".format(scale)  # convert to string and format
+        print('plotting nx: ', nx)
+
+        # plot titles and legends:
+
+        group_name    = f'nx{nx}'
+        legend_title  = 'Traces'
+        legend_values = sub_configs.traces.map("{0:.2f}".format)
+        plot_title    = f"Columns {nx}"
+
+        plot_runtimes_boxplots_dunntest(db, sub_configs, location, last_episode, group_name,
+                                    legend_title, legend_values, plot_title, figure_folder)
+
+        plot_deltaV(db, sub_configs, location, last_episode, group_name,
+                                    legend_title, legend_values, plot_title, figure_folder)
+
+    # plot each scale separately
+    for trace, sub_configs in configs.groupby(['traces']):
+        # get indices and format text for the plots
+        # nx_str = "{0:.2f}".format(scale)  # convert to string and format
+        print('plotting trace: ', trace)
+
+        # plot titles and legends:
+
+        group_name = f't{trace}'
+        legend_title = 'Columns'
+        legend_values = sub_configs.traces.map("{0:.1f}".format)
+        plot_title = f"Trace {trace:.1f}"
+
+        plot_runtimes_boxplots_dunntest(db, sub_configs, location, last_episode, group_name,
+                                        legend_title, legend_values, plot_title, figure_folder)
+
+        plot_deltaV(db, sub_configs, location, last_episode, group_name,
+                    legend_title, legend_values, plot_title, figure_folder)
 
 def plot_scale_experiment(figure_folder, configs, sample_rate, db):
     """
@@ -136,10 +185,11 @@ def plot_experiment(folder):
                             .split(sep='-')[0][10:]  # all experiments use syntax 'experimentN-...'
 
     experiment_map = {}
-    experiment_map['1'] = ( plot_experiment_traces,         5)
-    experiment_map['2'] = ( plot_scale_experiment,          5)
-    experiment_map['3'] = ( plot_scale_experiment,          5)
-    experiment_map['4'] = ( plot_experiment4_extraAtFeeder, 5)
+    experiment_map['1'] = ( plot_experiment_traces,         5 )
+    experiment_map['2'] = ( plot_scale_experiment,          5 )
+    experiment_map['3'] = ( plot_scale_experiment,          5 )
+    experiment_map['4'] = ( plot_experiment4_extraAtFeeder, 5 )
+    experiment_map['5'] = (plot_experiment_5_density      , 10)
 
     # plot the experiment
     e = experiment_map[experiment_name]
