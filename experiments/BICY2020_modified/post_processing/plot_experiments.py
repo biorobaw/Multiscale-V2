@@ -66,8 +66,8 @@ def plot_experiment_traces_and_scales_per_maze(figure_folder, configs, sample_ra
             # plot titles and legends:
 
             group_name = f't{trace:.1f}'
-            legend_title = 'Columns'
-            legend_values = sub_configs.numX.map("{}".format)
+            legend_title = 'PC Radius (cm)'
+            legend_values = (sub_configs.pcSizes * 100).astype(int).astype(str)
             plot_title = f"Maze {maze} - Trace {trace:.1f}"
 
             plot_runtimes_boxplots_dunntest(db, sub_configs, location, last_episode, group_name,
