@@ -77,6 +77,9 @@ public class LogData implements Script {
 		// save deltaV
 		BinaryFile.saveBinaryVector(maxDeltaV, prefix + "deltaV.bin", true);
 		
+		// save seed
+		BinaryFile.saveBinaryVector(new long[] {e.getGlobal("seed")}, prefix + "seed.bin", true);
+		
 	}
 	
 	

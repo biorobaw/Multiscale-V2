@@ -2,6 +2,16 @@ import numpy as np
 
 # this file assumes data was encoded using little endian
 
+def load_long_vector(file):
+    file_is_str = type(file) is str
+    if file_is_str:
+        file = open(file, 'rb')
+    length = read_vector_size(file)
+    result = np.fromfile(file, dtype=np.uint64, count=length)
+
+    if file_is_str:
+        file.close()
+    return result
 
 def load_int_vector(file):
     file_is_str = type(file) is str

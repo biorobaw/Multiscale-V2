@@ -53,6 +53,16 @@ def create_db_and_tables(config_folder):
     cursor.execute(summary_schema.format("rat_summaries"))
     cursor.execute(summary_schema.format("rat_summaries_normalized"))
 
+    seed_table_schema = """
+        CREATE TABLE rat_seeds
+                     ( config   INTEGER,
+                       rat      INTEGER,
+                       seed     INTEGER, 
+                       PRIMARY KEY ( config, rat )
+                     )  
+    """
+    cursor.execute(seed_table_schema)
+
     return db
 
 
@@ -112,6 +122,22 @@ def merge_runtimes_from_all_rats(config_folder, sample_rate):
                          'steps': steps,
                          'deltaV': deltaV
                          })
+
+
+def merge_seeds_from_all_rats(config_folder, config_number):
+    num_rats = len(glob.glob(config_folder + "r*-V0.bin"))
+    rats  = np.arange(num_rats, dtype=np.uint8)
+    seeds = np.zeros(num_rats, dtype=np.int64)
+    file_name = config_folder + "r{}-seed.bin"
+    for rat_id in range(0, num_rats):
+        with open(file_name.format(rat_id), 'rb') as file:
+            seeds[rat_id] = load_long_vector(file)[0]
+    return pd.DataFrame({
+        'config' : config_number,
+        'rat'    : rats,
+        'seed'   : seeds
+    })
+
 
 def process_and_save_runtimes(run_times, location, normalizer, config_folder, config_number, db):
     # save run times
@@ -178,10 +204,14 @@ def process_config(base_folder, config, sample_rate):
     all_run_times = merge_runtimes_from_all_rats(config_folder, sample_rate)
     all_run_times.insert(loc=0, column='config', value=config_number)
     all_run_times['normalized'] = np.float32(0)
+    all_seeds = merge_seeds_from_all_rats(config_folder, config_number)
 
 
     # create database and tables to store results
     db = create_db_and_tables(config_folder)
+
+    # store seeds in database
+    all_seeds.to_sql('rat_seeds', db, if_exists='append', index=False)
 
 
     # divide results according to location and process them
