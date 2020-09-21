@@ -7,7 +7,7 @@ def load_long_vector(file):
     if file_is_str:
         file = open(file, 'rb')
     length = read_vector_size(file)
-    result = np.fromfile(file, dtype=np.uint64, count=length)
+    result = np.fromfile(file, dtype=np.int64, count=length)
 
     if file_is_str:
         file.close()
