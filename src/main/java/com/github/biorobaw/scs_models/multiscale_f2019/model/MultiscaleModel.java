@@ -143,10 +143,12 @@ public class MultiscaleModel extends Subject{
 		
 		System.out.println("average active pcs: " + average_active_pcs);
 		for(int i=0; i<numScales; i++) {
-			float minActivation = 0.7f*0.7f*0.7f / average_active_pcs;
-			System.out.println("min activation layer "+ i + " : " + minActivation);
-			vTraces[i] = new EligibilityTraces(1, pcs[i].num_cells, v_traceDecay[i], minActivation);
-			qTraces[i] = new QTraces(numActions, pcs[i].num_cells, q_traceDecay[i], minActivation);
+			float v_min = (float)Math.pow(v_traceDecay[i], 3) / average_active_pcs;
+			float q_min = (float)Math.pow(q_traceDecay[i], 3) / average_active_pcs;
+
+			System.out.println("min activation layer "+ i + " : " + v_min);
+			vTraces[i] = new EligibilityTraces(1, pcs[i].num_cells, v_traceDecay[i], v_min);
+			qTraces[i] = new QTraces(numActions, pcs[i].num_cells, q_traceDecay[i], q_min);
 		}
 		
 		
