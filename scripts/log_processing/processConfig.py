@@ -127,7 +127,7 @@ def merge_runtimes_from_all_rats(config_folder, sample_rate):
 def merge_seeds_from_all_rats(config_folder, config_number):
     num_rats = len(glob.glob(config_folder + "r*-V0.bin"))
     rats  = np.arange(num_rats, dtype=np.uint8)
-    seeds = np.zeros(num_rats, dtype=np.int64)
+    seeds = np.zeros(num_rats, dtype=np.uint64)
     file_name = config_folder + "r{}-seed.bin"
     for rat_id in range(0, num_rats):
         with open(file_name.format(rat_id), 'rb') as file:

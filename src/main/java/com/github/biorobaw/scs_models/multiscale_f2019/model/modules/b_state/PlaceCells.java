@@ -18,7 +18,7 @@ import com.github.biorobaw.scs.utils.math.Floats;
 public class PlaceCells {
 	
 	// minimum activation of a place cell (value at its border)
-	static final float min_activation = 0.2f;
+	static final float min_activation = 0.001f;
 	static final float numerical_error_tolerance = 0.01f; // 1cm
 	
 	// total number of cells in the set

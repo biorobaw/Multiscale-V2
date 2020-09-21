@@ -1,50 +1,52 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>com.github.biorobaw.scs_models</groupId>
-  <artifactId>Multiscale-F2019</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
-  <name>Multiscale-F2019</name>
-  <description>This project contains the extension of the multiscale model, developed in fall 2019.</description>
-  
-  <properties>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.github.biorobaw.scs_models</groupId>
+	<artifactId>Multiscale-F2019</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<name>Multiscale-F2019</name>
+	<description>This project contains the extension of the multiscale model, developed in fall 2019.</description>
+
+	<properties>
 		<maven.compiler.source>10</maven.compiler.source>
 		<maven.compiler.target>10</maven.compiler.target>
-  </properties>
-  
+	</properties>
 
-  <dependencies>
-  	<dependency>
-  		<groupId>com.github.biorobaw</groupId>
-  		<artifactId>scs</artifactId>
-  		<version>4.0.0-SNAPSHOT</version>
-  	</dependency>
-	<dependency>
-	    <groupId>org.apache.commons</groupId>
-	    <artifactId>commons-lang3</artifactId>
-	    <version>3.9</version>
-	</dependency>
-  </dependencies>
-  
-  <build>
-	  <plugins>
-	  	<plugin>
-	  		<artifactId>maven-assembly-plugin</artifactId>
-			<executions>
-				<execution>
-					<phase>package</phase>
-					<goals>
-						<goal>single</goal>
-					</goals>
-				</execution>
-			</executions>
-			<configuration>
-				<descriptorRefs>
-					<descriptorRef>jar-with-dependencies</descriptorRef>
-				</descriptorRefs>
-			</configuration>
-	  	</plugin>
-	  </plugins>
-  </build>
-  	
-  
+
+	<dependencies>
+		<dependency>
+			<groupId>com.github.biorobaw</groupId>
+			<artifactId>scs</artifactId>
+			<version>4.0.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.9</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+
 </project>

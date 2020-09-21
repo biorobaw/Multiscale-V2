@@ -141,8 +141,10 @@ public class MultiscaleModel extends Subject{
 			
 		}
 		
+		System.out.println("average active pcs: " + average_active_pcs);
 		for(int i=0; i<numScales; i++) {
 			float minActivation = 0.7f*0.7f*0.7f / average_active_pcs;
+			System.out.println("min activation layer "+ i + " : " + minActivation);
 			vTraces[i] = new EligibilityTraces(1, pcs[i].num_cells, v_traceDecay[i], minActivation);
 			qTraces[i] = new QTraces(numActions, pcs[i].num_cells, q_traceDecay[i], minActivation);
 		}
@@ -169,14 +171,28 @@ public class MultiscaleModel extends Subject{
 		cycles++;
 		
 		
-//		if((Integer)Experiment.get().getGlobal("episode") == 0)
-//			if((Long)Experiment.get().getGlobal("cycle") == 0)
+		// ==================== DEBUG =================================
+		
+//		int debug_episode = 80000;
+//		long debug_cycle  = 7;
+//		int episode = (Integer)Experiment.get().getGlobal("episode");
+//		long cycle = (Long)Experiment.get().getGlobal("cycle");
+//		
+//		boolean is_debug_episode =  episode == debug_episode;
+//		boolean is_debug_cycle = is_debug_episode &&  cycle == debug_cycle;
+//		boolean is_above_debug_cycle = is_debug_episode && cycle >= debug_cycle;
+
+//		if(is_debug_cycle) {
 //				SimulationControl.togglePause();
+//			}
 //		int a =1;
 //		while(a!=0);
 		
 //		System.out.println("cycle: " + cycles);
 
+		
+		// ================= END DEBUG =================================
+		
 		tics[tics.length-1] = Debug.tic();
 		
 		
@@ -195,8 +211,29 @@ public class MultiscaleModel extends Subject{
 		for(int i=0; i<numScales; i++) pc_bins[i].active_pcs.normalize(totalActivity);
 		tocs[1] = Debug.toc(tics[1]);
 		
-		
-		
+		// DEBUG BLOCK
+//		if(is_above_debug_cycle) {
+//			
+//			System.out.println("Traces");
+//			var traces = vTraces[0].traces[0];
+//			var non_zero = vTraces[0].non_zero[0];
+//			for(var id : non_zero ) {
+//				System.out.println(id + " : " + String.format("%.3f",traces[id]));
+//			}
+//			
+//			var pcs = pc_bins[0].active_pcs;
+//			System.out.println("PC (ns,vs): ");
+//			float debug_bootstrap = 0;
+//			for(int j=0; j<pcs.num_cells; j++ ) {
+//				System.out.println(pcs.ids[j] + 
+//						" : "   + String.format("%.3f", pcs.ns[j]) 
+//						+ ","   + String.format("%.3f", vTable[0][pcs.ids[j]]));
+//				debug_bootstrap+= vTable[0][pcs.ids[j]] * pcs.ns[j];
+//			}
+//			System.out.println("bootstrap: " + debug_bootstrap);
+//			System.out.println();
+//						
+//		}
 		
 		tics[2] = Debug.tic();
 		// If not initial cycle, update state and action values
@@ -219,12 +256,23 @@ public class MultiscaleModel extends Subject{
 			float error = bootstrap - oldStateValue;
 			
 			// update RL
+			// DEBUG CODE BLOCK
+//			boolean toggle_pause = false;
+//			int 	cell_id;
+//			float 	maxDV = 0;;
+			
 			for(int i=0; i<numScales; i++) {
 				// update V
 				// v = v + error*learning_rate*trace
 				if(actionWasOptimal || error >0  || true) {
 					var traces = vTraces[i].traces[0];
 					for(var id : vTraces[i].non_zero[0]) {
+						// DEBUG CODE BLOCK
+//						if(Math.abs(error*v_learningRate[i]*traces[id]) > 1) {
+//							toggle_pause = true;
+//							maxDV = error*v_learningRate[i]*traces[id];
+//							System.out.println(id + " " + traces[id] + " " + error + " " + v_learningRate[i]);
+//						}
 						vTable[i][id]+=  error*v_learningRate[i]*traces[id];
 					}
 				}
@@ -237,6 +285,13 @@ public class MultiscaleModel extends Subject{
 						qTable[i][id][j] += error*q_learningRate[i]*traces[id];
 				}
 			}
+	
+			// DEBUG CODE BLOCK
+//			if(toggle_pause) {
+//
+//				SimulationControl.togglePause();
+//			}
+			
 		}
 		tocs[2] = Debug.toc(tics[2]);
 		
@@ -245,8 +300,9 @@ public class MultiscaleModel extends Subject{
 		tics[3] = Debug.tic();
 		oldStateValue = 0f;
 		qValues = new float[numActions];
-//		System.out.println("new cycle");
-//		System.out.println(Arrays.toString(qValues));
+		
+
+		
 		for(int i=0; i<numScales; i++) {
 			var pcs = pc_bins[i].active_pcs;
 			var ids = pcs.ids;
@@ -257,11 +313,12 @@ public class MultiscaleModel extends Subject{
 				oldStateValue+= vTable[i][ids[j]]*activation;
 
 				for(int k=0; k<numActions; k++)
-					qValues[k]+= qTable[i][ids[j]][k]*activation;
-					
+					qValues[k]+= qTable[i][ids[j]][k]*activation;	
 			}
-
 		}
+		
+
+		
 		tocs[3] = Debug.toc(tics[3]);
 		
 		// perform action selection
@@ -377,6 +434,17 @@ public class MultiscaleModel extends Subject{
 			episodeDeltaV = Math.max(episodeDeltaV, Floats.max(Floats.abs(dif,dif)));
 			
 		}
+		
+		// DEBUG CODE BLOCK
+//		if(episodeDeltaV > 1) {
+//			System.out.println("" + Experiment.get().getGlobal("episode") 
+//					+ ", " + cell_id
+//					+ ": " + episodeDeltaV);
+//			System.out.println("ERROR: DeltaV = " + episodeDeltaV);
+//			System.out.println("At episode: " + Experiment.get().getGlobal("episode"));
+//			System.exit(-1);
+//			SimulationControl.togglePause();
+//		}
 //		System.out.println(episodeDeltaV);
 		
 	}

@@ -74,6 +74,8 @@ public class PlaceCellBins {
 			var y = pcs.ys[k]; // pc y coordinate
 			var r = pcs.rs[k]; // pc radius
 			
+			System.out.println("PC " + id +": " + x + " " + y);
+			
 			// get bins that the place field may intersect
 			var minBins = getBin(x-r, y-r);
 			var maxBins = getBin(x+r, y+r);
