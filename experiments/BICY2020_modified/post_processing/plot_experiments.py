@@ -227,6 +227,7 @@ def plot_experiment(folder):
     experiment_map['3'] = ( plot_scale_experiment                     , 5 )
     experiment_map['4'] = ( plot_experiment4_extraAtFeeder            , 5 )
     experiment_map['5'] = ( plot_experiment_traces_and_nx_per_maze    , 10)
+    experiment_map['6'] = ( plot_experiment4_extraAtFeeder            , 5 )
 
     # plot the experiment
     e = experiment_map[experiment_name]
