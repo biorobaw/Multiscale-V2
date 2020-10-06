@@ -3,6 +3,8 @@ from plotnine import *
 import os
 import numpy as np
 from .data_loader import *
+from .pythonUtils.BinaryFiles import *
+from .pythonUtils.MazeParser import parse_maze
 
 """
    This file is to be called after processAllConfigs,
@@ -161,9 +163,33 @@ def plot_deltaV(db, configs, location, episode, group_name,
                      )
 
 
+def plot_paths(title, config_folder, config_df, save_name):
+
+    # first plot paths and then plot maze
+    # create plot
+    p = ggplot() + ggtitle(title)
+
+    # plot paths
+    for id in range(100):
+        # check if file exists
+        # file_name = os.path.join(config_folder, f'r{id}-paths.bin')
+        if not os.path.exists(file_name):
+            continue
+
+        print(file_name, save_name)
+        # open file and plot each path
+        with open( file_name, 'rb') as file:
+            for i in range(int(config_df['numStartingPositions'])):
+                xy_df = pd.DataFrame(data=load_float_vector(file).reshape((-1, 2)), columns=["x", "y"])
+                p = p + geom_path(aes(x='x', y='y'), data=xy_df, color='blue')
 
 
+    # plot maze
+    maze_file = os.path.join(config_folder, '../../mazes', config_df['mazeFile'])
+    walls, feeders, start_positions = parse_maze(maze_file)
+    p = p + geom_segment(aes(x='x1', y='y1', xend='x2', yend='y2'), data=walls, color='k')
+    p = p + geom_point(aes(x='x', y='y'), data=feeders, color='r')
+    p = p + coord_fixed(ratio = 1)
 
-
-
-
+    # save plot
+    ggsave(p, save_name, dpi=300)

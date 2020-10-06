@@ -66,6 +66,7 @@
 		</episodeTasks>
 		<cycleTasks>
 			<!-- the name of task nodes does not matter, you can name them however you wish -->
+			<logLastPaths class="$(PROJECT).tasks.LogLastPaths" subject_id="sub_1"/>
 			<maxCyclesCondition class="$(SCS).tasks.cycle.condition.MaxCycles"
 								cycles="4000"/> 
 			<noFoodLeftCondition class="$(SCS).tasks.cycle.condition.food.NoFoodLeft" /> 

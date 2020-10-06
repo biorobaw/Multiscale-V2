@@ -59,6 +59,10 @@ public class SetInitialPosition implements Script{
 	static public int getStartIndex() {
 		return permutation[currentPos];
 	}
+	
+	static public int getNumberOfStrartingPositions() {
+		return positions.size();
+	}
 
 	static private int[] generatePermutation(int size) {
 //		System.out.println("Generating permutation...");
