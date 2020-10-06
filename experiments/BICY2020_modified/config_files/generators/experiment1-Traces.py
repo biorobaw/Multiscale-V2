@@ -11,7 +11,7 @@ rat_ids = [i for i in range(ratsPerConfig)]
 # MAZE RELATED FIELDS
 mazeWidth   = 2.2
 mazeHeight  = 3
-mazes       = ['M1.xml']
+mazes       = ['M0.xml', 'M1.xml']
 mazesPath   = 'experiments/mazes' # relative to git root folder
 episodesPerStartingLocation = 10000
 

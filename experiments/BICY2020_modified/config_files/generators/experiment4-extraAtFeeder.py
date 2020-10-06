@@ -47,8 +47,8 @@ My = 1.2 + dy*(ny-1)/2.0      # max y
 single_layers.loc[14] = (r, mx, Mx, nx, my, My, ny)
 
 # add traces to the single layers and the convert columns to strings:
-single_layers['traces'] = 0.7
-final_columns = ['pcSizes', 'minX', 'maxX', 'numX', 'minY', 'maxY', 'numY', 'traces']
+# single_layers['traces'] = 0.7
+final_columns = ['pcSizes', 'minX', 'maxX', 'numX', 'minY', 'maxY', 'numY']
 single_layers.numX = single_layers.numX.astype(int)  # must set to int before string
 single_layers.numY = single_layers.numY.astype(int)  # myst set to int before string
 for c in final_columns:
@@ -65,6 +65,8 @@ combined_layers['key'] = 0  # the constant key is required to perform following 
 
 
 
+traces = [','.join([str(i/10),str(i/10)]) for i in range(10)]
+
 
 # GENERATE DATA FRAMES
 experiment_DF = dataFrame('experiment', experiment)
@@ -72,6 +74,7 @@ group_DF      = dataFrame('group',      group)
 ratIds_DF     = dataFrame('run_id',     rat_ids)
 mazes_DF      = generateMazeDF(mazesPath, mazes)
 pcs_DF        = combined_layers
+traces_DF     = dataFrame('traces', traces)
 
 
 
@@ -79,7 +82,7 @@ pcs_DF        = combined_layers
 #generate table
                              
 #Combine tables
-noRats = reduce(allXall , [experiment_DF, group_DF, mazes_DF, pcs_DF] )
+noRats = reduce(allXall , [experiment_DF, group_DF, mazes_DF, pcs_DF, traces_DF] )
 noRats = createConfigColumn(noRats)
 noRats['numEpisodes'] = noRats['numStartingPositions']*episodesPerStartingLocation
 

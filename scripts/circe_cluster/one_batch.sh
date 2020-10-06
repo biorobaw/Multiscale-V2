@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --time=2:40:00
+#SBATCH --time=4:00:00
 #SBATCH --cpus-per-task 2 
 #SBATCH --mem=1000M
 ##SBATCH -p mri2016
