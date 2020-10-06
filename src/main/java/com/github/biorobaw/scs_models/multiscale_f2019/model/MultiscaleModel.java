@@ -14,6 +14,7 @@ import com.github.biorobaw.scs.robot.modules.distance_sensing.DistanceSensingMod
 import com.github.biorobaw.scs.robot.modules.localization.SlamModule;
 import com.github.biorobaw.scs.simulation.SimulationControl;
 import com.github.biorobaw.scs.utils.Debug;
+import com.github.biorobaw.scs.utils.files.BinaryFile;
 import com.github.biorobaw.scs.utils.files.XML;
 import com.github.biorobaw.scs.utils.math.DiscreteDistribution;
 import com.github.biorobaw.scs.utils.math.Floats;
@@ -98,6 +99,8 @@ public class MultiscaleModel extends Subject{
 		q_traceDecay = xml.getFloatArrayAttribute("q_traces");
 		q_learningRate = xml.getFloatArrayAttribute("q_learningRate");
 		discountFactor = xml.getFloatAttribute("discountFactor");
+		
+		boolean load_model = xml.hasAttribute("load_model") && xml.getBooleanAttribute("load_model");
 
 		foodReward = xml.getFloatAttribute("foodReward");
 		
@@ -136,8 +139,21 @@ public class MultiscaleModel extends Subject{
 			
 			average_active_pcs += pc_bins[i].averageBinSize;
 			
-			vTable[i] = new float[pcs[i].num_cells];
-			qTable[i] = new float[pcs[i].num_cells][numActions];
+			if(!load_model) {
+				vTable[i] = new float[pcs[i].num_cells];
+				qTable[i] = new float[pcs[i].num_cells][numActions];
+				
+			} else {
+				
+				var e = Experiment.get();
+				String logFolder   = e.getGlobal("logPath").toString();
+				String ratId	   = e.getGlobal("run_id").toString();
+				String save_prefix = logFolder  +"/r" + ratId + "-";
+//				System.out.println(save_prefix);
+				vTable[i] = BinaryFile.loadFloatVector(save_prefix + "V" + i+ ".bin", true);
+				qTable[i] = BinaryFile.loadMatrix(save_prefix + "Q" + i+ ".bin", true);				
+				
+			}
 			
 		}
 		
@@ -478,4 +494,5 @@ public class MultiscaleModel extends Subject{
 //			e.printStackTrace();
 //		}
 	}
+	
 }

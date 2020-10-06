@@ -18,6 +18,7 @@
 		  file="$(mazeFile)" />
 
 	<template id="model" class="$(PROJECT).model.MultiscaleModel"
+		load_model="false"
 		numActions="$(numActions)" 
 		mazeWidth="2.2"
 		mazeHeight="3.0"
