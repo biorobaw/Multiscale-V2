@@ -186,23 +186,33 @@ def plot_experiment4_extraAtFeeder(figure_folder, configs, sample_rate, db):
     last_episode = -sample_rate % num_episodes
 
     # plot each scale separately
-    for maze, sub_configs in configs.groupby(['mazeFile']):
+    for maze, sub_configs1 in configs.groupby(['mazeFile']):
         # get indices and format text for the plots
         maze = ntpath.basename(maze)[1:-4]
         print('plotting maze: ', maze)
 
-        # plot titles and legends:
+        maze_figure_folder = figure_folder + 'M' + maze + '/'
+        make_folder(maze_figure_folder)
 
-        group_name = f'M{maze}'
-        legend_title = 'PC radius (cm)'
-        legend_values = sub_configs.pcSizes # (sub_configs.pcSizes * 100).map("{0:.2f}".format)
-        plot_title = f"Maze {maze}"
+        # plot each scale separately
+        for trace, sub_configs in sub_configs1.groupby(['traces']):
+            # get indices and format text for the plots
+            # nx_str = "{0:.2f}".format(scale)  # convert to string and format
+            print('plotting trace: ', trace)
 
-        plot_runtimes_boxplots_dunntest(db, sub_configs, location, last_episode, group_name,
-                                        legend_title, legend_values, plot_title, figure_folder)
+            # plot titles and legends:
 
-        plot_deltaV(db, sub_configs, location, last_episode, group_name,
-                    legend_title, legend_values, plot_title, figure_folder)
+            group_name = f'M{maze}-t{trace:.1f}'
+            legend_title = 'PC radius (cm)'
+            legend_values = sub_configs.pcSizes  # (sub_configs.pcSizes * 100).map("{0:.2f}".format)
+            plot_title = f"Maze {maze} - Trace {trace:.1f}"
+
+            plot_runtimes_boxplots_dunntest(db, sub_configs, location, last_episode, group_name,
+                                            legend_title, legend_values, plot_title, maze_figure_folder)
+
+            plot_deltaV(db, sub_configs, location, last_episode, group_name,
+                        legend_title, legend_values, plot_title, maze_figure_folder)
+
 
 
 def plot_experiment(folder):
