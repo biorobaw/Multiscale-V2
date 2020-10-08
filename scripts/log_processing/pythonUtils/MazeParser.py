@@ -11,7 +11,7 @@ def parse_feeder(xml_feeder):
 
 
 def parse_all_feeders(root):
-    return pd.concat([parse_feeder(xml_feeder) for xml_feeder in root.findall('feeder')]).reset_index(drop=True)
+    return pd.concat([pd.DataFrame(columns=['fid', 'x', 'y'])] + [parse_feeder(xml_feeder) for xml_feeder in root.findall('feeder')]).reset_index(drop=True)
 
 
 def parse_wall(xml_wall):
@@ -20,12 +20,12 @@ def parse_wall(xml_wall):
 
 
 def parse_all_walls(xml_root):
-    return pd.concat([parse_wall(xml_wall) for xml_wall in xml_root.findall('wall')]).reset_index(drop=True)
+    return pd.concat([pd.DataFrame(columns=['x1', 'y1', 'x2', 'y2'])]  + [parse_wall(xml_wall) for xml_wall in xml_root.findall('wall')]).reset_index(drop=True)
 
 
 def parse_all_generators(xml_root):
     wall_sets = [generator_parsers[g.get('class')](g) for g in xml_root.findall('generator')]
-    return pd.concat(wall_sets).reset_index(drop=True)
+    return pd.concat([pd.DataFrame(columns=['x1', 'y1', 'x2', 'y2'])] + wall_sets).reset_index(drop=True)
 
 
 def parse_rectangle(xml_rectangle):
