@@ -53,7 +53,7 @@ def plot_experiment(folder):
     experiment_name = ntpath.basename((ntpath.normpath(folder)))\
                             .split(sep='-')[0][10:]  # all experiments use syntax 'experimentN-...'
 
-    experiment_name = '1'
+    # experiment_name = '1'
     e_formatters = {
         '1': [format_maze, format_trace, format_scale],
         '2': [format_maze, format_scale],

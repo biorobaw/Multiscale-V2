@@ -172,7 +172,7 @@ def plot_paths(title, config_folder, config_df, save_name):
     # plot paths
     for id in range(100):
         # check if file exists
-        # file_name = os.path.join(config_folder, f'r{id}-paths.bin')
+        file_name = os.path.join(config_folder, f'r{id}-paths.bin')
         if not os.path.exists(file_name):
             continue
 
