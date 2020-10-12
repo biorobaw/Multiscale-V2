@@ -202,10 +202,10 @@ def plot_experiment4_extraAtFeeder(figure_folder, configs, sample_rate, db):
 
             # plot titles and legends:
 
-            group_name = f'M{maze}-t{trace:.1f}'
+            group_name = f'M{maze}-t{trace}'
             legend_title = 'PC radius (cm)'
             legend_values = sub_configs.pcSizes  # (sub_configs.pcSizes * 100).map("{0:.2f}".format)
-            plot_title = f"Maze {maze} - Trace {trace:.1f}"
+            plot_title = f"Maze {maze} - Trace {trace}"
 
             plot_runtimes_boxplots_dunntest(db, sub_configs, location, last_episode, group_name,
                                             legend_title, legend_values, plot_title, maze_figure_folder)
