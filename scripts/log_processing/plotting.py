@@ -176,7 +176,7 @@ def plot_paths(title, config_folder, config_df, save_name):
         if not os.path.exists(file_name):
             continue
 
-        print(file_name, save_name)
+        # print(file_name, save_name)
         # open file and plot each path
         with open( file_name, 'rb') as file:
             for i in range(int(config_df['numStartingPositions'])):
