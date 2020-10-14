@@ -58,9 +58,9 @@ def plot_experiment(folder):
         '1': [format_maze, format_trace, format_scale],
         '2': [format_maze, format_scale],
         '3': [format_maze, format_scale],
-        '4': [format_maze, lambda c: f's{c["pcSizes"]}'],
+        '4': [format_maze, lambda c: f's{c["pcSizes"]}', lambda c: f't{c["traces"]}'],
         '5': [format_maze, format_trace, format_nx],
-        '6': [format_maze, lambda c: f's{c["pcSizes"]}']
+        '6': [format_maze, lambda c: f's{c["pcSizes"]}', lambda c: f't{c["traces"]}']
     }
 
     for index, config in configs.iterrows():
