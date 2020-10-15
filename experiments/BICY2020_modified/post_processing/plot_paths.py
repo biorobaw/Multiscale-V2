@@ -38,22 +38,18 @@ def apply_formatters( config, formatters):
     return  '-'.join([f(config) for f in formatters])
 
 
-def plot_experiment(folder):
-    # get experiment folder
-    folder = os.path.join(sys.argv[1], '')
+def plot_config(experiment_folder, config, config_id):
 
-    # load configs and connect to database
-    configs = load_config_file(folder)
-
-    # create figures folder
-    figure_folder = folder + 'figures/paths/'
-    make_folder(figure_folder)
-
-    # plot the experiment
-    experiment_name = ntpath.basename((ntpath.normpath(folder)))\
+    # check which experiment to plot
+    experiment_name = ntpath.basename((ntpath.normpath(experiment_folder)))\
                             .split(sep='-')[0][10:]  # all experiments use syntax 'experimentN-...'
 
-    # experiment_name = '1'
+    # get folder names (create figure folder if necessary)
+    config_folder = f'{experiment_folder}configs/{config_id}/'
+    figure_folder = experiment_folder + 'figures/paths/'
+    make_folder(figure_folder)
+
+    # get format for configuration name
     e_formatters = {
         '1': [format_maze, format_trace, format_scale],
         '2': [format_maze, format_scale],
@@ -62,15 +58,29 @@ def plot_experiment(folder):
         '5': [format_maze, format_trace, format_nx],
         '6': [format_maze, lambda c: f's{c["pcSizes"]}', lambda c: f't{c["traces"]}']
     }
+    config_title = apply_formatters(config, e_formatters[experiment_name])
+    save_name = os.path.join(figure_folder, 'paths_' + config_title + '.pdf')
 
-    for index, config in configs.iterrows():
-        format = apply_formatters(config, e_formatters[experiment_name])
-        plot_title = format
-        config_folder = f'{folder}configs/{index}/'
-        save_name = os.path.join(figure_folder, 'paths_' + format + '.pdf')
-        plot_paths(plot_title, config_folder , config, save_name)
+    # plot configuration
+
+    plot_paths(config_title, config_folder, config, save_name)
+
+
+def plot_experiment(folder, config_id):
+
+    # load configs and connect to database
+    configs = load_config_file(folder)
+
+    if config_id is None:
+        for index, config in configs.iterrows():
+            plot_config(folder, config, index)
+    else:
+        plot_config(folder, configs.loc[config_id], config_id)
+
 
 if __name__ == '__main__':
-    folder_arg = sys.argv[1]
+    folder_arg = os.path.join(sys.argv[1], '')
+    config_arg = None if len(sys.argv) < 3 else sys.argv[2]
     # folder_arg = 'D:/JavaWorkspaceSCS/Multiscale-F2019/experiments/BICY2020_modified/logs/experiment1-traces/'
-    plot_experiment(folder_arg)
+    plot_experiment(folder_arg, config_arg)
+
