@@ -65,7 +65,7 @@ public class PlaceCells {
 		// get column names:
 		var columns = new HashMap<String, Integer>();
 		for(int i=0; i<3; i++) {
-			columns.put(pc_data[0][i], i);
+			columns.put(pc_data[0][i].trim(), i);
 		}
 		int x_id = columns.get("x");
 		int y_id = columns.get("y");
