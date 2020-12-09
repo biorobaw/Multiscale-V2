@@ -4,7 +4,7 @@ import os
 import numpy as np
 from .data_loader import *
 from .pythonUtils.BinaryFiles import *
-from .pythonUtils.MazeParser import parse_maze
+from .utils.MazeParser import parse_maze
 
 """
    This file is to be called after processAllConfigs,

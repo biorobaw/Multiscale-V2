@@ -1,4 +1,4 @@
-from pythonUtils.MazeParser import *
+from ..utils.MazeParser import *
 from plotnine import *
 import math
 import pandas as pd

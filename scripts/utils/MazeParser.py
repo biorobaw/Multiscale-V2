@@ -51,7 +51,9 @@ def parse_position(xml_position):
 
 
 def parse_start_positions(xml_positions):
-    return pd.concat([parse_position(xml_pos) for xml_pos in xml_positions.findall('pos')]).reset_index(drop=True)
+    if xml_positions is None:
+        return [pd.DataFrame(columns=['x', 'y', 'w'])]
+    return pd.concat([pd.DataFrame(columns=['x', 'y', 'w'])] + [parse_position(xml_pos) for xml_pos in xml_positions.findall('pos')]).reset_index(drop=True)
 
 
 def parse_maze(file):
