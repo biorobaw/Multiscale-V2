@@ -35,7 +35,7 @@ traces_DF     = dataFrame('traces', traces)
 #generate table
                              
 #Combine tables
-noRats = reduce(allXall , [experiment_DF, group_DF, mazes_DF, pcs_DF, traces_DF] )
+noRats = reduce(allXall , [experiment_DF, group_DF, oneXone(mazes_DF, pcs_DF), traces_DF] )
 noRats = createConfigColumn(noRats)
 noRats['numEpisodes'] = noRats['numStartingPositions']*episodesPerStartingLocation
 
