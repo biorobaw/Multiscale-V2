@@ -3,12 +3,12 @@
 
 <experiment>
 
-	<!-- removed seed="1008" from variables, seed="1977393959781007236"-->
+	<!-- removed seed="1008" from variables, seed="1977393959781007236" seed="3092299512224473078"-->
 	<variables  PROJECT="com.github.biorobaw.scs_models.multiscale_f2019" numActions="8"/>
 	
 	<!-- SCSDisplay vs NoDisplay -->
 	<display class="$(SCS).gui.displays.NoDisplay"
-		window="-2,-2,4,4" syncDisplay="false " />
+		window="-2,-2,4,4" syncDisplay="false" />
 		
 	<simulator
 		class="$(SCS).simulation.scs_simulator.SCSSimulator"
@@ -23,6 +23,7 @@
 		mazeWidth="2.2"
 		mazeHeight="3.0"
 		
+		pc_files="$(pc_files)"
 		pcSizes="$(pcSizes)"
 		minX="$(minX)"
 		maxX="$(maxX)"

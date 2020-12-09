@@ -35,7 +35,7 @@ public class MultiscaleModel extends Subject{
 	public float[] q_learningRate;
 	public float discountFactor;
 	public float foodReward;
-	public int numScales;
+	public int num_layers;
 
 	// Model Parameters: Action Space
 	public int numActions;
@@ -77,34 +77,13 @@ public class MultiscaleModel extends Subject{
 	public MultiscaleModel(XML xml) {
 		super(xml);
 		
-		// ======== PARAMETERS ===============
+		// ======== GENERAL PARAMETERS ===============
 
 		numActions = xml.getIntAttribute("numActions");
-
 		float mazeWidth = xml.getFloatAttribute("mazeWidth");
 		float mazeHeight = xml.getFloatAttribute("mazeHeight");
 
-		var pcSizes = xml.getFloatArrayAttribute("pcSizes");
-		var minX  = xml.getFloatArrayAttribute("minX");
-		var maxX  = xml.getFloatArrayAttribute("maxX");
-		var numX  = xml.getIntArrayAttribute("numX");
-		var minY  = xml.getFloatArrayAttribute("minY");
-		var maxY  = xml.getFloatArrayAttribute("maxY");
-		var numY  = xml.getIntArrayAttribute("numY");
-		numScales = pcSizes.length;
-		var pc_bin_size  = xml.getFloatAttribute("pc_bin_size");
-		
-		v_traceDecay = xml.getFloatArrayAttribute("v_traces");
-		v_learningRate = xml.getFloatArrayAttribute("v_learningRate");
-		q_traceDecay = xml.getFloatArrayAttribute("q_traces");
-		q_learningRate = xml.getFloatArrayAttribute("q_learningRate");
-		discountFactor = xml.getFloatAttribute("discountFactor");
-		
-		boolean load_model = xml.hasAttribute("load_model") && xml.getBooleanAttribute("load_model");
-
-		foodReward = xml.getFloatAttribute("foodReward");
-		
-		// ======== Model Input ====================
+		// ======== MODEL INPUT ======================
 		
 		// get robot modules
 		slam = robot.getModule("slam");
@@ -116,28 +95,59 @@ public class MultiscaleModel extends Subject{
 		
 		// Joystick module for testing purposes:
 		// joystick = new JoystickModule();
+		
+		// ======== MODEL STATE =======================
+		
+		var pc_bin_size  = xml.getFloatAttribute("pc_bin_size");
+		pcs = PlaceCells.load(xml);	
+		num_layers = pcs.length;
+		
+		pc_bins = new PlaceCellBins[num_layers];
+		for(int i=0; i<num_layers; i++)
+			pc_bins[i] = new PlaceCellBins(pcs[i], pc_bin_size);
+	
+		
+		
+		// ======== TRACES =============================
+		
+		v_traceDecay = xml.getFloatArrayAttribute("v_traces");
+		q_traceDecay = xml.getFloatArrayAttribute("q_traces");
+		
+		vTraces = new EligibilityTraces[num_layers];
+		qTraces = new QTraces[num_layers];
+		
+		
+		// need to find average number of active place cells:
+		float average_active_pcs = 0;
+		for (var bins : pc_bins) average_active_pcs += bins.averageBinSize;
+		System.out.println("average active pcs: " + average_active_pcs);
 
+		//  create traces
+		for(int i=0; i<num_layers; i++) {
+			// choose min trace threshold (traces below the threshold are set to 0)
+			float v_min = (float)Math.pow(v_traceDecay[i], 3) / average_active_pcs;
+			float q_min = (float)Math.pow(q_traceDecay[i], 3) / average_active_pcs;
+			System.out.println("min activation layer "+ i + " : " + v_min);
+
+			vTraces[i] = new EligibilityTraces(1, pcs[i].num_cells, v_traceDecay[i], v_min);
+			qTraces[i] = new QTraces(numActions, pcs[i].num_cells, q_traceDecay[i], q_min);
+		}
 		
-		// ======== Model Variables: STATE AND RL ==========
-		pcs = new PlaceCells[numScales];
-		pc_bins = new PlaceCellBins[numScales];
-		vTraces = new EligibilityTraces[numScales];
-		qTraces = new QTraces[numScales];
+		// ======== REINFORCEMENT LEARNING ===========
 		
-		vTable = new float[numScales][];
-		vTableCopy = new float[numScales][];
-		qTable = new float[numScales][][];
+		boolean load_model	= xml.hasAttribute("load_model") && xml.getBooleanAttribute("load_model");
+		v_learningRate 		= xml.getFloatArrayAttribute("v_learningRate");
+		q_learningRate 		= xml.getFloatArrayAttribute("q_learningRate");
+		discountFactor 		= xml.getFloatAttribute("discountFactor");
+		foodReward 	   		= xml.getFloatAttribute("foodReward");
+		
+		vTable = new float[num_layers][];
+		vTableCopy = new float[num_layers][];
+		qTable = new float[num_layers][][];
 		qValues = new float[numActions];
 		
-		float average_active_pcs = 0;
-		for(int i=0; i<numScales; i++) {
-			System.out.println("layer: " 
-						+ minX[i] + " " + maxX[i] + " " + numX[i] + " " 
-						+ minY[i] + " " + maxY[i]+ " " + numY[i] + " " + pcSizes[i]);
-			pcs[i] = new PlaceCells(minX[i], maxX[i], numX[i],minY[i], maxY[i], numY[i], pcSizes[i]); // added 1 cm to pcs to avoid precision issues
-			pc_bins[i] = new PlaceCellBins(pcs[i], pc_bin_size);
-			
-			average_active_pcs += pc_bins[i].averageBinSize;
+		
+		for(int i=0; i<num_layers; i++) {
 			
 			if(!load_model) {
 				vTable[i] = new float[pcs[i].num_cells];
@@ -157,22 +167,16 @@ public class MultiscaleModel extends Subject{
 			
 		}
 		
-		System.out.println("average active pcs: " + average_active_pcs);
-		for(int i=0; i<numScales; i++) {
-			float v_min = (float)Math.pow(v_traceDecay[i], 3) / average_active_pcs;
-			float q_min = (float)Math.pow(q_traceDecay[i], 3) / average_active_pcs;
+		
+		// ======== ACTION SELECTION =======================
 
-			System.out.println("min activation layer "+ i + " : " + v_min);
-			vTraces[i] = new EligibilityTraces(1, pcs[i].num_cells, v_traceDecay[i], v_min);
-			qTraces[i] = new QTraces(numActions, pcs[i].num_cells, q_traceDecay[i], q_min);
-		}
-		
-		
-		// Model variables: action selection
 		int numStartingPositions = Integer.parseInt(Experiment.get().getGlobal("numStartingPositions"));
 		motionBias = new MotionBias(numActions, 50*numStartingPositions);
 		softmax = new float[numActions];
 		possible = new float[numActions];
+		
+		
+		// ======== GUI ====================================
 		
 		gui = new GUI(this);
 		
@@ -224,9 +228,9 @@ public class MultiscaleModel extends Subject{
 		tics[1] = Debug.tic();
 		// calculate state
 		float totalActivity =0;
-		for(int i=0; i<numScales; i++) 
+		for(int i=0; i<num_layers; i++) 
 			totalActivity+=pc_bins[i].activateBin((float)pos.getX(), (float)pos.getY());
-		for(int i=0; i<numScales; i++) pc_bins[i].active_pcs.normalize(totalActivity);
+		for(int i=0; i<num_layers; i++) pc_bins[i].active_pcs.normalize(totalActivity);
 		tocs[1] = Debug.toc(tics[1]);
 		
 		// DEBUG BLOCK
@@ -261,7 +265,7 @@ public class MultiscaleModel extends Subject{
 			if(reward==0 ) {
 				// only calculate next state value if non terminal state
 				float value = 0;
-				for(int i=0; i<numScales; i++) {
+				for(int i=0; i<num_layers; i++) {
 					var pcs = pc_bins[i].active_pcs;
 					for(int j=0; j<pcs.num_cells; j++ ) {
 						value+= vTable[i][pcs.ids[j]]*pcs.ns[j];
@@ -279,7 +283,7 @@ public class MultiscaleModel extends Subject{
 //			int 	cell_id;
 //			float 	maxDV = 0;;
 			
-			for(int i=0; i<numScales; i++) {
+			for(int i=0; i<num_layers; i++) {
 				// update V
 				// v = v + error*learning_rate*trace
 				if(actionWasOptimal || error >0  || true) {
@@ -321,7 +325,7 @@ public class MultiscaleModel extends Subject{
 		
 
 		
-		for(int i=0; i<numScales; i++) {
+		for(int i=0; i<num_layers; i++) {
 			var pcs = pc_bins[i].active_pcs;
 			var ids = pcs.ids;
 			
@@ -383,7 +387,7 @@ public class MultiscaleModel extends Subject{
 		
 		// update traces
 		tics[5] = Debug.tic();
-		for(int i=0; i<numScales; i++) {
+		for(int i=0; i<num_layers; i++) {
 			var pcs = pc_bins[i].active_pcs;
 			vTraces[i].update(pcs.ns, pcs.ids, 0);
 			qTraces[i].update(pcs.ns, pcs.ids, chosenAction, learning_dist);
@@ -418,7 +422,7 @@ public class MultiscaleModel extends Subject{
 		super.newEpisode();
 		motionBias.newEpisode();
 		
-		for(int i=0; i<numScales; i++) {
+		for(int i=0; i<num_layers; i++) {
 			vTraces[i].clear();
 			qTraces[i].clear();
 			pc_bins[i].clear();
@@ -430,7 +434,7 @@ public class MultiscaleModel extends Subject{
 		
 		
 		// copy state values:
-		for(int i=0; i < numScales; i++)
+		for(int i=0; i < num_layers; i++)
 			vTableCopy[i] = Floats.copy(vTable[i]);
 				
 	}
@@ -447,7 +451,7 @@ public class MultiscaleModel extends Subject{
 //		System.out.println("percentual:"+ Arrays.toString(percentual));
 		
 		episodeDeltaV = 0;
-		for(int i=0; i < numScales; i++) {
+		for(int i=0; i < num_layers; i++) {
 			var dif = Floats.sub(vTable[i], vTableCopy[i]);
 			episodeDeltaV = Math.max(episodeDeltaV, Floats.max(Floats.abs(dif,dif)));
 			
@@ -494,5 +498,6 @@ public class MultiscaleModel extends Subject{
 //			e.printStackTrace();
 //		}
 	}
+	
 	
 }

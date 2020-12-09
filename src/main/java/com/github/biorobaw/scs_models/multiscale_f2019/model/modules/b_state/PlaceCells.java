@@ -3,9 +3,13 @@ package com.github.biorobaw.scs_models.multiscale_f2019.model.modules.b_state;
 
 
 
+import java.util.HashMap;
+
 import org.apache.commons.lang3.ArrayUtils;
 
 import com.github.biorobaw.scs.experiment.Experiment;
+import com.github.biorobaw.scs.utils.files.CSVReader;
+import com.github.biorobaw.scs.utils.files.XML;
 import com.github.biorobaw.scs.utils.math.Floats;
 
 /**
@@ -38,10 +42,56 @@ public class PlaceCells {
 	public float total_a; // the total activation of the layer (the sum)
 	
 	/**
+	 * Load place cells from a csv file with columns: x, y, r
+	 * @param pc_file
+	 */
+	public PlaceCells(String pc_file) {
+		// pc_file 
+		var pc_data = CSVReader.loadCSV(pc_file, ",");
+		
+		// create arrays
+		num_cells = pc_data.length - 1; // first row should be titles
+		xs = new float[num_cells]; // the x coordinates in the set
+		ys = new float[num_cells]; // the y coordinates in the set
+		rs = new float[num_cells]; // the radii of the cells
+		ks = new float[num_cells]; // the constant part of the pc equation e^(k*d^2) for each cell
+		ids = new int [num_cells]; // the id associated to each cell in the set
+
+		r2s = new float[num_cells]; // precalculated r squared values
+		as  = new float[num_cells]; // the activation of each cell in the set
+		ns  = new float[num_cells]; // normalized activation
+		
+		
+		// get column names:
+		var columns = new HashMap<String, Integer>();
+		for(int i=0; i<3; i++) {
+			columns.put(pc_data[0][i], i);
+		}
+		int x_id = columns.get("x");
+		int y_id = columns.get("y");
+		int r_id = columns.get("r");
+		
+		
+		// get pc data:
+		for(int i=1; i < pc_data.length; i++) {
+			
+			int id = i-1;
+			ids[id] = id;
+			xs[id]  = Float.parseFloat(pc_data[i][x_id]);
+			ys[id]  = Float.parseFloat(pc_data[i][y_id]);
+			rs[id]  = Float.parseFloat(pc_data[i][r_id]);
+			
+			float r_tolerance = rs[id] + numerical_error_tolerance;
+			r2s[id] = r_tolerance*r_tolerance;
+			ks[id] = (float) Math.log(min_activation)/r2s[id];			
+			
+		}
+	}
+	
+	/**
 	 * A constructor for an empty set of place cells
 	 */
 	public PlaceCells() {
-		xs = new float[] {};
 		xs = new float[] {}; // the x coordinates in the set
 		ys = new float[] {}; // the y coordinates in the set
 		rs = new float[] {}; // the radii of the cells
@@ -338,6 +388,7 @@ public class PlaceCells {
 //		System.out.println(pcs);
 //		System.out.println();
 //		
+		
 //		v.put(new INDArrayIndex[] {ids} , v.get(ids).addi(10)); // works!!!
 //		System.out.println("put2?: "+ v);
 //		System.out.println(pcs);
@@ -347,6 +398,53 @@ public class PlaceCells {
 		
 		
 				
+	}
+	
+	
+	public static PlaceCells[] load(XML xml) {
+		
+		PlaceCells pcs[] = null;
+		var files = xml.getStringListAttribute("pc_files");
+		System.out.println("files" + files.size());
+		for( var s : files) System.out.println("f: " + s);
+		
+		if(files.size() > 0) {
+			
+			// get layer parameters
+			
+			
+			// create layers
+			int num_layers = files.size();
+			pcs = new PlaceCells[num_layers];
+			for(int i=0; i<num_layers; i++) {
+				var file = files.get(i);
+				System.out.println("Loading layer "+ i + " from file " + file);
+				pcs[i] = new PlaceCells(file);
+			}
+			
+		} else {
+			// get layer parameters
+			var pcSizes = xml.getFloatArrayAttribute("pcSizes");
+			var minX  = xml.getFloatArrayAttribute("minX");
+			var maxX  = xml.getFloatArrayAttribute("maxX");
+			var numX  = xml.getIntArrayAttribute("numX");
+			var minY  = xml.getFloatArrayAttribute("minY");
+			var maxY  = xml.getFloatArrayAttribute("maxY");
+			var numY  = xml.getIntArrayAttribute("numY");
+			
+			// create layers
+			int num_layers = pcSizes.length;
+			pcs = new PlaceCells[num_layers];
+			for(int i=0; i<num_layers; i++) {
+				System.out.println("layer: " 
+							+ minX[i] + " " + maxX[i] + " " + numX[i] + " " 
+							+ minY[i] + " " + maxY[i]+ " " + numY[i] + " " + pcSizes[i]);
+				pcs[i] = new PlaceCells(minX[i], maxX[i], numX[i],minY[i], maxY[i], numY[i], pcSizes[i]); // added 1 cm to pcs to avoid precision issues
+			}
+			
+		}
+		
+		return pcs;
 	}
 	
 	

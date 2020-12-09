@@ -68,7 +68,7 @@ public class LogData implements Script {
 		// save state and action values of last episode
 		var model = (MultiscaleModel)e.getSubject(subject_id);
 		var numActions = model.numActions;
-		for(int i=0; i<model.numScales; i++) {
+		for(int i=0; i<model.num_layers; i++) {
 			int num_pcs = model.vTable[i].length;
 			BinaryFile.saveBinaryVector(model.vTable[i], prefix + "V" + i+ ".bin", true);
 			BinaryFile.saveBinaryMatrix(model.qTable[i], num_pcs, numActions , prefix + "Q" + i+ ".bin", true);
