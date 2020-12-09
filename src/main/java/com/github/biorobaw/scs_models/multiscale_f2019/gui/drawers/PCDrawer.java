@@ -166,9 +166,8 @@ public class PCDrawer extends Drawer {
 		
 		// proceed only if drawer has been updated at least once
 		if(ids==null) return;
-		
 		var active_top_x = Integers.getElements(all_top_x, ids);
-		var active_top_y = Integers.getElements(all_top_x, ids);
+		var active_top_y = Integers.getElements(all_top_y, ids);
 		var active_2r	 = Integers.getElements(r2, ids);
 		int num_active = ids.length;
 		
