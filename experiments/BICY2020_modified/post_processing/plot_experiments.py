@@ -215,6 +215,41 @@ def plot_experiment4_extraAtFeeder(figure_folder, configs, sample_rate, db):
 
 
 
+def plot_experiment7(figure_folder, configs, sample_rate, db):
+    """
+    plot all
+    :param folder:
+    :param figure_folder:
+    :param configs:
+    :param db:
+    :return:
+    """
+
+    # PARAMETERS:
+    location = -1  # we will only plot geometric mean data (represented with location -1)
+    num_episodes = configs['numEpisodes'].max() / configs['numStartingPositions'].max()
+    last_episode = -sample_rate % num_episodes
+
+    # plot each scale separately
+    for maze, sub_configs in configs.groupby(['mazeFile']):
+        # get indices and format text for the plots
+        maze = ntpath.basename(maze)[1:-4]
+        print('plotting maze: ', maze)
+
+        # plot titles and legends:
+
+        group_name = f't{trace:.1f}'
+        legend_title = 'Traces'
+        legend_values = sub_configs.traces.map("{0:.1f}".format)
+        plot_title = f"Maze {maze}"
+
+        plot_runtimes_boxplots_dunntest(db, sub_configs, location, last_episode, group_name,
+                                        legend_title, legend_values, plot_title, figure_folder)
+
+        plot_deltaV(db, sub_configs, location, last_episode, group_name,
+                    legend_title, legend_values, plot_title, figure_folder)
+
+
 def plot_experiment(folder):
     # get experiment folder
     folder = os.path.join(sys.argv[1], '')
@@ -238,6 +273,7 @@ def plot_experiment(folder):
     experiment_map['4'] = ( plot_experiment4_extraAtFeeder            , 5 )
     experiment_map['5'] = ( plot_experiment_traces_and_nx_per_maze    , 10)
     experiment_map['6'] = ( plot_experiment4_extraAtFeeder            , 5 )
+    experiment_map['7'] = ( plot_experiment7, 5)
 
     # plot the experiment
     e = experiment_map[experiment_name]
