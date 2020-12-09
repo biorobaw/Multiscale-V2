@@ -11,14 +11,14 @@ rat_ids = [i for i in range(ratsPerConfig)]
 # MAZE RELATED FIELDS
 mazeWidth   = 2.2
 mazeHeight  = 3
-mazes       = ['M0.xml', 'M1.xml']
+mazes       = ['M0.xml']
 mazesPath   = 'experiments/mazes' # relative to git root folder
 episodesPerStartingLocation = 10000
 
 
 # PC RELATED FIELDS
 pc_path  = 'experiments/pc_layers/'
-pc_files = [ pc_path + file for file in ['pcs_maze0.csv', 'pcs_maze1.csv']]
+pc_files = [ pc_path + file for file in ['pcs_maze0.csv']] #, 'pcs_maze1.csv']]
 traces   = [0.1*i for i in range(10)]
 
 # GENERATE DATA FRAMES
