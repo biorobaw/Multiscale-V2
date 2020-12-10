@@ -56,7 +56,8 @@ def plot_config(experiment_folder, config, config_id):
         '3': [format_maze, format_scale],
         '4': [format_maze, lambda c: f's{c["pcSizes"]}', lambda c: f't{c["traces"]}'],
         '5': [format_maze, format_trace, format_nx],
-        '6': [format_maze, lambda c: f's{c["pcSizes"]}', lambda c: f't{c["traces"]}']
+        '6': [format_maze, lambda c: f's{c["pcSizes"]}', lambda c: f't{c["traces"]}'],
+        '7': [format_maze, lambda c: f't{c["traces"]}']
     }
     config_title = apply_formatters(config, e_formatters[experiment_name])
     save_name = os.path.join(figure_folder, 'paths_' + config_title + '.pdf')
