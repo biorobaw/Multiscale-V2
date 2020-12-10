@@ -9,3 +9,13 @@ c6	experiments/setups/experiment_1.xml	g1	experiments/mazes/M0.xml	7	experiments
 c7	experiments/setups/experiment_1.xml	g1	experiments/mazes/M0.xml	7	experiments/pc_layers/pcs_maze0.csv	0.7000000000000001	70000
 c8	experiments/setups/experiment_1.xml	g1	experiments/mazes/M0.xml	7	experiments/pc_layers/pcs_maze0.csv	0.8	70000
 c9	experiments/setups/experiment_1.xml	g1	experiments/mazes/M0.xml	7	experiments/pc_layers/pcs_maze0.csv	0.9	70000
+c10	experiments/setups/experiment_1.xml	g1	experiments/mazes/M1.xml	7	experiments/pc_layers/pcs_maze1.csv	0.0	70000
+c11	experiments/setups/experiment_1.xml	g1	experiments/mazes/M1.xml	7	experiments/pc_layers/pcs_maze1.csv	0.1	70000
+c12	experiments/setups/experiment_1.xml	g1	experiments/mazes/M1.xml	7	experiments/pc_layers/pcs_maze1.csv	0.2	70000
+c13	experiments/setups/experiment_1.xml	g1	experiments/mazes/M1.xml	7	experiments/pc_layers/pcs_maze1.csv	0.30000000000000004	70000
+c14	experiments/setups/experiment_1.xml	g1	experiments/mazes/M1.xml	7	experiments/pc_layers/pcs_maze1.csv	0.4	70000
+c15	experiments/setups/experiment_1.xml	g1	experiments/mazes/M1.xml	7	experiments/pc_layers/pcs_maze1.csv	0.5	70000
+c16	experiments/setups/experiment_1.xml	g1	experiments/mazes/M1.xml	7	experiments/pc_layers/pcs_maze1.csv	0.6000000000000001	70000
+c17	experiments/setups/experiment_1.xml	g1	experiments/mazes/M1.xml	7	experiments/pc_layers/pcs_maze1.csv	0.7000000000000001	70000
+c18	experiments/setups/experiment_1.xml	g1	experiments/mazes/M1.xml	7	experiments/pc_layers/pcs_maze1.csv	0.8	70000
+c19	experiments/setups/experiment_1.xml	g1	experiments/mazes/M1.xml	7	experiments/pc_layers/pcs_maze1.csv	0.9	70000

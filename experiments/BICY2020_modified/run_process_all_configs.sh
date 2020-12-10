@@ -9,7 +9,7 @@ PROCESS_CONFIG="scripts/circe_cluster/configuration_process_results.sh"
 [ -z "$DO_EXPERIMENT_4" ] || sbatch -a 0-219  $PROCESS_CONFIG $LOG_E4/ 5
 [ -z "$DO_EXPERIMENT_5" ] || sbatch -a 0-159  $PROCESS_CONFIG $LOG_E5/ 10
 [ -z "$DO_EXPERIMENT_6" ] || sbatch -a 0-109  $PROCESS_CONFIG $LOG_E6/ 5
-[ -z "$DO_EXPERIMENT_7" ] || sbatch -a 0-9    $PROCESS_CONFIG $LOG_E7/ 5
+[ -z "$DO_EXPERIMENT_7" ] || sbatch -a 0-19   $PROCESS_CONFIG $LOG_E7/ 5
 # sbatch -a 0-47 $PROCESS_CONFIG ${LOG_FOLDER}experiment4-mazes/
 # sbatch -a 0-27 $PROCESS_CONFIG ${LOG_FOLDER}experiment5-single/
 # sbatch -a 0-181 $PROCESS_CONFIG ${LOG_FOLDER}experiment5-twoScales/

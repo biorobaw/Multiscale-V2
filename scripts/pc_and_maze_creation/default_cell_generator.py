@@ -4,9 +4,132 @@ import numpy as np
 
 def load_pc_df():
     """ This is the actual function that gets called"""
-    return concentric_layer_for_experiment_0_B()
+    return concentric_layer_for_maze_1_A()
 
-def concentric_layer_for_experiment_0_B():
+def concentric_layer_for_maze_1_A():
+    goal_x, goal_y = 0.1, 1.2
+    gap_x, gap_y = 0.575, -0.12
+    dummy_df = pd.DataFrame(columns=['x', 'y', 'r'])
+    phase = np.pi/4
+    try:
+
+        """ place cells below gap """
+
+        layer_params_gap = pd.DataFrame(
+            columns=['origin_x', 'origin_y', 'num_cells', 'pc_radius', 'distance', 'phase'],
+            data=[[0, 0, 1, 0.16, 0, 0],
+                  [0, 0, 4, 0.25, 0.31, 0],
+                  [0, 0, 4, 0.32, 0.61, phase],
+                  [0, 0, 4, 0.48, 0.98, 0],
+                  [0, 0, 4, 0.56, 1.33, phase],
+                  # [0, 0, 4, 0.56, 1.53, 0],
+                  # [0, 0, 4, 0.56, 1.45, phase],
+                  # [0, 0, 4, 0.64, 1.57, 0],
+                  # [0, 0, 4, 0.72, 1.87, phase],
+                  ])
+        layers_gap = [single_concentric_layer(row) for index, row in layer_params_gap.iterrows()]
+        pcs_gap = pd.concat([dummy_df] + layers_gap, ignore_index=True)
+        pcs_gap['x'] = pcs_gap['x'] + gap_x
+        pcs_gap['y'] = pcs_gap['y'] + gap_y
+        pcs_gap = filter_not_in_box(pcs_gap, -1.1, 1.1, -1.5, 0)
+        pcs_gap = pcs_gap.drop([2, 5, 6, 9]) # remove cells
+        pcs_gap = pcs_gap.reset_index(drop=True)
+
+        pcs_gap.y[3] -= 0.02
+
+        pcs_gap.y[6] -= 0.12
+        pcs_gap.x[6] += 0.20
+        pcs_gap.r[6]  = 0.4
+
+        pcs_gap.x[8] += 0.28
+        pcs_gap.y[8] -= 0.06
+        pcs_gap.r[8] = 0.56
+
+        pcs_gap.x[9] -= 0.45
+        pcs_gap.y[9] -= 0.15
+        pcs_gap.r[9] = 0.4
+
+
+        pcs_gap.loc[len(pcs_gap)] = (-0.75, -0.4, 0.56)
+        pcs_gap.loc[len(pcs_gap)] = (-0.75, -1.15, 0.56)
+
+        print(pcs_gap)
+
+        """ place cells above gap """
+
+        pcs_gap_above = pcs_gap.copy()
+        pcs_gap_above.y = -pcs_gap_above.y
+        pcs_gap_above = pcs_gap_above.drop(list(range(6, 12)))
+        pcs_gap_above = pcs_gap_above.drop([4])
+
+
+        """ place cells around goal """
+
+        layer_params_goal = pd.DataFrame(
+            columns=['origin_x', 'origin_y', 'num_cells', 'pc_radius', 'distance', 'phase'],
+            data=[[0, 0, 1, 0.08, 0, 0],
+                  [0, 0, 4, 0.16, 0.20, 0],
+                  [0, 0, 4, 0.24, 0.44, phase],
+                  [0, 0, 4, 0.32, 0.64, 0],
+                  [0, 0, 4, 0.40, 0.96, phase],
+                  [0, 0, 4, 0.50, 1.12, 0],
+                  [0, 0, 4, 0.56, 1.45, phase]
+                  ])
+        layers_goal = [single_concentric_layer(row) for index, row in layer_params_goal.iterrows()]
+        pcs_goal = pd.concat([dummy_df] + layers_goal, ignore_index=True)
+        pcs_goal['x'] = pcs_goal['x'] + goal_x
+        pcs_goal['y'] = pcs_goal['y'] + goal_y
+        pcs_goal = filter_not_in_box(pcs_goal, -1.1, 1.1, -1.5, 1.5)
+
+        print(pcs_goal)
+        pcs_goal = pcs_goal.drop([12, 13, 15 , 20]) # remove cells
+        pcs_goal = pcs_goal.reset_index(drop=True)
+
+        pcs_goal.r[4] += 0.02
+        pcs_goal.r[1] = pcs_goal.r[4]
+        pcs_goal.y[1] -= 0.02
+        pcs_goal.x[1] += 0.02
+
+        pcs_goal.y[4] -= 0.03
+        pcs_goal.x[4] += 0.02
+
+
+        pcs_goal.r[8] = 0.32
+        pcs_goal.x[8] += 0.15
+        pcs_goal.y[8] -= 0.05
+
+        pcs_goal.r[12] -= 0.08
+        pcs_goal.x[12] += 0.12
+        pcs_goal.y[12] += 0.12
+
+        pcs_goal.r[13] -= 0.12
+        pcs_goal.x[13] -= 0.18
+        pcs_goal.y[13] -= 0.02
+
+        pcs_goal.r[14] = 0.44
+        pcs_goal.x[14] += 0.09
+        pcs_goal.y[14] -= 0.03
+
+        pcs_goal.r[15] = 0.36
+        pcs_goal.x[15] -= 0.30
+        pcs_goal.y[15] += 0.13
+
+        pcs_goal.r[16] = 0.52
+        pcs_goal.x[16] += 0.1
+        pcs_goal.y[16] += 0.15
+
+
+        """ concat all pcs and then filter out """
+        # pcs_gap = dummy_df
+        # pcs_gap_above = dummy_df
+
+        return pd.concat([pcs_goal, pcs_gap_above, pcs_gap], ignore_index=True)
+    except:
+        print("Error in concentric_layer_for_experiment_0_B")
+        return dummy_df
+
+
+def concentric_layer_for_maze_0_FINAL():
     cx, cy = 0.1, 1.2
     dummy_df = pd.DataFrame(columns=['x', 'y', 'r'])
     phase = np.pi/4
@@ -28,7 +151,7 @@ def concentric_layer_for_experiment_0_B():
         concatenated['y'] = concatenated['y'] + cy
         filtered = filter_not_in_box(concatenated, -1.1, 1.1, -1.5, 1.5)
 
-        filtered = filtered.drop([13, 14]) # remove cells
+        filtered = filtered.drop([12, 13]) # remove cells
 
         # fill remaining space
         r = 0.64
@@ -49,8 +172,8 @@ def concentric_layer_for_experiment_0_B():
         print("Error in concentric_layer_for_experiment_0_B")
         return dummy_df
 
-def concentric_layer_for_experiment_0_A():
-
+def concentric_layer_for_maze_0_A():
+    """ DEPRECATED BY concentric_layer_for_maze_0_FINAL """
     dummy_df = pd.DataFrame(columns=['x', 'y', 'r'])
     try:
         cx, cy = 0.1, 1.2
@@ -101,6 +224,8 @@ def dummy_demo_pc_df():
 
 
 def filter_not_in_box(pcs : pd.DataFrame, xmin, xmax, ymin, ymax ) -> pd.DataFrame:
+    pcs = pcs[pcs.apply(lambda pc: pc_intersects_rectangle(pc, xmin, xmax, ymin, ymax), axis=1)]
+    pcs = pcs.reset_index(drop=True)
     return pcs[pcs.apply(lambda pc: pc_intersects_rectangle(pc, xmin, xmax, ymin, ymax), axis=1)]
 
 

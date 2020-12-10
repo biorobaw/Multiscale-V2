@@ -12,4 +12,4 @@ BATCH_SCRIPT="module add apps/python/3.7.3; python $PLOT_EXPERIMENT ENAME/ c\$SL
 [ -z "$DO_EXPERIMENT_4" ] || sbatch -a 0-219 --mem=500M --time=0:15:00 --cpus-per-task=2 --wrap="${BATCH_SCRIPT/ENAME/$LOG_E4}"
 [ -z "$DO_EXPERIMENT_5" ] || sbatch -a 0-159 --mem=500M --time=0:15:00 --cpus-per-task=2 --wrap="${BATCH_SCRIPT/ENAME/$LOG_E5}"
 [ -z "$DO_EXPERIMENT_6" ] || sbatch -a 0-109 --mem=500M --time=0:15:00 --cpus-per-task=2 --wrap="${BATCH_SCRIPT/ENAME/$LOG_E6}"
-[ -z "$DO_EXPERIMENT_7" ] || sbatch -a 0-9  --mem=500M --time=0:15:00 --cpus-per-task=2 --wrap="${BATCH_SCRIPT/ENAME/$LOG_E7}"
+[ -z "$DO_EXPERIMENT_7" ] || sbatch -a 0-19  --mem=500M --time=0:15:00 --cpus-per-task=2 --wrap="${BATCH_SCRIPT/ENAME/$LOG_E7}"
