@@ -238,7 +238,7 @@ def plot_experiment7(figure_folder, configs, sample_rate, db):
 
         # plot titles and legends:
 
-        group_name = f't{trace:.1f}'
+        group_name = f'M{maze}'
         legend_title = 'Traces'
         legend_values = sub_configs.traces.map("{0:.1f}".format)
         plot_title = f"Maze {maze}"
