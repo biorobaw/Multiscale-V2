@@ -123,7 +123,36 @@ def concentric_layer_for_maze_1_A():
         # pcs_gap = dummy_df
         # pcs_gap_above = dummy_df
 
-        return pd.concat([pcs_goal, pcs_gap_above, pcs_gap], ignore_index=True)
+
+        pcs_all = pd.concat([pcs_goal, pcs_gap_above, pcs_gap], ignore_index=True)
+
+        # lower half
+        pcs_all.loc[len(pcs_all)] = [-0.89, -0.43, 0.48]
+        pcs_all.loc[32] = [-0.49, -0.35, 0.4]
+        pcs_all.loc[28] = [-0.15, -0.28, 0.32]
+        pcs_all.loc[24] = [0.12, -0.22, 0.25]
+        pcs_all.loc[22] = [0.35, -0.16, 0.20]
+        pcs_all.loc[len(pcs_all)] = [0.575, -0.12, 0.16]  # <--- gap
+        pcs_all.loc[len(pcs_all)] = [0.80, -0.16, 0.20]
+        pcs_all.loc[23] = [1.03, -0.22, 0.25]
+
+        # upper half
+        pcs_all.loc[len(pcs_all)] = [-0.89, 0.43, 0.48]
+        pcs_all.loc[len(pcs_all)] = [-0.49, 0.35, 0.4]
+        pcs_all.loc[16] = [-0.15, 0.28, 0.32]
+        pcs_all.loc[15] = [0.12, 0.22, 0.25]
+        pcs_all.loc[19] = [0.35, 0.16, 0.20]
+        pcs_all.loc[17] = [0.575, 0.12, 0.16]  # <--- gap
+        pcs_all.loc[len(pcs_all)] = [0.80, 0.16, 0.20]
+        pcs_all.loc[18] = [1.03, 0.22, 0.25]
+
+
+        # pcs_all.loc[len(pcs_all)] = [0.425, -0.06, 0.08]
+        # pcs_all.loc[len(pcs_all)] = [0.095, -0.06, 0.08]
+        # pcs_all.loc[len(pcs_all)] = [-0.35, -0.1, 0.12]
+        # pcs_all.loc[len(pcs_all)] = [-1, -0.1, 0.12]
+
+        return pcs_all
     except:
         print("Error in concentric_layer_for_experiment_0_B")
         return dummy_df
