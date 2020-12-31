@@ -26,7 +26,7 @@ class PlaceCell(QWidget):
             widget.setMinimum(-10000 if widget != self.widget_r else 0)
             widget.setMaximum(10000)
             widget.setFrame(False)
-            widget.setSingleStep(0.0001)
+            widget.setSingleStep(0.01)
             widget.setAlignment(Qt.AlignCenter)
 
         self.widget_x.setValue(x)

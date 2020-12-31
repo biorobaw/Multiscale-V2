@@ -7,6 +7,104 @@ def load_pc_df():
     return concentric_layer_for_maze_1_A()
 
 def concentric_layer_for_maze_1_A():
+    ang45 = np.deg2rad(45)
+    ang90 = np.deg2rad(90)
+    goal_x, goal_y = 0.1, 1.2
+    gap_x, gap_y = 0.575, -0.12
+    try:
+
+
+        """ concat all pcs and then filter out """
+        # pcs_gap = dummy_df
+        # pcs_gap_above = dummy_df
+
+        pcs_all = pd.DataFrame(columns=['x', 'y', 'r'])
+        # pcs_all = pd.concat([pcs_goal, pcs_gap_above, pcs_gap], ignore_index=True)
+
+        # upper half around goal
+
+        # cell 0 at goal : 1-1
+        pcs_all.loc[len(pcs_all)] = [0.1, 1.2, 0.08]
+
+        # first ring around goal : 2-5
+        l = 0.20
+        pcs_all.loc[len(pcs_all)] = [ goal_x+l*np.cos(ang45+ang90*0), goal_y+l*np.sin(ang45+ang90*0), 0.16]
+        pcs_all.loc[len(pcs_all)] = [ goal_x+l*np.cos(ang45+ang90*1), goal_y+l*np.sin(ang45+ang90*1), 0.16]
+        pcs_all.loc[len(pcs_all)] = [ goal_x+l*np.cos(ang45+ang90*2), goal_y+l*np.sin(ang45+ang90*2), 0.16]
+        pcs_all.loc[len(pcs_all)] = [ goal_x+l*np.cos(ang45+ang90*3), goal_y+l*np.sin(ang45+ang90*3), 0.16]
+
+        # second ring around goal : 6-9
+        l = 0.45
+        pcs_all.loc[len(pcs_all)] = [goal_x+l*np.cos(ang90*0), goal_y+l*np.sin(ang90*0), 0.24]
+        pcs_all.loc[len(pcs_all)] = [goal_x+l*np.cos(ang90*1), goal_y+l*np.sin(ang90*1), 0.24]
+        pcs_all.loc[len(pcs_all)] = [goal_x+l*np.cos(ang90*2), goal_y+l*np.sin(ang90*2), 0.24]
+        pcs_all.loc[len(pcs_all)] = [goal_x+l*np.cos(ang90*3), goal_y+l*np.sin(ang90*3), 0.24]
+
+        # third ring around goal : 10-13
+        l = 0.64
+        pcs_all.loc[len(pcs_all)] = [goal_x+l*np.cos(ang45+ang90*0), goal_y+l*np.sin(ang45+ang90*0), 0.32]
+        pcs_all.loc[len(pcs_all)] = [goal_x+l*np.cos(ang45+ang90*1), goal_y+l*np.sin(ang45+ang90*1), 0.32]
+        pcs_all.loc[len(pcs_all)] = [goal_x+l*np.cos(ang45+ang90*2), goal_y+l*np.sin(ang45+ang90*2), 0.32] # [0.25,  -0.72, 0.40]
+        pcs_all.loc[len(pcs_all)] = [goal_x+l*np.cos(ang45+ang90*3), goal_y+l*np.sin(ang45+ang90*3), 0.32]
+
+        # fourth and final ring around goal : 14-15
+        l=0.96
+        pcs_all.loc[len(pcs_all)] = [goal_x+l*np.cos(ang90*0), goal_y+l*np.sin(ang90*0), 0.4]   # [-0.58, 0.52, 0.4] # [-.46, 0.64, 0.32]
+        pcs_all.loc[len(pcs_all)] = [goal_x+l*np.cos(ang90*2), goal_y+l*np.sin(ang90*2), 0.4]
+
+
+        # wall layer above  gap : 16 - 23
+        pcs_all.loc[len(pcs_all)] = [-0.89, 0.44, 0.49]
+        pcs_all.loc[len(pcs_all)] = [-0.49, 0.16, 0.25]
+        pcs_all.loc[len(pcs_all)] = [-0.15, 0.28, 0.32]
+        pcs_all.loc[len(pcs_all)] = [0.12, 0.22, 0.25]
+        pcs_all.loc[len(pcs_all)] = [0.35, 0.16, 0.20]
+        pcs_all.loc[len(pcs_all)] = [0.575, 0.12, 0.16]  # <--- gap
+        pcs_all.loc[len(pcs_all)] = [0.80, 0.16, 0.20]
+        pcs_all.loc[len(pcs_all)] = [1.03, 0.22, 0.25]
+
+        # second layer of wall cells above gap : 24 - 26
+        pcs_all.loc[len(pcs_all)] = [0.26, 0.51, 0.20]
+        pcs_all.loc[len(pcs_all)] = [0.57, 0.45, 0.24]
+        pcs_all.loc[len(pcs_all)] = [1.00, 0.58, 0.32]
+
+
+        # wall layer below  gap : 27 - 34
+
+        pcs_all.loc[len(pcs_all)] = [-0.89, -0.43, 0.48]
+        pcs_all.loc[len(pcs_all)] = [-0.49, -0.35, 0.4]
+        pcs_all.loc[len(pcs_all)] = [-0.15, -0.28, 0.32]
+        pcs_all.loc[len(pcs_all)] = [0.12, -0.22, 0.25]
+        pcs_all.loc[len(pcs_all)] = [0.35, -0.16, 0.20]
+        pcs_all.loc[len(pcs_all)] = [0.575, -0.12, 0.16]  # <--- gap
+        pcs_all.loc[len(pcs_all)] = [0.80, -0.16, 0.20]
+        pcs_all.loc[len(pcs_all)] = [1.03, -0.22, 0.25]
+
+        # second layer of wall cells above gap : 35 - 39
+
+        d = 0.10
+        l0 = 0.05
+        l = 0.35
+        l2 = 0.3
+        pcs_all.loc[len(pcs_all)] = [-0.34, -1.27, 0.56]
+        pcs_all.loc[len(pcs_all)] = [-0.06, -1.01, 0.44]
+        pcs_all.loc[len(pcs_all)] = [0.27, -0.68, 0.36]
+        pcs_all.loc[len(pcs_all)] = [0.57, -0.39, 0.24]  # <--- aligned with gap
+        pcs_all.loc[len(pcs_all)] = [0.87, -0.70, 0.36]
+
+        # filler cells : 40-41
+
+        pcs_all.loc[len(pcs_all)] = [0.40, -1.23, 0.4]  # <-- aligned with gap
+        pcs_all.loc[len(pcs_all)] = [0.9, -1.23, 0.4]
+        pcs_all.loc[len(pcs_all)] = [-0.89, -1.27, 0.56]
+
+
+        return pcs_all
+    except:
+        print("Error in concentric_layer_for_experiment_0_B")
+        return dummy_df
+
+def concentric_layer_for_maze_1_E():
     goal_x, goal_y = 0.1, 1.2
     gap_x, gap_y = 0.575, -0.12
     dummy_df = pd.DataFrame(columns=['x', 'y', 'r'])
