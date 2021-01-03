@@ -46,7 +46,7 @@ else
   do
     configId=`expr $baseID + $i`
     
-    if [ \( -z "$min_indiv" -o "$min_indiv" -le "configId" \) -a \( -z "$max_indiv" -o "$configId" -le "$max_indiv" \) ]; then
+    if [ \( -z "$min_indiv" -o "$min_indiv" -le "$configId" \) -a \( -z "$max_indiv" -o "$configId" -le "$max_indiv" \) ]; then
 
       echo "---java $CMD_ARGS $configFile $configId $baseLogFolder"
       java $CMD_ARGS $configFile $configId $baseLogFolder
