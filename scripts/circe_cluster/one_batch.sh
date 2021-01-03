@@ -35,6 +35,8 @@ if [ -z "$SLURM_ARRAY_TASK_ID" ]; then
 
 else
   batchSize=$3
+  min_indiv=$4
+  max_indiv=$5
   batchID=$SLURM_ARRAY_TASK_ID
   baseID=`expr $batchSize \* $batchID`
   maxID=`expr $batchSize - 1`
@@ -44,14 +46,22 @@ else
   do
     configId=`expr $baseID + $i`
     
-    echo "---java $CMD_ARGS $configFile $configId $baseLogFolder"
-    java $CMD_ARGS $configFile $configId $baseLogFolder
-    
-    
-    if [ $? -eq 0 ]; then
-        echo SUCCESS
+    if [ \( -z "$min_indiv" -o "$min_indiv" -le "configId" \) -a \( -z "$max_indiv" -o "$configId" -le "$max_indiv" \) ]; then
+
+      echo "---java $CMD_ARGS $configFile $configId $baseLogFolder"
+      java $CMD_ARGS $configFile $configId $baseLogFolder
+      
+      
+      if [ $? -eq 0 ]; then
+          echo SUCCESS
+      else
+          FAILED_IDS="$configId, $FAILED_IDS"
+      fi
+
     else
-        FAILED_IDS="$configId, $FAILED_IDS"
+
+      echo "skipping individual $configId"
+
     fi
     
   done
