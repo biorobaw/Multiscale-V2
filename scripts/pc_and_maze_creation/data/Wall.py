@@ -23,11 +23,11 @@ class Wall(QWidget):
 
         # create editable fields
         for widget in self.widgets[1:]:
-            widget.setDecimals(4)
+            widget.setDecimals(3)
             widget.setMinimum(-10000)
             widget.setMaximum(10000)
             widget.setFrame(False)
-            widget.setSingleStep(0.0001)
+            widget.setSingleStep(0.01)
             widget.setAlignment(Qt.AlignCenter)
 
         self.widget_x1.setValue(x1)

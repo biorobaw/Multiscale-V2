@@ -5,7 +5,20 @@ import numpy as np
 def load_pc_df():
     """ This is the actual function that gets called"""
     # return concentric_layer_for_maze_1_A()
-    return uniform_layer(16)
+
+    dummy_points = pd.DataFrame(columns=['x', 'y', 'r'],
+                                data=[
+                                    [1  ,  0.1, 0.04],
+                                    [0.9, 1.2, 0.04],
+                                    [-1  , 0.1, 0.04],
+                                    [-0.9,1.2, 0.04],
+                                    [-0.1,-1.3, 0.04],
+                                    [1   ,-1.4, 0.04],
+                                    [-1  ,-1.4, 0.04],
+                                    [0.1 , 1.2, 0.09 ]
+                                ])
+    return pd.concat([uniform_layer(4), dummy_points], ignore_index=True)
+
 
 def concentric_layer_for_maze_1_A():
     dummy_df = pd.DataFrame(columns=['x', 'y', 'r'])

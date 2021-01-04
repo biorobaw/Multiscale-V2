@@ -22,7 +22,7 @@ class PlaceCell(QWidget):
 
         # create editable fields
         for widget in self.widgets[1:]:
-            widget.setDecimals(4)
+            widget.setDecimals(3)
             widget.setMinimum(-10000 if widget != self.widget_r else 0)
             widget.setMaximum(10000)
             widget.setFrame(False)
