@@ -7,12 +7,19 @@ from PyQt5.QtWidgets import QWidget, QCheckBox, QDoubleSpinBox
 class PlaceCell(QWidget):
 
     pc_modified = pyqtSignal(object)
+    pc_selected_changed = pyqtSignal(object)
+    delete_signal = pyqtSignal(object)
+    all_selected = set()
 
     def __init__(self, x, y, r, *args, **kwargs):
         super(PlaceCell, self).__init__(*args, **kwargs)
 
+        self.is_selected = False
+
         self.widget_show = QCheckBox(self)
         self.widget_x = QDoubleSpinBox(self)
+        # self.widget_x.setWindowOpacity(0)
+        # self.widget_x.setAutoFillBackground(True)
         self.widget_y = QDoubleSpinBox(self)
         self.widget_r = QDoubleSpinBox(self)
         self.widgets = [self.widget_show, self.widget_x, self.widget_y, self.widget_r]
@@ -47,8 +54,43 @@ class PlaceCell(QWidget):
     def r(self):
         return self.widget_r.value()
 
+    def translate(self, vector):
+        self.widget_x.setValue(self.x() + vector.x())
+        self.widget_y.setValue(self.y() + vector.y())
+        self.pc_changed()
+
+    def setSelected(self, new_val: bool):
+        # check if value changed
+        if new_val != self.is_selected:
+
+            # add or remove from selected set
+            if new_val:
+                PlaceCell.all_selected.add(self)
+            elif self in PlaceCell.all_selected:
+                PlaceCell.all_selected.remove(self)
+
+            # set new value and signal
+            self.is_selected = new_val
+            self.pc_selected_changed.emit(self)
+
+    def selected(self):
+        return self.is_selected
+
     def is_hidden(self):
         return self.widget_show.checkState() == Qt.Unchecked
 
     def pc_changed(self):
         self.pc_modified.emit(self)
+
+    @staticmethod
+    def clear_all_selected():
+        aux = PlaceCell.all_selected
+        PlaceCell.all_selected = set()
+        for pc in aux:
+            pc.setSelected(False)
+
+    def delete(self):
+        if self in PlaceCell.all_selected:
+            PlaceCell.all_selected.remove(self)
+        self.delete_signal.emit(self)
+

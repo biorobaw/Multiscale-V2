@@ -4,20 +4,21 @@ import numpy as np
 
 def load_pc_df():
     """ This is the actual function that gets called"""
-    # return concentric_layer_for_maze_1_A()
 
     dummy_points = pd.DataFrame(columns=['x', 'y', 'r'],
                                 data=[
-                                    [1  ,  0.1, 0.04],
-                                    [0.9, 1.2, 0.04],
-                                    [-1  , 0.1, 0.04],
-                                    [-0.9,1.2, 0.04],
-                                    [-0.1,-1.3, 0.04],
-                                    [1   ,-1.4, 0.04],
-                                    [-1  ,-1.4, 0.04],
-                                    [0.1 , 1.2, 0.09 ]
+                                    [1  ,  0.1, 0.01],
+                                    [0.9, 1.2, 0.01],
+                                    [-1  , 0.1, 0.01],
+                                    [-0.9,1.2, 0.01],
+                                    [-0.1,-1.3, 0.01],
+                                    [1   ,-1.4, 0.01],
+                                    [-1  ,-1.4, 0.01],
+                                    [0.1 , 1.2, 0.02 ]
                                 ])
-    return pd.concat([uniform_layer(4), dummy_points], ignore_index=True)
+    # return pd.concat([uniform_layer(4), dummy_points], ignore_index=True)
+    # return pd.concat([concentric_layer_for_maze_8_A(), dummy_points], ignore_index=True)
+    return concentric_layer_for_maze_8_A()
 
 
 def concentric_layer_for_maze_1_A():
@@ -124,6 +125,46 @@ def concentric_layer_for_maze_1_A():
     except:
         print("Error in concentric_layer_for_experiment_0_B")
         return dummy_df
+
+def concentric_layer_for_maze_8_A():
+    pcs = pd.DataFrame(columns=['x', 'y', 'r'])
+    ang45 = np.deg2rad(45)
+    ang90 = np.deg2rad(90)
+    goal_x, goal_y = 0.1, 1.2
+    gap_x, gap_y = 0.575, -0.12
+
+    # goal
+    pcs.loc[len(pcs)] = [0.1, 1.2, 0.08]
+
+    # top left wall
+    pcs.loc[len(pcs)] = [-0.78, 1.44, 0.08]
+    pcs.loc[len(pcs)] = [-0.68, 1.44, 0.08]
+    pcs.loc[len(pcs)] = [-0.78, 0.73, 0.08]
+    pcs.loc[len(pcs)] = [-0.68, 0.73, 0.08]
+
+    # wall beneath top left wall
+    pcs.loc[len(pcs)] = [-0.95, 0.57, 0.08]
+    pcs.loc[len(pcs)] = [-0.95, 0.47, 0.08]
+    pcs.loc[len(pcs)] = [-0.42, 0.57, 0.08]
+    pcs.loc[len(pcs)] = [-0.42, 0.47, 0.08]
+
+    # wall beneath goal
+    pcs.loc[len(pcs)] = [-0.16, 0.77, 0.08]
+    pcs.loc[len(pcs)] = [0.3, 0.77, 0.08]
+
+    # wall right goal
+    pcs.loc[len(pcs)] = [0.52, 0.73, 0.08]
+    pcs.loc[len(pcs)] = [0.52, 1.41, 0.08]
+
+    # right most wall ( at top )
+    pcs.loc[len(pcs)] = [0.73, 0.73, 0.08]
+
+    # bottom wall
+    pcs.loc[len(pcs)] = [-0.9, -0.71, 0.08]
+    pcs.loc[len(pcs)] = [0.07, -0.71, 0.08]
+
+    return pcs
+
 
 def concentric_layer_for_maze_1_E():
     goal_x, goal_y = 0.1, 1.2

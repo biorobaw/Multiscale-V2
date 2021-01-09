@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, \
                             QItemDelegate, QLineEdit, QDoubleSpinBox, QPushButton, \
                             QSpacerItem, QHBoxLayout, QSizePolicy, QFileDialog
 from PyQt5.QtGui import QPalette, QColor, QDoubleValidator
-from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtCore import Qt, pyqtSignal, QItemSelection, QItemSelectionModel
 import pandas as pd
 
 from data.PC import PlaceCell
@@ -31,6 +31,8 @@ class PanelPCEdit(QWidget):
 
         # create the table to display data
         table_widget = QTableWidget()
+        table_widget.setSelectionBehavior(table_widget.SelectRows)
+        # table_widget.set
         table_widget.setColumnCount(4)
         table_widget.setHorizontalHeaderLabels(('show', 'x', 'y', 'r'))
         table_widget.setRowCount(0)
@@ -90,21 +92,55 @@ class PanelPCEdit(QWidget):
 
         table_widget.selectionModel().selectionChanged.connect(self.selection_changed)
 
-    def selection_changed(self, val1, val2):
+    def selection_changed(self, selected, deselected):
+        # select pcs that changed and remove
+        rows = set()
+        for i in deselected.indexes():
+            r = i.row()
+            if r not in rows:
+                rows.add(r)
+                self.pcs[r].setSelected(False)
+
+        for i in selected.indexes():
+            r = i.row()
+            if r not in rows:
+                rows.add(r)
+                self.pcs[r].setSelected(True)
+
+        # activate / deactivate button less
         selection = self.table_widget.selectionModel()
-        enabled = selection.hasSelection() and len(selection.selectedRows()) > 0
-        self.button_less.setEnabled(enabled)
+        self.button_less.setEnabled(selection.hasSelection())
+
+    def select_pc(self, pc):
+        if pc in self.pcs:
+            row = self.pcs.index(pc)
+
+            # get index of item in table and selection model
+            for col in range(0, self.table_widget.columnCount()):
+                index  = self.table_widget.model().index(row, col)
+                model = self.table_widget.selectionModel()
+
+                # read current selection value:
+                # current_val = model.isSelected(index)
+                new_val = model.Select if pc.selected() else model.Deselect
+
+                # observation: it seems using the selection model directly does not generate selection changed events
+                # which avoids signal loops
+                model.select(index, new_val)
+
+
 
     def delete_selection(self):
-        indexes = [r.row() for r in self.table_widget.selectionModel().selectedRows()]
+        indexes = {r.row() for r in self.table_widget.selectionModel().selection().indexes()}
         self.delete_indexes(indexes)
 
     def delete_indexes(self, indexes):
+        indexes = sorted(indexes)
         for i in range(0, len(indexes)):
             self.table_widget.removeRow(indexes[i]-i)
             pc = self.pcs[indexes[i] - i]
-            self.pc_removed.emit(pc)
-            del self.pcs[indexes[i]-i]
+            del self.pcs[indexes[i] - i]
+            pc.delete()
 
     def clear(self):
         self.delete_indexes(list(range(0, len(self.pcs))))
@@ -132,6 +168,8 @@ class PanelPCEdit(QWidget):
         self.table_widget.setCellWidget(row_id, 0, cb_widget)
         for i in range(1, len(pc.widgets)):
             self.table_widget.setCellWidget(row_id, i, pc.widgets[i])
+
+        pc.pc_selected_changed.connect(self.select_pc)
         self.pc_added.emit(pc)
 
     def save(self):

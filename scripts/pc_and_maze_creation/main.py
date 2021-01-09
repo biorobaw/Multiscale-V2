@@ -50,7 +50,7 @@ class MainWindow(QMainWindow):
         tab_maze.wall_removed.connect(pane_plot.gview.remove_graphics)
 
         tab_pcs.pc_added.connect(pane_plot.gview.add_pc)
-        tab_pcs.pc_removed.connect(pane_plot.gview.remove_graphics)
+
 
     def load_dafault_data(self):
         self.tab_maze.reload()
