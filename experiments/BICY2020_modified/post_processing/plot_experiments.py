@@ -231,23 +231,54 @@ def plot_experiment7(figure_folder, configs, sample_rate, db):
     last_episode = -sample_rate % num_episodes
 
     # plot each scale separately
-    for maze, sub_configs in configs.groupby(['mazeFile']):
+    for maze, maze_configs in configs.groupby(['mazeFile']):
         # get indices and format text for the plots
         maze = ntpath.basename(maze)[1:-4]
         print('plotting maze: ', maze)
 
+        maze_figure_folder = figure_folder + 'M' + maze +'/'
+        make_folder(maze_figure_folder)
+
+
+
+        # group by trace:
+        for trace, sub_configs in maze_configs.groupby(['traces']):
+
+            group_name = f'M{maze}-t{trace:.1f}'
+            legend_title = 'Layer'
+            legend_values = sub_configs.pc_files.map(format_pc_file)
+            plot_title = f"Maze {maze} - trace {trace:.1f}"
+
+            plot_runtimes_boxplots_dunntest(db, sub_configs, location, last_episode, group_name,
+                                            legend_title, legend_values, plot_title, figure_folder)
+
+            plot_deltaV(db, sub_configs, location, last_episode, group_name,
+                        legend_title, legend_values, plot_title, figure_folder)
+
+        # group by layer
+        for layer, layer_configs in sub_configs.groupby(['pc_files']):
+
+            group_name = f'M{maze}-L{format_pc_file(layer)}'
+            legend_title = 'Trace'
+            legend_values = sub_configs.traces.map("{0:.1f}".format)
+            plot_title = f"Maze {maze} - Trace {trace:.1f}"
+
+            plot_runtimes_boxplots_dunntest(db, sub_configs, location, last_episode, group_name,
+                                            legend_title, legend_values, plot_title, figure_folder)
+
+            plot_deltaV(db, sub_configs, location, last_episode, group_name,
+                        legend_title, legend_values, plot_title, figure_folder)
+
+        # for each layer
+
         # plot titles and legends:
 
-        group_name = f'M{maze}'
-        legend_title = 'Traces'
-        legend_values = sub_configs.traces.map("{0:.1f}".format)
-        plot_title = f"Maze {maze}"
 
-        plot_runtimes_boxplots_dunntest(db, sub_configs, location, last_episode, group_name,
-                                        legend_title, legend_values, plot_title, figure_folder)
 
-        plot_deltaV(db, sub_configs, location, last_episode, group_name,
-                    legend_title, legend_values, plot_title, figure_folder)
+def format_pc_file(file_name):
+    pc_file = ntpath.basename(file_name)[0:-4]
+    return f'{pc_file}'
+
 
 
 def plot_experiment(folder):

@@ -33,6 +33,10 @@ def format_maze(config):
     maze = ntpath.basename(config['mazeFile'])[1:-4]
     return f'M{maze}'
 
+def format_pc_file(config):
+    pc_file = ntpath.basename(config['pc_files'])[0:-4]
+    return f'L{pc_file}'
+
 
 def apply_formatters( config, formatters):
     return  '-'.join([f(config) for f in formatters])
@@ -57,7 +61,7 @@ def plot_config(experiment_folder, config, config_id):
         '4': [format_maze, lambda c: f's{c["pcSizes"]}', lambda c: f't{c["traces"]}'],
         '5': [format_maze, format_trace, format_nx],
         '6': [format_maze, lambda c: f's{c["pcSizes"]}', lambda c: f't{c["traces"]}'],
-        '7': [format_maze, lambda c: f't{c["traces"]}']
+        '7': [format_maze, format_pc_file, lambda c: f't{c["traces"]}']
     }
     config_title = apply_formatters(config, e_formatters[experiment_name])
     save_name = os.path.join(figure_folder, 'paths_' + config_title + '.pdf')
