@@ -28,7 +28,7 @@ maze_layers = pd.DataFrame(columns=['maze_id','pc_files'],
                                  [2,pc_path + 'u08.csv'],
                                  [2,pc_path + 'u12.csv'],
                                  [2,pc_path + 'u16.csv'],
-                                 [2,pc_path + 'non_uniform_2.csv']
+                                 [2,pc_path + 'non_uniform_8.csv']
                                 ]
                            )
 mazes_pcs_DF = mazes_DF.loc[maze_layers.maze_id].reset_index(drop=True)

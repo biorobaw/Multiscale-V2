@@ -169,6 +169,7 @@ class GViewPlotting(QGraphicsView):
         # check if item selected
         item = self.itemAt(event.x(), event.y())
 
+
         if item in self.pc_from_graphic:
             # select pc
             self.dragging_pc = self.pc_from_graphic[item]

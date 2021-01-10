@@ -128,6 +128,8 @@ class PanelPCEdit(QWidget):
                 # which avoids signal loops
                 model.select(index, new_val)
 
+            self.table_widget.scrollTo(self.table_widget.model().index(row, 0))
+
 
 
     def delete_selection(self):
