@@ -244,30 +244,30 @@ def plot_experiment7(figure_folder, configs, sample_rate, db):
         # group by trace:
         for trace, sub_configs in maze_configs.groupby(['traces']):
 
-            group_name = f'M{maze}-t{trace:.1f}'
+            group_name = f't{trace:.1f}'
             legend_title = 'Layer'
             legend_values = sub_configs.pc_files.map(format_pc_file)
             plot_title = f"Maze {maze} - trace {trace:.1f}"
 
             plot_runtimes_boxplots_dunntest(db, sub_configs, location, last_episode, group_name,
-                                            legend_title, legend_values, plot_title, figure_folder)
+                                            legend_title, legend_values, plot_title, maze_figure_folder)
 
             plot_deltaV(db, sub_configs, location, last_episode, group_name,
-                        legend_title, legend_values, plot_title, figure_folder)
+                        legend_title, legend_values, plot_title, maze_figure_folder)
 
         # group by layer
         for layer, layer_configs in sub_configs.groupby(['pc_files']):
 
-            group_name = f'M{maze}-L{format_pc_file(layer)}'
+            group_name = f'L{format_pc_file(layer)}'
             legend_title = 'Trace'
             legend_values = sub_configs.traces.map("{0:.1f}".format)
             plot_title = f"Maze {maze} - Trace {trace:.1f}"
 
             plot_runtimes_boxplots_dunntest(db, sub_configs, location, last_episode, group_name,
-                                            legend_title, legend_values, plot_title, figure_folder)
+                                            legend_title, legend_values, plot_title, maze_figure_folder)
 
             plot_deltaV(db, sub_configs, location, last_episode, group_name,
-                        legend_title, legend_values, plot_title, figure_folder)
+                        legend_title, legend_values, plot_title, maze_figure_folder)
 
         # for each layer
 
