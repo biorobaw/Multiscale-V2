@@ -1,7 +1,7 @@
 from baseGenerator import *
 
 # EXPERIMENT SETUP FIELDS  
-outputFile     = '../experiment2-SingleMin.csv'           # relative to this folder
+outputFile     = '../experiment2-singleMin.csv'           # relative to this folder
 experiment     = 'experiments/setups/experiment_1.xml' # relative to git root folder
 group          = 'g1'
 ratsPerConfig  = 100
