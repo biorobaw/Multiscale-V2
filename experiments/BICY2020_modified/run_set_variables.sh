@@ -1,5 +1,8 @@
 #in git root folder execute the following commands:
 
+# AUXILIARY FUNCTION
+map() { eval "echo \${$1[$2]}"; }
+
 # FOLDERS
 EXPERIMENT_FOLDER="experiments/BICY2020_modified"
 CONFIGS_FOLDER=$EXPERIMENT_FOLDER/config_files
@@ -14,31 +17,49 @@ SCRIPT_4_MERGE="scripts/log_processing/mergeConfigs.py"
 SCRIPT_5_PLOT_EXPERIMENT=$EXPERIMENT_FOLDER/post_processing/plot_experiments.py
 
 # EXPERIMENTS
-E1=experiment1-traces
-E2=experiment2-singleMin
-E3=experiment3-singleSame
-E4=experiment4-extraAtFeeder
-E5=experiment5-density
-E6=experiment6-extraAtGap
-E7=experiment7-nonUniform
+RUN=()
+RUN+=(E1)
+#RUN+=(E2)
+#RUN+=(E3)
+#RUN+=(E4)
+#RUN+=(E5)
+#RUN+=(E6)
+RUN+=(E7)
+
+decalre -A E1=( ["NAME"]="experiment1-traces" )
+decalre -A E2=( ["NAME"]="experiment2-singleMin" )
+decalre -A E3=( ["NAME"]="experiment3-singleSame" )
+decalre -A E4=( ["NAME"]="experiment4-extraAtFeeder" )
+decalre -A E5=( ["NAME"]="experiment5-density" )
+decalre -A E6=( ["NAME"]="experiment6-extraAtGap" )
+decalre -A E7=( ["NAME"]="experiment7-nonUniform" )
 
 # EXPERIMENT LOG FOLDERS
-LOG_FOLDER_E1=$LOG_FOLDER/$E1
-LOG_FOLDER_E2=$LOG_FOLDER/$E2
-LOG_FOLDER_E3=$LOG_FOLDER/$E3
-LOG_FOLDER_E4=$LOG_FOLDER/$E4
-LOG_FOLDER_E5=$LOG_FOLDER/$E5
-LOG_FOLDER_E6=$LOG_FOLDER/$E6
-LOG_FOLDER_E7=$LOG_FOLDER/$E7
+for E in $RUN[*]; do
+	eval "$E[LOG_FOLDER]=\$LOG_FOLDER/\$(map $E NAME)"
+	eval "$E[CONFIG_FILE]=\$CONFIGS_FOLDER/\$(map $E NAME).csv"
+
+	echo $(map $E LOG_FOLDER)
+	echo $(map $E CONFIG_FILE)
+
+done
+
+# E1[LOG_FOLDER]=$LOG_FOLDER/$E1
+# E2[LOG_FOLDER]=$LOG_FOLDER/$E2
+# E3[LOG_FOLDER]=$LOG_FOLDER/$E3
+# E4[LOG_FOLDER]=$LOG_FOLDER/$E4
+# E5[LOG_FOLDER]=$LOG_FOLDER/$E5
+# E6[LOG_FOLDER]=$LOG_FOLDER/$E6
+# E7[LOG_FOLDER]=$LOG_FOLDER/$E7
 
 # EXPERIMENT CONFIG FILES
-CONFIG_FILE_E1=$CONFIGS_FOLDER/$E1.csv
-CONFIG_FILE_E2=$CONFIGS_FOLDER/$E2.csv
-CONFIG_FILE_E3=$CONFIGS_FOLDER/$E3.csv
-CONFIG_FILE_E4=$CONFIGS_FOLDER/$E4.csv
-CONFIG_FILE_E5=$CONFIGS_FOLDER/$E5.csv
-CONFIG_FILE_E6=$CONFIGS_FOLDER/$E6.csv
-CONFIG_FILE_E7=$CONFIGS_FOLDER/$E7.csv
+# E1[CONFIG_FILE]=$CONFIGS_FOLDER/$(map E1 NAME).csv
+# E2[CONFIG_FILE]=$CONFIGS_FOLDER/$(map E2 NAME).csv
+# E3[CONFIG_FILE]=$CONFIGS_FOLDER/$(map E3 NAME).csv
+# E4[CONFIG_FILE]=$CONFIGS_FOLDER/$(map E4 NAME).csv
+# E5[CONFIG_FILE]=$CONFIGS_FOLDER/$(map E5 NAME).csv
+# E6[CONFIG_FILE]=$CONFIGS_FOLDER/$(map E6 NAME).csv
+# E7[CONFIG_FILE]=$CONFIGS_FOLDER/$(map E7 NAME).csv
 
 
 
@@ -48,4 +69,4 @@ CONFIG_FILE_E7=$CONFIGS_FOLDER/$E7.csv
 # DO_EXPERIMENT_4=1
 # DO_EXPERIMENT_5=1
 # DO_EXPERIMENT_6=1
-DO_EXPERIMENT_7=1
+# DO_EXPERIMENT_7=1
