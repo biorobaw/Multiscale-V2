@@ -55,9 +55,5 @@ for E in ${RUN[*]}; do
 
 	numLines=`wc -l $(map $E CONFIG_FILE) | cut -f1 -d' '`
 	maxRatInFile=`expr ${numLines} - 2`
-
-	[ -z "$(map $E MIN_RAT)" ] && eval "$E[MIN_RAT]=0" 
-	[ -z "$(map $E MAX_RAT)" ] && eval "$E[MIN_RAT]=$maxRatInFile" 
-	[ -z "$(map $E MIN_CONFIG)" ] && eval "$E[MIN_CONFIG]=`expr $(map $E )`" 
-	[ -z "$(map $E MIN_CONFIG)" ] && eval "$E[MIN_CONFIG]=``" 
+	
 done
