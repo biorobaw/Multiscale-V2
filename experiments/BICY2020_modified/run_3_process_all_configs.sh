@@ -1,3 +1,4 @@
+#!/bin/sh
 # This script starts slurm path plotting scripts and configuration processing scripts 
 
 source "experiments/BICY2020_modified/run_set_variables.sh"

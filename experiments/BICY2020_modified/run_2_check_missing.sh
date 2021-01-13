@@ -1,3 +1,4 @@
+#!/bin/sh
 #in git root folder execute the following commands:
 
 source "experiments/BICY2020_modified/run_set_variables.sh"

@@ -31,6 +31,7 @@ RUN+=(E7)
 #	BATCH_SIZE : the number of rats executed together by each slurm process
 #	RATS : number of rats per config
 #	SAMPLE_RATE : states every how many episodes should we log results
+#!/bin/sh
 # OPTIONAL parameters:
 #	MIN_RAT, MAX_RAT to be executed
 #	MIN_CONFIG, MAX_CONFIG to be processed

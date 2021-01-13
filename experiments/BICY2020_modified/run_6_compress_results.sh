@@ -1,3 +1,4 @@
+#!/bin/sh
 #cd to folder
 echo `pwd`
 cd $1
