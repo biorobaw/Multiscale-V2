@@ -9,15 +9,15 @@ for E in ${RUN[*]}; do
 
 	# num rats in experiment is number of lines in config file -2:
 	numLines=`wc -l $(map $E CONFIG_FILE) | cut -f1 -d' '`
-	numRats=`expr ${numLines} - 2`
+	numRats=$((${numLines} - 2))
 
 	# if max and min rats were not defined, then define them
 	[[ -z "$(map $E MIN_RAT)" ]] && MIN_RAT=0 || MIN_RAT=$(map $E MIN_RAT)
 	[[ -z "$(map $E MAX_RAT)" ]] && MAX_RAT=$numRats || MAX_RAT=$(map $E MAX_RAT) 
 
 	# if max and min configs were not defined, then define them
-	[[ -z "$(map $E MIN_CONFIG)" ]] && MIN_CONFIG=`expr $MIN_RAT / $(map $E RATS)` || MIN_CONFIG=$(map $E MIN_CONFIG)
-	[[ -z "$(map $E MAX_CONFIG)" ]] && MAX_CONFIG=`expr $MAX_RAT / $(map $E RATS)` || MAX_CONFIG=$(map $E MAX_CONFIG)
+	[[ -z "$(map $E MIN_CONFIG)" ]] && MIN_CONFIG=$(($MIN_RAT / $(map $E RATS))) || MIN_CONFIG=$(map $E MIN_CONFIG)
+	[[ -z "$(map $E MAX_CONFIG)" ]] && MAX_CONFIG=$(($MAX_RAT / $(map $E RATS))) || MAX_CONFIG=$(map $E MAX_CONFIG)
 
 	echo "sbatch -a ${MIN_CONFIG}-${MAX_CONFIG} --mem=500M --time=0:15:00 --cpus-per-task=2 --wrap=\"${BATCH_SCRIPT/ENAME/$(map $E LOG_FOLDER)}\""
 	sbatch -a ${MIN_CONFIG}-${MAX_CONFIG} --mem=500M --time=0:15:00 --cpus-per-task=2 --wrap="${BATCH_SCRIPT/ENAME/$(map $E LOG_FOLDER)}"
