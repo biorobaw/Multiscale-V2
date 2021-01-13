@@ -4,11 +4,7 @@ source "experiments/BICY2020_modified/run_set_variables.sh"
 
 CHECK_FILE="r#ID-steps.bin"
 
-[ -z "$DO_EXPERIMENT_1" ] || ( echo "E1" && python $SCRIPT_2_CHECK $LOG_FOLDER_E1/ $CHECK_FILE 100 )
-[ -z "$DO_EXPERIMENT_2" ] || ( echo "E2" && python $SCRIPT_2_CHECK $LOG_FOLDER_E2/ $CHECK_FILE 100 )
-[ -z "$DO_EXPERIMENT_3" ] || ( echo "E3" && python $SCRIPT_2_CHECK $LOG_FOLDER_E3/ $CHECK_FILE 100 )
-[ -z "$DO_EXPERIMENT_4" ] || ( echo "E4" && python $SCRIPT_2_CHECK $LOG_FOLDER_E4/ $CHECK_FILE 100 )
-[ -z "$DO_EXPERIMENT_5" ] || ( echo "E5" && python $SCRIPT_2_CHECK $LOG_FOLDER_E5/ $CHECK_FILE 50 )
-[ -z "$DO_EXPERIMENT_6" ] || ( echo "E6" && python $SCRIPT_2_CHECK $LOG_FOLDER_E6/ $CHECK_FILE 100 )
-[ -z "$DO_EXPERIMENT_7" ] || ( echo "E7" && python $SCRIPT_2_CHECK $LOG_FOLDER_E7/ $CHECK_FILE 100 )
-
+for E in ${RUN[*]}; do
+	echo "sh python $SCRIPT_2_CHECK $(map $E LOG_FOLDER) $CHECK_FILE $(map $E RATS)"
+	python $SCRIPT_2_CHECK $(map $E LOG_FOLDER) $CHECK_FILE $(map $E RATS)
+done

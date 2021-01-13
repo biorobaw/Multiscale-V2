@@ -2,7 +2,7 @@
 
 #SBATCH --time=1:00:00
 #SBATCH --cpus-per-task 2
-#SBATCH --mem=500M
+#SBATCH --mem=2000M
 ##SBATCH -p mri2016
 
 baseDir=$1

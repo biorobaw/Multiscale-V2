@@ -18,7 +18,7 @@ SCRIPT_5_PLOT_EXPERIMENT=$EXPERIMENT_FOLDER/post_processing/plot_experiments.py
 
 # EXPERIMENTS
 RUN=()
-RUN+=(E1)
+#RUN+=(E1)
 #RUN+=(E2)
 #RUN+=(E3)
 #RUN+=(E4)
@@ -26,47 +26,38 @@ RUN+=(E1)
 #RUN+=(E6)
 RUN+=(E7)
 
-decalre -A E1=( ["NAME"]="experiment1-traces" )
-decalre -A E2=( ["NAME"]="experiment2-singleMin" )
-decalre -A E3=( ["NAME"]="experiment3-singleSame" )
-decalre -A E4=( ["NAME"]="experiment4-extraAtFeeder" )
-decalre -A E5=( ["NAME"]="experiment5-density" )
-decalre -A E6=( ["NAME"]="experiment6-extraAtGap" )
-decalre -A E7=( ["NAME"]="experiment7-nonUniform" )
+# Each experiment requires parameters: 
+#	NAME : name of the experiment
+#	BATCH_SIZE : the number of rats executed together by each slurm process
+#	RATS : number of rats per config
+#	SAMPLE_RATE : states every how many episodes should we log results
+# OPTIONAL parameters:
+#	MIN_RAT, MAX_RAT to be executed
+#	MIN_CONFIG, MAX_CONFIG to be processed
+# 
+
+declare -A E1=( ["NAME"]=experiment1-traces 		["BATCH_SIZE"]=10 ["RATS"]=100 ["SAMPLE_RATE"]=5  )
+declare -A E2=( ["NAME"]=experiment2-singleMin 		["BATCH_SIZE"]=10 ["RATS"]=100 ["SAMPLE_RATE"]=5  )
+declare -A E3=( ["NAME"]=experiment3-singleSame 	["BATCH_SIZE"]=4  ["RATS"]=100 ["SAMPLE_RATE"]=1  )
+declare -A E4=( ["NAME"]=experiment4-extraAtFeeder 	["BATCH_SIZE"]=10 ["RATS"]=100 ["SAMPLE_RATE"]=5  )
+declare -A E5=( ["NAME"]=experiment5-density 		["BATCH_SIZE"]=8  ["RATS"]=50  ["SAMPLE_RATE"]=10 )
+declare -A E6=( ["NAME"]=experiment6-extraAtGap 	["BATCH_SIZE"]=10 ["RATS"]=100 ["SAMPLE_RATE"]=5  )
+declare -A E7=( ["NAME"]=experiment7-nonUniform 	["BATCH_SIZE"]=10 ["RATS"]=100 ["SAMPLE_RATE"]=5  )
+E7[MIN_RAT]=0
+E7[MAX_RAT]=9999
+E7[MIN_CONFIG]=0
+E7[MAX_CONFIG]=99
 
 # EXPERIMENT LOG FOLDERS
-for E in $RUN[*]; do
+for E in ${RUN[*]}; do
 	eval "$E[LOG_FOLDER]=\$LOG_FOLDER/\$(map $E NAME)"
 	eval "$E[CONFIG_FILE]=\$CONFIGS_FOLDER/\$(map $E NAME).csv"
 
-	echo $(map $E LOG_FOLDER)
-	echo $(map $E CONFIG_FILE)
+	numLines=`wc -l $(map $E CONFIG_FILE) | cut -f1 -d' '`
+	maxRatInFile=`expr ${numLines} - 2`
 
+	[ -z "$(map $E MIN_RAT)" ] && eval "$E[MIN_RAT]=0" 
+	[ -z "$(map $E MAX_RAT)" ] && eval "$E[MIN_RAT]=$maxRatInFile" 
+	[ -z "$(map $E MIN_CONFIG)" ] && eval "$E[MIN_CONFIG]=`expr $(map $E )`" 
+	[ -z "$(map $E MIN_CONFIG)" ] && eval "$E[MIN_CONFIG]=``" 
 done
-
-# E1[LOG_FOLDER]=$LOG_FOLDER/$E1
-# E2[LOG_FOLDER]=$LOG_FOLDER/$E2
-# E3[LOG_FOLDER]=$LOG_FOLDER/$E3
-# E4[LOG_FOLDER]=$LOG_FOLDER/$E4
-# E5[LOG_FOLDER]=$LOG_FOLDER/$E5
-# E6[LOG_FOLDER]=$LOG_FOLDER/$E6
-# E7[LOG_FOLDER]=$LOG_FOLDER/$E7
-
-# EXPERIMENT CONFIG FILES
-# E1[CONFIG_FILE]=$CONFIGS_FOLDER/$(map E1 NAME).csv
-# E2[CONFIG_FILE]=$CONFIGS_FOLDER/$(map E2 NAME).csv
-# E3[CONFIG_FILE]=$CONFIGS_FOLDER/$(map E3 NAME).csv
-# E4[CONFIG_FILE]=$CONFIGS_FOLDER/$(map E4 NAME).csv
-# E5[CONFIG_FILE]=$CONFIGS_FOLDER/$(map E5 NAME).csv
-# E6[CONFIG_FILE]=$CONFIGS_FOLDER/$(map E6 NAME).csv
-# E7[CONFIG_FILE]=$CONFIGS_FOLDER/$(map E7 NAME).csv
-
-
-
-# DO_EXPERIMENT_1=1
-# DO_EXPERIMENT_2=1
-# DO_EXPERIMENT_3=1
-# DO_EXPERIMENT_4=1
-# DO_EXPERIMENT_5=1
-# DO_EXPERIMENT_6=1
-# DO_EXPERIMENT_7=1
