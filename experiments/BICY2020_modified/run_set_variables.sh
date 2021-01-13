@@ -53,7 +53,4 @@ for E in ${RUN[*]}; do
 	eval "$E[LOG_FOLDER]=\$LOG_FOLDER/\$(map $E NAME)"
 	eval "$E[CONFIG_FILE]=\$CONFIGS_FOLDER/\$(map $E NAME).csv"
 
-	numLines=`wc -l $(map $E CONFIG_FILE) | cut -f1 -d' '`
-	maxRatInFile=`expr ${numLines} - 2`
-	
 done
