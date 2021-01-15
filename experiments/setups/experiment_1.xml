@@ -35,10 +35,10 @@
 		q_traces="$(traces)"
     	pc_bin_size="0.04"
 		
-		discountFactor="0.99"
+		discountFactor="0.95" 
 		v_learningRate="0.7,0.7,0.7"
 		q_learningRate="0.7,0.7,0.7"
-		foodReward="1.0"/>
+		foodReward="1.0"/> <!-- discount factor 0.99, learning rate 0.7 -->
 
 	<template id="robot"
 			  class="$(SCS).robot.Robot">
