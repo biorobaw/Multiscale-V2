@@ -18,12 +18,12 @@ SCRIPT_5_PLOT_EXPERIMENT=$EXPERIMENT_FOLDER/post_processing/plot_experiments.py
 
 # EXPERIMENTS
 RUN=()
-#RUN+=(E1)
+RUN+=(E1)
 #RUN+=(E2)
-#RUN+=(E3)
-#RUN+=(E4)
-#RUN+=(E5)
-#RUN+=(E6)
+RUN+=(E3)
+RUN+=(E4)
+RUN+=(E5)
+RUN+=(E6)
 RUN+=(E7)
 
 # Each experiment requires parameters: 
@@ -44,10 +44,10 @@ declare -A E4=( ["NAME"]=experiment4-extraAtFeeder 	["BATCH_SIZE"]=10 ["RATS"]=1
 declare -A E5=( ["NAME"]=experiment5-density 		["BATCH_SIZE"]=8  ["RATS"]=50  ["SAMPLE_RATE"]=10 )
 declare -A E6=( ["NAME"]=experiment6-extraAtGap 	["BATCH_SIZE"]=10 ["RATS"]=100 ["SAMPLE_RATE"]=5  )
 declare -A E7=( ["NAME"]=experiment7-nonUniform 	["BATCH_SIZE"]=10 ["RATS"]=100 ["SAMPLE_RATE"]=5  )
-E7[MIN_RAT]=0
-E7[MAX_RAT]=9999
-E7[MIN_CONFIG]=0
-E7[MAX_CONFIG]=99
+#E7[MIN_RAT]=0
+#E7[MAX_RAT]=9999
+#E7[MIN_CONFIG]=0
+#E7[MAX_CONFIG]=99
 
 # EXPERIMENT LOG FOLDERS
 for E in ${RUN[*]}; do
