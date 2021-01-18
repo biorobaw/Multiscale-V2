@@ -8,8 +8,8 @@ from ..utils.MazeParser import parse_maze
 
 """
    This file is to be called after processAllConfigs,
-   it creates the plots for the multi_scale_memory model 
-   that require information from multiple configurations   
+   it creates the plots for the multi_scale_memory model
+   that require information from multiple configurations
 """
 
 
@@ -120,9 +120,15 @@ def plot_runtimes_boxplots_dunntest(db, configs, location, episode, group_name,
                                     legend_title, legend_values,  plot_title, save_folder):
 
     # get config  indices and then get data from db
-    indices = [np.uint8(c[1:]) for c in configs.index]  # config numbers
+    indices = [np.uint16(c[1:]) for c in configs.index]  # config numbers
     summaries = load_summaries(db, indices, location)
     runtimes_last_episode = load_episode_runtimes(db, indices, location, episode)
+
+    # print("configs: ", pd.unique(runtimes_last_episode.config))
+
+    # print(runtimes_last_episode.groupby(['config'])['location'].describe())
+    # print(runtimes_last_episode.groupby(['config'])['episode'].describe())
+    # print(runtimes_last_episode.groupby(['config'])['steps'].describe())
 
     # prepare save folder
     save_folder = os.path.join(save_folder , group_name, '')
@@ -148,7 +154,7 @@ def plot_deltaV(db, configs, location, episode, group_name,
                     legend_title, legend_values,  plot_title, save_folder):
 
     # get config  indices and then get data from db
-    indices = [np.uint8(c[1:]) for c in configs.index]  # config numbers
+    indices = [np.uint16(c[1:]) for c in configs.index]  # config numbers
     deltaV = load_deltaV(db, indices, location)
 
     # prepare save folder

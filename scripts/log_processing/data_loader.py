@@ -29,7 +29,7 @@ def load_summaries(db, config_indices, location):
                            "AND location = {}"
                            .format(indices_str, np.uint8(location)), db)
     # adjust data types to reduce memory size
-    df.config = df.config.astype(np.uint8)
+    df.config = df.config.astype(np.uint16)
     df.location = df.location.astype(np.uint8)
     df.episode = df.episode.astype(np.uint16)
     df.steps = df.steps.astype(np.float32)
@@ -44,7 +44,7 @@ def load_deltaV(db, config_indices, location):
                            "AND location = {}"
                            .format(indices_str, np.uint8(location)), db)
     # adjust data types to reduce memory size
-    df.config = df.config.astype(np.uint8)
+    df.config = df.config.astype(np.uint16)
     df.location = df.location.astype(np.uint8)
     df.episode = df.episode.astype(np.uint16)
     df.deltaV = df.deltaV.astype(np.float32)
@@ -61,7 +61,7 @@ def load_episode_runtimes(db, config_indices, location, episode):
                            "AND location = {}"
                            .format(episode, indices_str, np.uint8(location)), db)
     # adjust data types to reduce memory size
-    df.config = df.config.astype(np.uint8)
+    df.config = df.config.astype(np.uint16)
     df.location = df.location.astype(np.uint8)
     df.episode = df.episode.astype(np.uint16)
     df.steps = df.steps.astype(np.float32)
