@@ -176,7 +176,8 @@ def plot_paths(title, config_folder, config_df, save_name):
     p = ggplot() + ggtitle(title)
 
     # plot paths
-    for id in range(100):
+    num_rats = 100
+    for id in range(num_rats):
         # check if file exists
         file_name = os.path.join(config_folder, f'r{id}-paths.bin')
         if not os.path.exists(file_name):
@@ -187,7 +188,7 @@ def plot_paths(title, config_folder, config_df, save_name):
         with open( file_name, 'rb') as file:
             for i in range(int(config_df['numStartingPositions'])):
                 xy_df = pd.DataFrame(data=load_float_vector(file).reshape((-1, 2)), columns=["x", "y"])
-                p = p + geom_path(aes(x='x', y='y'), data=xy_df, color='blue')
+                p = p + geom_path(aes(x='x', y='y'), data=xy_df, color='blue', alpha=1.0/num_rats)
 
 
     # plot maze
