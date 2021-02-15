@@ -1,5 +1,5 @@
-
 import sys
+import numpy as np
 from PyQt5.QtCore import QObject, Qt, pyqtSignal
 from PyQt5.QtWidgets import QWidget, QCheckBox, QDoubleSpinBox
 
@@ -93,4 +93,16 @@ class PlaceCell(QWidget):
         if self in PlaceCell.all_selected:
             PlaceCell.all_selected.remove(self)
         self.delete_signal.emit(self)
+
+    def __str__(self):
+        return f'{self.x():9.3f}, {self.y():9.3f}, {self.r():9.2f}'
+
+    @staticmethod
+    def fromstring(s):
+        args = np.fromstring(s.replace('[','').replace(']',''), sep=",")
+        if len(args) == 3:
+            return PlaceCell(args[0], args[1], args[2])
+        else:
+            print('PC parse error')
+            return None
 

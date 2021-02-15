@@ -147,9 +147,14 @@ class PanelPCEdit(QWidget):
     def clear(self):
         self.delete_indexes(list(range(0, len(self.pcs))))
 
-    def add_entry(self, x=0, y=0, r=0.08):
+    def add_entry(self, x=0, y=0, r=0.08, pc_str=""):
         # create place cell
-        pc = PlaceCell(x, y, r)
+        if pc_str != "":
+            pc = PlaceCell.fromstring(pc_str)
+            if pc is None:
+                return
+        else:
+            pc = PlaceCell(x, y, r)
         self.pcs += [pc]
 
         # create row in the table
@@ -213,6 +218,17 @@ class PanelPCEdit(QWidget):
         self.clear()
         self.load_from_file(self.last_file_loaded)
 
+
+    def process_copy_event(self):
+        pc_strs = [ f'[{pc}]' for pc in PlaceCell.all_selected ]
+        QApplication.clipboard().setText( '\n'.join( pc_strs) )
+
+    def process_paste_event(self):
+        paste_text = QApplication.clipboard().text()
+        print(paste_text)
+        tokens = paste_text.splitlines()
+        for t in tokens:
+            self.add_entry(pc_str = t)
 
 
 
