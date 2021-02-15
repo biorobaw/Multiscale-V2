@@ -7,7 +7,8 @@
 
 baseDir=$1
 sample_rate=$2
-configId=c$SLURM_ARRAY_TASK_ID
+[ -z $SLURM_ARRAY_TASK_ID ] && configId=$3 || configId=c$SLURM_ARRAY_TASK_ID
+
 
 echo "configId " $configId
 

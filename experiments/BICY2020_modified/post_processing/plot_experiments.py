@@ -256,17 +256,17 @@ def plot_experiment7(figure_folder, configs, sample_rate, db):
                         legend_title, legend_values, plot_title, maze_figure_folder)
 
         # group by layer
-        for layer, layer_configs in sub_configs.groupby(['pc_files']):
+        for layer, layer_configs in maze_configs.groupby(['pc_files']):
 
             group_name = f'L{format_pc_file(layer)}'
             legend_title = 'Trace'
-            legend_values = sub_configs.traces.map("{0:.1f}".format)
+            legend_values = layer_configs.traces.map("{0:.1f}".format)
             plot_title = f"Maze {maze} - Trace {trace:.1f}"
 
-            plot_runtimes_boxplots_dunntest(db, sub_configs, location, last_episode, group_name,
+            plot_runtimes_boxplots_dunntest(db, layer_configs, location, last_episode, group_name,
                                             legend_title, legend_values, plot_title, maze_figure_folder)
 
-            plot_deltaV(db, sub_configs, location, last_episode, group_name,
+            plot_deltaV(db, layer_configs, location, last_episode, group_name,
                         legend_title, legend_values, plot_title, maze_figure_folder)
 
         # for each layer
