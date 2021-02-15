@@ -1,7 +1,7 @@
 import sys
 
 from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QWidget, QHBoxLayout, QTabWidget, QSplitter
-from PyQt5.QtGui import QPalette, QColor
+from PyQt5.QtGui import QPalette, QColor, QKeyEvent
 from PyQt5.QtCore import Qt
 
 from panels.pc_edit_panel import PanelPCEdit
@@ -39,6 +39,7 @@ class MainWindow(QMainWindow):
         self.tab_maze = tab_maze = PanelMazeEdit()
         pane_edit.addTab(tab_pcs, "PCs")
         pane_edit.addTab(tab_maze, "maze")
+        self.pane_edit = pane_edit
 
         # create and set main widget's layout
         self.setCentralWidget(splitter)
@@ -55,6 +56,23 @@ class MainWindow(QMainWindow):
     def load_dafault_data(self):
         self.tab_maze.reload()
         self.tab_pcs.reload()
+
+    def keyReleaseEvent(self, event : QKeyEvent):
+        if event.key() == Qt.Key_C:
+            active_widget = self.pane_edit.currentWidget()
+            if hasattr(active_widget, 'process_copy_event'):
+                active_widget.process_copy_event()
+            else:
+                print("widget has no attribute 'process_copy_event'")
+
+        if event.key() == Qt.Key_V:
+            active_widget = self.pane_edit.currentWidget()
+            if hasattr(active_widget, 'process_paste_event'):
+                active_widget.process_paste_event()
+            else:
+                print("widget has no attribute 'process_paste_event'")
+
+
 
 
 if __name__ == '__main__':
