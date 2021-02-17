@@ -14,13 +14,14 @@ for E in ${RUN[*]}; do
 	[[ -z "$(map $E MIN_RAT)" ]] && MIN_RAT=0 || MIN_RAT=$(map $E MIN_RAT)
 	[[ -z "$(map $E MAX_RAT)" ]] && MAX_RAT=$numRats || MAX_RAT=$(map $E MAX_RAT)  
 
-	if [ ${1,,} == "serial" ]; then
-		echo "Serial"
+	if [ "${1,,}" == "serial" ]; then
+		echo "Serial, running rats: $MIN_RAT-$MAX_RAT $(map $E NAME)"
 		module add apps/jdk/11.0.5 
 		CMD_ARGS="-cp target/Multiscale-F2019-1.0.0-SNAPSHOT-jar-with-dependencies.jar -Xmx1500m com.github.biorobaw.scs.Main"
 		for rat_id in $(seq $MIN_RAT $MAX_RAT)
 		do
 			echo "rat $rat_id"
+			# Note: prepending "time -v" to command gives time and max memory usage of program + other metrics
 			time -v java $CMD_ARGS $(map $E CONFIG_FILE) $rat_id $(map $E LOG_FOLDER) >> serial_out.out
 
 			# check exit status
@@ -33,6 +34,6 @@ for E in ${RUN[*]}; do
 
 	else
 		echo "sh $SCRIPT_1_RUN_ALL $(map $E CONFIG_FILE) $(map $E LOG_FOLDER) $(map $E BATCH_SIZE) $MIN_RAT $MAX_RAT"
-		#sh $SCRIPT_1_RUN_ALL $(map $E CONFIG_FILE) $(map $E LOG_FOLDER) $(map $E BATCH_SIZE) $MIN_RAT $MAX_RAT
+		sh $SCRIPT_1_RUN_ALL $(map $E CONFIG_FILE) $(map $E LOG_FOLDER) $(map $E BATCH_SIZE) $MIN_RAT $MAX_RAT
 	fi
 done
