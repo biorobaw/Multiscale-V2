@@ -32,7 +32,6 @@ class PanelPCEdit(QWidget):
         # create the table to display data
         table_widget = QTableWidget()
         table_widget.setSelectionBehavior(table_widget.SelectRows)
-        # table_widget.set
         table_widget.setColumnCount(4)
         table_widget.setHorizontalHeaderLabels(('show', 'x', 'y', 'r'))
         table_widget.setRowCount(0)
@@ -206,13 +205,13 @@ class PanelPCEdit(QWidget):
                 loader_module = loader.module_from_spec(spec)
                 spec.loader.exec_module(loader_module)
                 df = loader_module.load_pc_df()
-                self.last_file_loaded = file_name
 
             except:
                 print("ERROR: the python script couldnt be loaded, check syntax errors in the script")
 
         for index, row in df.iterrows():
             self.add_entry(float(row['x']), float(row['y']), float(row['r']))
+        self.last_file_loaded = file_name
 
     def reload(self):
         self.clear()

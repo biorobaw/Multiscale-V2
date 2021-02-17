@@ -1,4 +1,5 @@
 import sys
+import importlib.util as loader
 from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, \
                             QWidget, QVBoxLayout, QTableWidget, \
                             QHeaderView, QCheckBox, QTableWidgetItem, \
@@ -12,12 +13,19 @@ sys.path.append('../utils')
 import MazeParser
 
 from data.Wall import Wall
-
+from data.Feeder import Feeder
+from data.StartPos import StartPos
 
 class PanelMazeEdit(QWidget):
 
     wall_added = pyqtSignal(Wall)
     wall_removed = pyqtSignal(Wall)
+
+    feeder_added = pyqtSignal(Feeder)
+    feeder_removed = pyqtSignal(Feeder)
+    
+    start_pos_added = pyqtSignal(StartPos)
+    start_pos_removed = pyqtSignal(StartPos) 
 
     def __init__(self, *args, **kwargs):
         super(PanelMazeEdit, self).__init__(*args, **kwargs)
@@ -25,7 +33,9 @@ class PanelMazeEdit(QWidget):
 
         # create data container:
         self.walls = []
-        self.last_file_loaded = 'default_maze.xml'
+        self.feeders = []
+        self.start_positions = []
+        self.last_file_loaded = 'default_maze_generator.py'
 
         # create the layout for the panel
         layout_pane = QVBoxLayout()
@@ -33,6 +43,7 @@ class PanelMazeEdit(QWidget):
 
         # create the table to display data
         table_widget = QTableWidget()
+        table_widget.setSelectionBehavior(table_widget.SelectRows)
         table_widget.setColumnCount(5)
         table_widget.setHorizontalHeaderLabels(('show', 'x1', 'y1', 'x2', 'y2'))
         table_widget.setRowCount(0)
@@ -60,7 +71,7 @@ class PanelMazeEdit(QWidget):
         button_add = QPushButton(self)
         button_add.setText("+")
         button_add.setMaximumWidth(20)
-        button_add.clicked.connect(self.add_entry)
+        button_add.clicked.connect(self.add_wall)
 
         button_load = QPushButton(self)
         button_load.setText("load")
@@ -95,28 +106,75 @@ class PanelMazeEdit(QWidget):
         table_widget.selectionModel().selectionChanged.connect(self.selection_changed)
 
 
-    def selection_changed(self, val1, val2):
+    def selection_changed(self, selected, deselected):
+
+        rows = set()
+        for i in deselected.indexes():
+            r = i.row()
+            if r not in rows:
+                rows.add(r)
+                self.walls[r].setSelected(False)
+
+        for i in selected.indexes():
+            r = i.row()
+            if r not in rows:
+                rows.add(r)
+                self.walls[r].setSelected(True)
+
+        # activate / deactivate button less
         selection = self.table_widget.selectionModel()
-        enabled = selection.hasSelection() and len(selection.selectedRows()) > 0
-        self.button_less.setEnabled(enabled)
+        self.button_less.setEnabled(selection.hasSelection())
+
+    def select_wall(self, wall):
+        if wall in self.walls:
+            row = self.walls.index(wall)
+
+            # get index of item in table and selection model
+            for col in range(0, self.table_widget.columnCount()):
+                index  = self.table_widget.model().index(row, col)
+                model = self.table_widget.selectionModel()
+
+                # read current selection value:
+                # current_val = model.isSelected(index)
+                new_val = model.Select if wall.selected() else model.Deselect
+
+                # observation: it seems using the selection model directly does not generate selection changed events
+                # which avoids signal loops
+                model.select(index, new_val)
+
+            self.table_widget.scrollTo(self.table_widget.model().index(row, 0))
 
     def delete_selection(self):
         indexes = [r.row() for r in self.table_widget.selectionModel().selectedRows()]
         self.delete_indexes(indexes)
 
     def delete_indexes(self, indexes):
+        indexes = sorted(indexes)
         for i in range(0, len(indexes)):
             self.table_widget.removeRow(indexes[i] - i)
             wall = self.walls[indexes[i] - i]
-            self.wall_removed.emit(wall)
             del self.walls[indexes[i] - i]
+            wall.delete()
 
     def clear(self):
         self.delete_indexes(list(range(0, len(self.walls))))
+        
+        for f in self.feeders:
+            f.delete()
+        self.feeders = []
 
-    def add_entry(self, x1=0, y1=-1.5, x2=0, y2=1.3):
-        # create place cell
-        wall = Wall(x1, y1, x2, y2, self)
+        for p in self.start_positions:
+            p.delete()
+        self.start_positions = []
+
+    def add_wall(self, x1=0, y1=-1.5, x2=0, y2=1.3, wall_str=""):
+        # create wall
+        if wall_str != "":
+            wall = Wall.fromstring(wall_str)
+            if wall is None:
+                return
+        else:
+            wall = Wall(x1, y1, x2, y2, self)
         self.walls += [wall]
 
         # create row in the table
@@ -138,7 +196,34 @@ class PanelMazeEdit(QWidget):
         for i in range(1, len(wall.widgets)):
             self.table_widget.setCellWidget(row_id, i, wall.widgets[i])
 
+        wall.wall_selected_changed.connect(self.select_wall)
         self.wall_added.emit(wall)
+
+    def add_feeder(self, id=1, x=0.5, y=-0.5, feeder_str=""):
+        # create feeder
+        if feeder_str != "":
+            feeder = feeder.fromstring(feeder_str)
+            if feeder is None:
+                return
+        else:
+            feeder = Feeder(id, x, y, None)
+        self.feeders += [feeder]
+
+        # feeder.object_changed.connect(self.select_feeder)
+        self.feeder_added.emit(feeder)
+
+    def add_start_pos(self, x=0, y=-1.5, w=0, start_pos_str=""):
+        # create start_pos
+        if start_pos_str != "":
+            start_pos = start_pos.fromstring(start_pos_str)
+            if start_pos is None:
+                return
+        else:
+            start_pos = StartPos(x, y, w, None)
+        self.start_positions += [start_pos]
+
+        # start_pos.object_changed.connect(self.select_wall)
+        self.start_pos_added.emit(start_pos)
 
     def save(self):
         name = QFileDialog().getSaveFileName(self, 'Save File')[0]
@@ -154,27 +239,73 @@ class PanelMazeEdit(QWidget):
             f.write(f'<world>\n')
             f.write('\n')
             for w in self.walls:
-                f.write(f'    {w.to_xml()}\n')
+                f.write(f'    {w.xml_tag()}\n')
+            if len(self.start_positions) > 0:
+                f.write('\n')
+                f.write('\n')
+                f.write('    <startPositions>\n')
+                for p in self.start_positions:
+                    f.write(f'        {p.xml_tag()}\n')
+                f.write('    </startPositions>\n')
+
+            if len(self.feeders) > 0:
+                f.write('\n')
+                f.write('\n')
+                for feeder in self.feeders:
+                    f.write(f'    {feeder.xml_tag()}\n')
             f.write('\n')
             f.write('</world>\n')
-        pass
 
     def load(self):
-        name = QFileDialog().getOpenFileName(self, 'Open File', '', "*.xml")[0]
+        name = QFileDialog().getOpenFileName(self, 'Open File', '', "*.xml;*.py")[0]
         self.load_from_file(name)
 
     def load_from_file(self, file_name):
         if file_name == '':
             return
+
+        walls, feeders, start_positions = pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
         try:
-            walls, feeders, start_positions = MazeParser.parse_maze(file_name)
-            for index, row in walls.iterrows():
-                self.add_entry(float(row['x1']), float(row['y1']),
-                               float(row['x2']), float(row['y2']))
-            self.last_file_loaded = file_name
+            if file_name.endswith(".xml"):
+                walls, feeders, start_positions = MazeParser.parse_maze(file_name)
+            elif file_name.endswith(".py"):
+                spec = loader.spec_from_file_location("maze_loader_file", file_name)
+                loader_module = loader.module_from_spec(spec)
+                spec.loader.exec_module(loader_module)
+                walls, feeders, start_positions = loader_module.load_maze_df()
         except:
             print(f'ERROR: unable to load the file {self.last_file_loaded}')
+
+        for index, row in walls.iterrows():
+            self.add_wall(float(row['x1']), float(row['y1']),
+                           float(row['x2']), float(row['y2']))
+
+        for index, row in feeders.iterrows():
+            #Currently we only display feeders, we do not allow editting them
+            self.add_feeder(int(row['fid']), float(row['x']), float(row['y']))
+
+        for index, row in start_positions.iterrows():
+            #Currently we only display feeders, we do not allow editting them
+            self.add_start_pos(float(row['x']), float(row['y']), float(row['w']))
+
+
+        self.last_file_loaded = file_name
+
 
     def reload(self):
         self.clear()
         self.load_from_file(self.last_file_loaded)
+
+    
+    def process_copy_event(self):
+        # get selected walls:
+        wall_strs = [ f'[{wall}]' for wall in Wall.all_selected ]
+        QApplication.clipboard().setText( '\n'.join( wall_strs) )
+
+    def process_paste_event(self):
+        paste_text = QApplication.clipboard().text()
+        print(paste_text)
+        tokens = paste_text.splitlines()
+        for t in tokens:
+            self.add_wall(wall_str = t)
+

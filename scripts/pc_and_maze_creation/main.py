@@ -48,8 +48,8 @@ class MainWindow(QMainWindow):
 
         # connect signals and slots:
         tab_maze.wall_added.connect(pane_plot.gview.add_wall)
-        tab_maze.wall_removed.connect(pane_plot.gview.remove_graphics)
-
+        tab_maze.feeder_added.connect(pane_plot.gview.add_feeder)
+        tab_maze.start_pos_added.connect(pane_plot.gview.add_start_pos)
         tab_pcs.pc_added.connect(pane_plot.gview.add_pc)
 
 
@@ -58,19 +58,29 @@ class MainWindow(QMainWindow):
         self.tab_pcs.reload()
 
     def keyReleaseEvent(self, event : QKeyEvent):
-        if event.key() == Qt.Key_C:
-            active_widget = self.pane_edit.currentWidget()
-            if hasattr(active_widget, 'process_copy_event'):
-                active_widget.process_copy_event()
-            else:
-                print("widget has no attribute 'process_copy_event'")
+        control = event.modifiers() & Qt.ControlModifier
 
-        if event.key() == Qt.Key_V:
+        if control:
+            if event.key() == Qt.Key_C:
+                active_widget = self.pane_edit.currentWidget()
+                if hasattr(active_widget, 'process_copy_event'):
+                    active_widget.process_copy_event()
+                else:
+                    print("widget has no attribute 'process_copy_event'")
+
+            if event.key() == Qt.Key_V:
+                active_widget = self.pane_edit.currentWidget()
+                if hasattr(active_widget, 'process_paste_event'):
+                    active_widget.process_paste_event()
+                else:
+                    print("widget has no attribute 'process_paste_event'")
+
+        if event.key() == Qt.Key_Delete:
             active_widget = self.pane_edit.currentWidget()
-            if hasattr(active_widget, 'process_paste_event'):
-                active_widget.process_paste_event()
+            if hasattr(active_widget, 'delete_selection'):
+                active_widget.delete_selection()
             else:
-                print("widget has no attribute 'process_paste_event'")
+                print("widget has no attribute 'delete_selection'")
 
 
 

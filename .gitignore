@@ -1,5 +1,6 @@
 /target/
 logs/
+/scripts/pc_and_maze_creation/saved_files/
 
 /slurm
 slurm*.out

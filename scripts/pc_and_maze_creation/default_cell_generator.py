@@ -6,6 +6,17 @@ import numpy as np
 def load_pc_df():
     """ This is the actual function that gets called"""
 
+    start_points_obstacle_experiment = pd.DataFrame(
+            columns = ['x', 'y', 'r'],
+            data = [
+                [1   ,-1.4, 0.01],
+                [-1  ,-1.4, 0.01],
+                [-1  , 0.1, 0.01],
+                [1   , 0.1, 0.01],
+                [0.5,  1, 0.02]
+            ]
+        )
+
     dummy_points = pd.DataFrame(columns=['x', 'y', 'r'],
                                 data=[
                                     [1  ,  0.1, 0.01], # d =
@@ -17,8 +28,12 @@ def load_pc_df():
                                     [-1  ,-1.4, 0.01],
                                     [0.1 , 1.2, 0.02 ]
                                 ])
+    return pd.DataFrame(columns=['x', 'y', 'r'])
+    # return start_points_obstacle_experiment
+    #return pd.concat([maze8_manual2(), dummy_points], ignore_index=True)
+    
+    # OLD CODE
     # return pd.concat([uniform_layer(4), dummy_points], ignore_index=True)
-    return pd.concat([maze8_manual2(), dummy_points], ignore_index=True)
     # final layers used for each maze:
         # maze 0 : maze0_manual()
         # maze 1 : none of the functions below, instead a modification of maze1_manual2() done by hand and then saved
