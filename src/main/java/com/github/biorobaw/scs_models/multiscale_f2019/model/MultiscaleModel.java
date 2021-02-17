@@ -8,6 +8,7 @@ import java.util.Arrays;
 
 import com.github.biorobaw.scs.experiment.Experiment;
 import com.github.biorobaw.scs.experiment.Subject;
+import com.github.biorobaw.scs.gui.displays.SCSDisplay;
 import com.github.biorobaw.scs.robot.commands.TranslateXY;
 import com.github.biorobaw.scs.robot.modules.FeederModule;
 import com.github.biorobaw.scs.robot.modules.distance_sensing.DistanceSensingModule;
