@@ -188,6 +188,14 @@ public class MultiscaleModel extends Subject{
 	static public float  tocs[]= new float[num_tics];
 	static public float averages[]=new float[num_tics];
 	
+	private void debug() {
+		var old_value = ((SCSDisplay)Experiment.get().display).setSync(true);
+		Experiment.get().display.updateData();
+		Experiment.get().display.repaint();
+		((SCSDisplay)Experiment.get().display).setSync(old_value);
+		SimulationControl.setPause(true);
+	}
+	
 	@Override
 	public long runModel() {
 		cycles++;
@@ -221,8 +229,17 @@ public class MultiscaleModel extends Subject{
 		tics[0] = Debug.tic();
 		// get inputs
 		var pos = slam.getPosition();
+		var orientation = slam.getOrientation2D();
 		float reward = feederModule.ate() ? foodReward : 0f;
-		float[] distances = distance_sensors.getDistances();
+		
+		// get alocentric distances from egocentric measures:
+		float[] ego_distances = distance_sensors.getDistances();
+		float[] distances = new float[numActions];
+		int id0 = angle_to_index(orientation);
+		for(int i=0; i<numActions; i++) {
+			distances[i] = ego_distances[(i + id0) % numActions];
+		}
+		
 		tocs[0] = Debug.toc(tics[0]);
 		
 		tics[1] = Debug.tic();
@@ -497,6 +514,12 @@ public class MultiscaleModel extends Subject{
 //		} catch (IOException e) {
 //			e.printStackTrace();
 //		}
+	}
+	
+	int angle_to_index(float angle) {
+		double dtita = Math.PI*2 / numActions;
+		var res = (int)Math.round(angle/dtita) % numActions;
+		return res < 0 ? res + numActions : res;
 	}
 	
 	
