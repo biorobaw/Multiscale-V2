@@ -148,7 +148,7 @@ def plot_runtimes_boxplots_dunntest(db, configs, location, episode, group_name,
     if not skip_runtimes:
         plot_time_series(summaries, 'episode', 'steps', legend_values,
                          'episode', 'optimality ratio', legend_title, plot_title,
-                         save_folder + f'runtimes{suffix}', [0, 1.3, 1.8], xlims = xlims
+                         save_folder + f'runtimes{suffix}', [0, 1.3, 1.8], x_lims = xlims
                          )
 
     if not skip_boxplots:
