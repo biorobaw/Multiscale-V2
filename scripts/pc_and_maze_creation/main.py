@@ -1,6 +1,6 @@
 import sys
 
-from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QWidget, QHBoxLayout, QTabWidget, QSplitter
+from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QWidget, QHBoxLayout, QTabWidget, QSplitter, QAction
 from PyQt5.QtGui import QPalette, QColor, QKeyEvent
 from PyQt5.QtCore import Qt
 
@@ -46,11 +46,19 @@ class MainWindow(QMainWindow):
 
         self.setMinimumSize(800, 450)
 
+
+        self.createMenus()
+
         # connect signals and slots:
         tab_maze.wall_added.connect(pane_plot.gview.add_wall)
         tab_maze.feeder_added.connect(pane_plot.gview.add_feeder)
         tab_maze.start_pos_added.connect(pane_plot.gview.add_start_pos)
+        tab_maze.signal_clear_paths.connect(pane_plot.gview.clear_paths)
+        tab_maze.signal_paths_added.connect(pane_plot.gview.add_paths)
         tab_pcs.pc_added.connect(pane_plot.gview.add_pc)
+
+        self.action_do_path_planner.triggered.connect(tab_maze.perform_path_planning)
+        self.action_create_maze_metrics.triggered.connect(tab_maze.create_all_maze_metrics)
 
 
     def load_dafault_data(self):
@@ -82,6 +90,16 @@ class MainWindow(QMainWindow):
             else:
                 print("widget has no attribute 'delete_selection'")
 
+    def createMenus(self):
+        self.menu_tools = self.menuBar().addMenu('&Tools')
+        self.action_do_path_planner = QAction('Do &Path Planning')
+        self.action_create_maze_metrics = QAction('Create all &Maze Metrics')
+
+        self.menu_tools.addAction(self.action_do_path_planner)
+        self.menu_tools.addAction(self.action_create_maze_metrics)
+
+
+        
 
 
 

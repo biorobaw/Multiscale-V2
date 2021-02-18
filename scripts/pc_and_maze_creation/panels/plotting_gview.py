@@ -33,6 +33,7 @@ class GViewPlotting(QGraphicsView):
         self.dragging_pc = None
         self.dragging_start_pos = None
         self.dragging_wall = None
+        self.path_graphics = []
 
         # remove scroll bars
         #self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -60,6 +61,10 @@ class GViewPlotting(QGraphicsView):
         self.pen_wall_selected = QPen()
         self.pen_wall_selected.setWidthF(0.02)
         self.pen_wall_selected.setColor(QColor('red'))
+
+        self.pen_path = QPen()
+        self.pen_path.setWidthF(0.01)
+        self.pen_path.setColor(QColor('blue'))
 
         self.pen_feeder = QPen()
         self.pen_feeder.setWidthF(0.02)
@@ -294,5 +299,24 @@ class GViewPlotting(QGraphicsView):
         self.dragging_wall = None
         self.dragging_start_pos = None
 
+    def add_paths(self, paths):
+        for path in paths:
+            graphics = []
+            for i in range(1, len(path)):
+                start = path[i-1]
+                end = path[i]
+                g_line = self.scene().addLine(start[0] , start[1], end[0] , end[1] , self.pen_path)
+                g_line.setFlag(QGraphicsItem.ItemIsMovable)
+                g_line.setZValue(-10)
+                graphics += [g_line]
+
+            self.path_graphics += [graphics]
+
+    def clear_paths(self):
+        # remove paths:
+        for path in self.path_graphics:
+            for graphic in path:
+                self.scene().removeItem(graphic)
+        self.path_graphics = []
 
 

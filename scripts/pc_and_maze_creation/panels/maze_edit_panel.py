@@ -15,6 +15,7 @@ import MazeParser
 from data.Wall import Wall
 from data.Feeder import Feeder
 from data.StartPos import StartPos
+from tools.path_planning.planner import find_path, generate_maze_metrics
 
 class PanelMazeEdit(QWidget):
 
@@ -26,6 +27,9 @@ class PanelMazeEdit(QWidget):
     
     start_pos_added = pyqtSignal(StartPos)
     start_pos_removed = pyqtSignal(StartPos) 
+
+    signal_clear_paths = pyqtSignal()
+    signal_paths_added = pyqtSignal(object)
 
     def __init__(self, *args, **kwargs):
         super(PanelMazeEdit, self).__init__(*args, **kwargs)
@@ -166,6 +170,8 @@ class PanelMazeEdit(QWidget):
         for p in self.start_positions:
             p.delete()
         self.start_positions = []
+
+        self.signal_clear_paths.emit()
 
     def add_wall(self, x1=0, y1=-1.5, x2=0, y2=1.3, wall_str=""):
         # create wall
@@ -308,4 +314,20 @@ class PanelMazeEdit(QWidget):
         tokens = paste_text.splitlines()
         for t in tokens:
             self.add_wall(wall_str = t)
+
+    def perform_path_planning(self):
+        self.signal_clear_paths.emit()
+        i = 0
+        paths = []
+        for goal in self.feeders:
+            for start in self.start_positions:
+                path, distance = find_path(goal, start, self.walls )
+                print(i, f'[{goal}]', f'[{start}]', distance, path)
+                i+=1
+                paths += [path]
+        self.signal_paths_added.emit(paths)
+
+    def create_all_maze_metrics(self):
+        folder = QFileDialog().getExistingDirectory(self, 'Choose folder with mazes', '')
+        generate_maze_metrics(folder)
 
