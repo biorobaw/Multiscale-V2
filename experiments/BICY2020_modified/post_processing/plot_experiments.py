@@ -274,11 +274,36 @@ def plot_experiment7(figure_folder, configs, sample_rate, db):
         # plot titles and legends:
 
 
+def plot_experiment_8(figure_folder, configs, sample_rate, db):
+
+    # PARAMETERS:
+    location = -1  # we will only plot geometric mean data (represented with location -1)
+    num_episodes = configs['numEpisodes'].max() / configs['numStartingPositions'].max()
+    last_episode = -sample_rate % num_episodes
+
+    # plot each numnber of obstacles separatedly:
+    obstacle_figure_folder = figure_folder + 'obstacles/'
+    make_folder(obstacle_figure_folder)
+
+    for num_obstacles, sub_configs in configs.groupby(['numObstacles']):
+        # get indices and format text for the plots
+        print('obstacles: ', num_obstacles)
+
+        group_name = f'o{num_obstacles}'
+        legend_title = 'Maze'
+        legend_values = sub_configs.mazeFile.map(format_pc_file) 
+        plot_title = f"Obstacles {num_obstacles}"
+
+        plot_runtimes_boxplots_dunntest(db, sub_configs, location, last_episode, group_name,
+                                        legend_title, legend_values, plot_title, obstacle_figure_folder)
+
+
+
 
 def format_pc_file(file_name):
+    # WARNING: also used for maze, if no longer useful will need separate funcion
     pc_file = ntpath.basename(file_name)[0:-4]
     return f'{pc_file}'
-
 
 
 def plot_experiment(folder):
@@ -305,6 +330,7 @@ def plot_experiment(folder):
     experiment_map['5'] = ( plot_experiment_traces_and_nx_per_maze    , 10)
     experiment_map['6'] = ( plot_experiment4_extraAtFeeder            , 5 )
     experiment_map['7'] = ( plot_experiment7, 5)
+    experiment_map['8'] = ( plot_experiment_8, 5)
 
     # plot the experiment
     e = experiment_map[experiment_name]
