@@ -329,5 +329,6 @@ class PanelMazeEdit(QWidget):
 
     def create_all_maze_metrics(self):
         folder = QFileDialog().getExistingDirectory(self, 'Choose folder with mazes', '')
-        generate_maze_metrics(folder)
+        if folder is not None and folder != "":
+            generate_maze_metrics(folder)
 
