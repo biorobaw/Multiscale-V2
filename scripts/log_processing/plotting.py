@@ -33,12 +33,17 @@ def zoom_and_save(plot, ylims, file_name):
         ggsave(p, file_name + '-lim{}.pdf'.format(lim), dpi=300)
 
 
-def plot_time_series(data, x_column, y_column, group_labels, x_title, y_title, legend_title, plot_title, save_name, zoom_levels= [0, 2.5, 5]):
+def plot_time_series(data, x_column, y_column, 
+                     group_labels, x_title, y_title, legend_title, plot_title, 
+                     save_name, zoom_levels= [0, 2.5, 5], xlims=[[0, 1000]]):
     p0 = ggplot(data, aes(x_column, y_column, color='factor(config)', group='config')) \
          + geom_line() \
          + labs(x=x_title, y=y_title, title=plot_title, caption='smt') \
          + scale_color_discrete(name=legend_title, labels=group_labels)
     zoom_and_save(p0, zoom_levels, save_name)
+    for lim in xlims:
+        zoom_and_save(p0 + xlims(lim[0], lim[1]), zoom_levels, save_name + f'x{lim[0]}_{lim[1]}')
+
 
 
 def plot_box_plot(data, y_column, group_labels, x_title, y_title, plot_title, save_name, zoom_levels=[0, 2.5, 5]):
@@ -117,12 +122,16 @@ def plot_statistical_test(df, column, group_names, title, savefile):
 
 
 def plot_runtimes_boxplots_dunntest(db, configs, location, episode, group_name,
-                                    legend_title, legend_values,  plot_title, save_folder):
+                                    legend_title, legend_values,  plot_title, save_folder, 
+                                    skip_runtimes=False, skip_boxplots=False, skip_dunntest=False,
+                                    xlims = [[0,1000]]):
 
     # get config  indices and then get data from db
     indices = [np.uint16(c[1:]) for c in configs.index]  # config numbers
-    summaries = load_summaries(db, indices, location)
-    runtimes_last_episode = load_episode_runtimes(db, indices, location, episode)
+    if not skip_runtimes:
+        summaries = load_summaries(db, indices, location)
+    if not skip_boxplots or not skip_dunntest:
+        runtimes_last_episode = load_episode_runtimes(db, indices, location, episode)
 
     # print("configs: ", pd.unique(runtimes_last_episode.config))
 
@@ -136,18 +145,21 @@ def plot_runtimes_boxplots_dunntest(db, configs, location, episode, group_name,
     suffix = '' if group_name == '' else f'_{group_name}'
 
     # do the actual plotting
-    plot_time_series(summaries, 'episode', 'steps', legend_values,
-                     'episode', 'optimality ratio', legend_title, plot_title,
-                     save_folder + f'runtimes{suffix}', [0, 1.3, 1.8]
-                     )
+    if not skip_runtimes:
+        plot_time_series(summaries, 'episode', 'steps', legend_values,
+                         'episode', 'optimality ratio', legend_title, plot_title,
+                         save_folder + f'runtimes{suffix}', [0, 1.3, 1.8], xlims = xlims
+                         )
 
-    plot_box_plot(runtimes_last_episode, 'steps', legend_values,
-                  'trace', 'optimality ratio', plot_title,
-                  save_folder + f'boxplot{suffix}', [0, 1.3, 1.8])
+    if not skip_boxplots:
+        plot_box_plot(runtimes_last_episode, 'steps', legend_values,
+                      'trace', 'optimality ratio', plot_title,
+                      save_folder + f'boxplot{suffix}', [0, 1.3, 1.8])
 
-    plot_statistical_test(runtimes_last_episode, 'steps',
-                          dict(zip(indices, legend_values)), plot_title,
-                          save_folder + f'dunnTest{suffix}.pdf')
+    if not skip_dunntest:
+        plot_statistical_test(runtimes_last_episode, 'steps',
+                              dict(zip(indices, legend_values)), plot_title,
+                              save_folder + f'dunnTest{suffix}.pdf')
 
 
 def plot_deltaV(db, configs, location, episode, group_name,
