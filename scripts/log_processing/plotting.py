@@ -42,7 +42,7 @@ def plot_time_series(data, x_column, y_column,
          + scale_color_discrete(name=legend_title, labels=group_labels)
     zoom_and_save(p0, zoom_levels, save_name)
     for lim in x_lims:
-        zoom_and_save(p0 + xlims(lim[0], lim[1]), zoom_levels, save_name + f'x{lim[0]}_{lim[1]}')
+        zoom_and_save(p0 + xlim(lim[0], lim[1]), zoom_levels, save_name + f'x{lim[0]}_{lim[1]}')
 
 
 
