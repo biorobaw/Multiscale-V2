@@ -124,7 +124,7 @@ def plot_statistical_test(df, column, group_names, title, savefile):
 def plot_runtimes_boxplots_dunntest(db, configs, location, episode, group_name,
                                     legend_title, legend_values,  plot_title, save_folder, 
                                     skip_runtimes=False, skip_boxplots=False, skip_dunntest=False,
-                                    xlims = [[0,1000]]):
+                                    xlims = [[0,250],[0,1000]]):
 
     # get config  indices and then get data from db
     indices = [np.uint16(c[1:]) for c in configs.index]  # config numbers
