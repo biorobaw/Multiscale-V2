@@ -35,13 +35,13 @@ def zoom_and_save(plot, ylims, file_name):
 
 def plot_time_series(data, x_column, y_column, 
                      group_labels, x_title, y_title, legend_title, plot_title, 
-                     save_name, zoom_levels= [0, 2.5, 5], xlims=[[0, 1000]]):
+                     save_name, zoom_levels= [0, 2.5, 5], x_lims=[[0, 1000]]):
     p0 = ggplot(data, aes(x_column, y_column, color='factor(config)', group='config')) \
          + geom_line() \
          + labs(x=x_title, y=y_title, title=plot_title, caption='smt') \
          + scale_color_discrete(name=legend_title, labels=group_labels)
     zoom_and_save(p0, zoom_levels, save_name)
-    for lim in xlims:
+    for lim in x_lims:
         zoom_and_save(p0 + xlims(lim[0], lim[1]), zoom_levels, save_name + f'x{lim[0]}_{lim[1]}')
 
 
