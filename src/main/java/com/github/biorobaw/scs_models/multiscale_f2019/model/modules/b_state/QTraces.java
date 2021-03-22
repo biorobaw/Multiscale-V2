@@ -4,17 +4,16 @@ import java.util.HashSet;
 
 public class QTraces {
 	
-	// min value for a trace to be considered as active
-	public final float min_value;
+	private final int dimensions;	// number of dimensions (actions)
+	private final int num_traces;	// number of traces
+	private final float decay_rate; // the decay rate
+	private final int init_count;	// initial number of decays until trace is assumed to be 0
 	
 	
-	public int dimensions;			  // number of dimensions (actions)
 	public float[][] traces;  // value of all traces
-	public int num_traces;	  // number of traces
-	public HashSet<Integer>[] non_zero; // sets with ids of non zero traces per dimension
-	
-	public float decay_rate; // the decay rate
-	
+	public int [] counter;
+	public HashSet<Integer> non_zero; // sets with ids of non zero traces per dimension
+		
 	
 	
 	/**
@@ -28,11 +27,14 @@ public class QTraces {
 		this.dimensions = dimensions;
 		this.num_traces = num_traces;
 		this.decay_rate = decay_rate;
-		this.min_value = min_value;
+		init_count = decay_rate == 0 ? 0 : (int)Math.ceil(Math.log(min_value)/Math.log(decay_rate));
+		System.out.println("QTrace decay rate: " + decay_rate);
+		System.out.println("QTrace min_value: " + min_value);
+		System.out.println("QTrace init counter: " + init_count);
 		
 		traces = new float[dimensions][num_traces];
-		non_zero = new HashSet[dimensions];
-		for(int i=0; i<dimensions; i++) non_zero[i] = new HashSet<>();
+		counter  = new int[num_traces];
+		non_zero = new HashSet<>();
 		
 	}
 	
@@ -48,28 +50,43 @@ public class QTraces {
 	 */
 	public void update(float[] activations, int[] ids, int dimension, float[] probabilities) {
 		
-		for(int d=0; d<dimensions; d++) {
-
-			// exponentially decrease traces, and remove them form set if below minimum:
-			float[] vals = traces[d];
-			for(var i : non_zero[d]) vals[i]*=decay_rate;
+		// exponentially decrease traces, and set them to 0 if below minimum (i.e. counter expired):
+		non_zero.removeIf(i -> {
+			counter[i]--;
+			boolean set_zero = counter[i] <= 0;
+			if(set_zero) 
+				for(int d=0; d<dimensions; d++) traces[d][i] = 0;
+			else 
+				for(int d=0; d<dimensions; d++) traces[d][i]*=decay_rate;
 			
-			// update traces for current state
-			float p = probabilities[d];
-			float delta_tj = d==dimension ? 1 : 0;
-			
-			for(int i=0; i<ids.length; i++) {
-				var v = vals[ids[i]];
-				v += (delta_tj-p)*activations[i];
-				if(v<=-min_value || min_value<=v) {
-					non_zero[d].add(ids[i]);
-					vals[ids[i]]=v;
-				} else vals[ids[i]]=0;
+			return set_zero;
+		});
+		
+		
+		// reset counters of active cells:
+		for(int i=0; i<ids.length; i++)
+			if( activations[i] > 0) {
+				non_zero.add(ids[i]);
+				counter[ids[i]] = init_count;
 			}
 			
-			non_zero[d].removeIf(i -> -min_value<vals[i] && vals[i]< min_value );
+		// update traces of active cells:
+		for(int d=0; d<dimensions; d++) {
+
+			// calculate direction delta_p in which distribution is updated
+			float delta_p =  -probabilities[d];
+			if(d==dimension) delta_p += 1;
+			if(delta_p == 0) continue; // if dimension is 0, skip dimension
 			
-		}	
+			// update trace for each non zero place cell
+			float[] d_traces = traces[d]; // get dimension traces
+			for(int i=0; i<ids.length; i++) {
+				var a  = activations[i];
+				if(a > 0) d_traces[ids[i]]+= delta_p*a;
+			}			
+		}
+		
+		
 	}
 	
 	
@@ -78,10 +95,10 @@ public class QTraces {
 	 * clear all traces, should be called at the start of each episode
 	 */
 	public void clear() {
-		for(int i=0; i<dimensions; i++) {
-			for(var id : non_zero[i]) traces[i][id] = 0;
-			non_zero[i].clear();			
-		}
+		for(int d=0; d<dimensions; d++)
+			for(var id : non_zero) 
+				traces[d][id] = 0;
+		non_zero.clear();			
 	}
 
 

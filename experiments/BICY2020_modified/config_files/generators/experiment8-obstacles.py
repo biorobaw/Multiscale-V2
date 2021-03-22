@@ -26,7 +26,7 @@ experiment_DF = dataFrame('experiment', experiment)
 group_DF      = dataFrame('group',      group)
 ratIds_DF     = dataFrame('run_id',     rat_ids)
 pc_layers_DF  = dataFrame('pc_files', [pc_path + f for f in ['u08.csv']])
-traces_DF     = dataFrame('traces', [ 0.0 ])
+traces_DF     = dataFrame('traces', [ 0.8 ])
 
 
 

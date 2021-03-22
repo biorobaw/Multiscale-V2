@@ -117,7 +117,7 @@ public class GUI {
 			var t = model.vTraces[i];
 			var pcs = model.pcs[i];
 			TDrawers[i] = new VDrawer(pcs.xs, pcs.ys, t.traces[0]);
-			TDrawers[i].setMinValue(t.min_value);
+			TDrawers[i].setMinValue(0);
 		}
 		
 		// V drawers
