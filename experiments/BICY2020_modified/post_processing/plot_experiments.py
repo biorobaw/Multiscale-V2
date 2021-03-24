@@ -331,6 +331,7 @@ def plot_experiment(folder):
     experiment_map['6'] = ( plot_experiment4_extraAtFeeder            , 5 )
     experiment_map['7'] = ( plot_experiment7, 5)
     experiment_map['8'] = ( plot_experiment_8, 5)
+    experiment_map['9'] = ( plot_experiment_8, 5)
 
     # plot the experiment
     e = experiment_map[experiment_name]
