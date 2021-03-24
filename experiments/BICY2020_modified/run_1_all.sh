@@ -17,6 +17,11 @@ for E in ${RUN[*]}; do
 	if [ "${1,,}" == "serial" ]; then
 		echo "Serial, running rats: $MIN_RAT-$MAX_RAT $(map $E NAME)"
 		module add apps/jdk/11.0.5 
+		module add apps/python/3.7.3;
+
+		# create log structure:
+		python scripts/circe_cluster/logFolderGenerator.py $(map $E LOG_FOLDER) $(map $E CONFIG_FILE)
+
 		CMD_ARGS="-cp target/Multiscale-F2019-1.0.0-SNAPSHOT-jar-with-dependencies.jar -Xmx1500m com.github.biorobaw.scs.Main"
 		for rat_id in $(seq $MIN_RAT $MAX_RAT)
 		do

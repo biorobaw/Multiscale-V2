@@ -18,13 +18,15 @@ SCRIPT_5_PLOT_EXPERIMENT=$EXPERIMENT_FOLDER/post_processing/plot_experiments.py
 
 # EXPERIMENTS
 RUN=()
-RUN+=(E1)
+#RUN+=(E1)
 #RUN+=(E2)
-RUN+=(E3)
-RUN+=(E4)
-RUN+=(E5)
-RUN+=(E6)
-RUN+=(E7)
+#RUN+=(E3)
+#RUN+=(E4)
+#RUN+=(E5)
+#RUN+=(E6)
+#RUN+=(E7)
+#RUN+=(E8)
+RUN+=(E9)
 
 # Each experiment requires parameters: 
 #	NAME : name of the experiment
@@ -42,14 +44,23 @@ declare -A E2=( ["NAME"]=experiment2-singleMin 		["BATCH_SIZE"]=10 ["RATS"]=100 
 declare -A E3=( ["NAME"]=experiment3-singleSame 	["BATCH_SIZE"]=4  ["RATS"]=100 ["SAMPLE_RATE"]=1  )
 declare -A E4=( ["NAME"]=experiment4-extraAtFeeder 	["BATCH_SIZE"]=10 ["RATS"]=100 ["SAMPLE_RATE"]=5  )
 declare -A E5=( ["NAME"]=experiment5-density 		["BATCH_SIZE"]=8  ["RATS"]=50  ["SAMPLE_RATE"]=10 )
+#E5[MIN_RAT]=7527
+#E5[MAX_RAT]=7527
 declare -A E6=( ["NAME"]=experiment6-extraAtGap 	["BATCH_SIZE"]=10 ["RATS"]=100 ["SAMPLE_RATE"]=5  )
 declare -A E7=( ["NAME"]=experiment7-nonUniform 	["BATCH_SIZE"]=10 ["RATS"]=100 ["SAMPLE_RATE"]=5  )
-#E7[MIN_RAT]=0
+#E7[MIN_RAT]=9100
 #E7[MAX_RAT]=9999
 #E7[MIN_CONFIG]=0
 #E7[MAX_CONFIG]=99
+declare -A E8=( ["NAME"]=experiment8-obstacles	 	["BATCH_SIZE"]=10 ["RATS"]=100 ["SAMPLE_RATE"]=5  )
+#E8[MIN_RAT]=2400
+#E8[MAX_RAT]=2499
+declare -A E9=( ["NAME"]=experiment9-biology1       ["BATCH_SIZE"]=100 ["RATS"]=20 ["SAMPLE_RATE"]=5  )
+# E9[MIN_RAT]=8
+# E9[MAX_RAT]=8
+#E9[MIN_CONFIG]=0
+# E9[MAX_CONFIG]=0
 
-# EXPERIMENT LOG FOLDERS
 for E in ${RUN[*]}; do
 	eval "$E[LOG_FOLDER]=\$LOG_FOLDER/\$(map $E NAME)"
 	eval "$E[CONFIG_FILE]=\$CONFIGS_FOLDER/\$(map $E NAME).csv"
