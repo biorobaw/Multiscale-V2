@@ -156,10 +156,13 @@ def plot_runtimes_boxplots_dunntest(db, configs, location, episode, group_name,
                       'trace', 'optimality ratio', plot_title,
                       save_folder + f'boxplot{suffix}', [0, 1.3, 1.8])
 
-    if not skip_dunntest:
-        plot_statistical_test(runtimes_last_episode, 'steps',
-                              dict(zip(indices, legend_values)), plot_title,
-                              save_folder + f'dunnTest{suffix}.pdf')
+    if len(runtimes_last_episode['config'].unique()) > 1:
+        if not skip_dunntest:
+            plot_statistical_test(runtimes_last_episode, 'steps',
+                                  dict(zip(indices, legend_values)), plot_title,
+                                  save_folder + f'dunnTest{suffix}.pdf')
+    else:
+        print('WARNING: skipping dunntest since only 1 configuration')
 
 
 def plot_deltaV(db, configs, location, episode, group_name,
