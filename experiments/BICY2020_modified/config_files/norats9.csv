@@ -1,0 +1,5 @@
+config	experiment	group	mazeFile	numStartingPositions	pc_files	traces	numEpisodes	numObstacles	num_cells
+c0	experiments/setups/experiment_1.xml	g1	experiments/mazes/biology/M10000.xml	4	experiments/pc_layers/uniform_densities/u56_10.csv	0.8	40000	0	140
+c1	experiments/setups/experiment_1.xml	g1	experiments/mazes/biology/M10600.xml	4	experiments/pc_layers/uniform_densities/u56_10.csv	0.8	40000	6	140
+c2	experiments/setups/experiment_1.xml	g1	experiments/mazes/biology/M11100.xml	4	experiments/pc_layers/uniform_densities/u56_10.csv	0.8	40000	11	140
+c3	experiments/setups/experiment_1.xml	g1	experiments/mazes/biology/M12300.xml	4	experiments/pc_layers/uniform_densities/u56_10.csv	0.8	40000	23	140

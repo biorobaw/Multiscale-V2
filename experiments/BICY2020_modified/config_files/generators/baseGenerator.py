@@ -87,5 +87,8 @@ def generatePC_DF_OLD(mazeWidth, mazeHeight, numPCx, radii):
   
   
   
-  
+def count_cells(file):
+    root = get_git_root()
+    full_path = os.path.join(root, file)
+    return len(open(full_path).readlines())-1
   
