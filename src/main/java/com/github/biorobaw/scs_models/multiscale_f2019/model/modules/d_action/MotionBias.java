@@ -5,12 +5,11 @@ import com.github.biorobaw.scs.utils.math.Floats;
 public class MotionBias {
 	int numActions;	
 	float[] biases;
-	float[] probabilities;
 	float uniform_value;
 	
 	int episodesToHalfLife = 50;
 	float decay = (float)(1f/Math.pow(2, 1f/episodesToHalfLife));
-	float interpolationValue = 1f/decay;
+	float interpolationValue = 1f/decay; // set to 1/decay since it is multiplied by decay before initial episode
 	float interpolationComplement;
 	
 	private boolean compute_bias;
@@ -39,7 +38,6 @@ public class MotionBias {
 		this.interpolationValue = 1f/decay;
 		
 		biases = new float[numActions];
-		probabilities = new float[numActions];
 		interpolatedBias = new float[numActions];
 		uniform_value=1f/numActions;
 		
@@ -55,22 +53,6 @@ public class MotionBias {
 		return biases;
 	}
 	
-	
-	public float[] addBias(int lastAction, float[] p_input) {
-				
-		calculateBias(lastAction);
-
-		Floats.mul(biases, p_input,probabilities);
-		var sum = Floats.sum(probabilities);
-		
-		if(sum!=0) Floats.div(probabilities, sum, probabilities);
-		else {
-			System.err.println("WARNING: Probability sum is 0, setting uniform distribution (MotionBias.java)");
-			for(int i=0; i<numActions; i++) probabilities[i] = uniform_value;
-		}
-				
-		return probabilities;
-	}
 	
 	
 	public void newEpisode(){
@@ -93,9 +75,7 @@ public class MotionBias {
 		return biases;
 	}
 	
-	public float[] getProbabilities() {
-		return probabilities;
-	}
+
 	
 }
 
