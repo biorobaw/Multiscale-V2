@@ -8,7 +8,8 @@ import java.util.Arrays;
 
 import com.github.biorobaw.scs.experiment.Experiment;
 import com.github.biorobaw.scs.experiment.Subject;
-import com.github.biorobaw.scs.gui.displays.SCSDisplay;
+import com.github.biorobaw.scs.gui.Display;
+import com.github.biorobaw.scs.gui.displays.DisplaySwing;
 import com.github.biorobaw.scs.robot.commands.TranslateXY;
 import com.github.biorobaw.scs.robot.modules.FeederModule;
 import com.github.biorobaw.scs.robot.modules.distance_sensing.DistanceSensingModule;
@@ -19,12 +20,13 @@ import com.github.biorobaw.scs.utils.files.BinaryFile;
 import com.github.biorobaw.scs.utils.files.XML;
 import com.github.biorobaw.scs.utils.math.DiscreteDistribution;
 import com.github.biorobaw.scs.utils.math.Floats;
-import com.github.biorobaw.scs_models.multiscale_f2019.gui.GUI;
+import com.github.biorobaw.scs_models.multiscale_f2019.gui.fx.GUI;
 import com.github.biorobaw.scs_models.multiscale_f2019.model.modules.a_input.Affordances;
 import com.github.biorobaw.scs_models.multiscale_f2019.model.modules.b_state.EligibilityTraces;
 import com.github.biorobaw.scs_models.multiscale_f2019.model.modules.b_state.PlaceCellBins;
 import com.github.biorobaw.scs_models.multiscale_f2019.model.modules.b_state.PlaceCells;
 import com.github.biorobaw.scs_models.multiscale_f2019.model.modules.b_state.QTraces;
+import com.github.biorobaw.scs_models.multiscale_f2019.model.modules.c_rl.ObstacleBiases;
 import com.github.biorobaw.scs_models.multiscale_f2019.model.modules.d_action.MotionBias;
 
 public class MultiscaleModel extends Subject{
@@ -40,10 +42,16 @@ public class MultiscaleModel extends Subject{
 
 	// Model Parameters: Action Space
 	public int numActions;
+	public float certainty_threshold = 1;
+	
+	// Model Parameters: Wall Bias option
+	final int obstacle_bias_method; // 1 = wall reward, 2 = bias to closest elements
+
 	
 	// Model Variables: input
 	public SlamModule slam;
 	public FeederModule feederModule;
+	public ObstacleBiases obstacle_biases;
 	public DistanceSensingModule distance_sensors;
 	
 	
@@ -63,16 +71,18 @@ public class MultiscaleModel extends Subject{
 	public float[] qValues;
 	
 	// Model Variables: action selection
-	public float[] softmax;  // probability after applying softmax
 	public Affordances affordances;
-	public float[] possible; // probability after applying affordances
 	public MotionBias motionBias;   // Module to add bias to probabilities
+	public float[] softmax;  // probability after applying softmax
+	public float[] possible; // probability after applying affordances
+	public float[] action_selection_probs;
 	public int chosenAction;
 	public boolean actionWasOptimal = false;
 	
 	
 	
 	// GUI
+	com.github.biorobaw.scs_models.multiscale_f2019.gui.swing.GUI gui_old;
 	GUI gui;
 	
 	public MultiscaleModel(XML xml) {
@@ -90,6 +100,7 @@ public class MultiscaleModel extends Subject{
 		slam = robot.getModule("slam");
 		feederModule = robot.getModule("FeederModule");
 		distance_sensors = robot.getModule("distance_sensors");
+		
 		
 		//Create affordances / distance sensing module
 		affordances = new Affordances( robot, numActions, 0.1f);
@@ -174,15 +185,29 @@ public class MultiscaleModel extends Subject{
 		
 		// ======== ACTION SELECTION =======================
 
-		int numStartingPositions = Integer.parseInt(Experiment.get().getGlobal("numStartingPositions"));
-		motionBias = new MotionBias(numActions, 50*numStartingPositions);
-		softmax = new float[numActions];
-		possible = new float[numActions];
+		certainty_threshold 		= xml.getFloatAttribute("certainty_threshold");
+		var wall_selection_weights 	= xml.getFloatArrayAttribute("wall_selection_weights");
+		int numStartingPositions 	= Integer.parseInt(Experiment.get().getGlobal("numStartingPositions"));
+		motionBias 				= new MotionBias(numActions, 50*numStartingPositions);
+		softmax 				= new float[numActions];
+		possible 				= new float[numActions];
+		action_selection_probs 	= new float[numActions];
+
+		
+		
+		obstacle_bias_method = xml.getIntAttribute("wall_bias_method");
+		float wall_reached_distance = xml.getFloatAttribute("wall_reached_distance");
+		float wall_reward = xml.getFloatAttribute("wall_reward");
+		float bin_distance = obstacle_bias_method == 1 ? wall_reached_distance : xml.getFloatAttribute("wall_detection_distance"); 
+		float bin_size = 0.1f;
+		obstacle_biases = new ObstacleBiases(bin_size, bin_distance, wall_reached_distance, wall_reward, wall_selection_weights); // bin size, bin_distance, reward distance, reward value
 		
 		
 		// ======== GUI ====================================
 		
-		gui = new GUI(this);
+		if(Experiment.get().display instanceof DisplaySwing) {
+			gui_old = new com.github.biorobaw.scs_models.multiscale_f2019.gui.swing.GUI(this);
+		} else gui = new GUI(this);
 		
 	}
 
@@ -193,10 +218,10 @@ public class MultiscaleModel extends Subject{
 	static public float averages[]=new float[num_tics];
 	
 	private void debug() {
-		var old_value = ((SCSDisplay)Experiment.get().display).setSync(true);
+		var old_value = ((DisplaySwing)Experiment.get().display).setSync(true);
 		Experiment.get().display.updateData();
-		Experiment.get().display.repaint();
-		((SCSDisplay)Experiment.get().display).setSync(old_value);
+//		Experiment.get().display.repaint();
+		((DisplaySwing)Experiment.get().display).setSync(old_value);
 		SimulationControl.setPause(true);
 	}
 	
@@ -236,6 +261,12 @@ public class MultiscaleModel extends Subject{
 		var orientation = slam.getOrientation2D();
 		float reward = feederModule.ate() ? foodReward : 0f;
 		
+		if(obstacle_bias_method == 1)
+			if(reward == 0) {
+				reward = obstacle_biases.getReward(pos);
+	//			if (reward > 0) System.out.println(cycles + "Wall reward: " + reward);
+			}
+		
 		// get alocentric distances from egocentric measures:
 		float[] ego_distances = distance_sensors.getDistances();
 		float[] distances = new float[numActions];
@@ -255,7 +286,17 @@ public class MultiscaleModel extends Subject{
 		tocs[1] = Debug.toc(tics[1]);
 		
 		// DEBUG BLOCK
-//		if(is_above_debug_cycle) {
+		
+//		if(reward>0) {
+//			
+//			var old_value = ((SCSDisplay)Experiment.get().display).setSync(true);
+//			Experiment.get().display.updateData();
+//			Experiment.get().display.repaint();
+//			((SCSDisplay)Experiment.get().display).setSync(old_value);
+//			SimulationControl.setPause(true);
+//		}
+
+		//		if(is_above_debug_cycle) {
 //			
 //			System.out.println("Traces");
 //			var traces = vTraces[0].traces[0];
@@ -385,20 +426,34 @@ public class MultiscaleModel extends Subject{
 			
 		// METHOD 2
 		Floats.softmaxWithWeights(qValues, aff_values, softmax);
-		var biased = motionBias.addBias(chosenAction, softmax);
+		
+		float non_zero = Floats.sum(aff_values);
+		float certainty = 1 - Floats.entropy(softmax, non_zero > 1 ? non_zero : 2f);
+//		System.out.prin tln("Certainty: " + certainty );
+		
+		var bias_motion = motionBias.calculateBias(chosenAction);
+		var bias_obstacles = obstacle_bias_method==2 ? 
+				obstacle_biases.calculateBias(pos) :
+				Floats.constant(1, numActions);
+
+		// If Q policy is not certain enough, use bias, else, don't use it
+		if(certainty < certainty_threshold ) {
+			// Combine bias, then add bias to softmax to get resulting probabilities
+			Floats.mul(bias_motion, bias_obstacles, action_selection_probs);		
+			addMultiplicativeBias(action_selection_probs, softmax, action_selection_probs);
+		} else Floats.copy(softmax,action_selection_probs);
+		
+				
+		
 		learning_dist = softmax;
 //		optimal_action_dist = softmax;
-		optimal_action_dist = biased;
+		optimal_action_dist = action_selection_probs;
 		
 		
 //		Floats.softmaxWithWeights(qValues, biased, biased);
 		
 		
-		
-		
-		
-		
-		chosenAction = DiscreteDistribution.sample(biased);
+		chosenAction = DiscreteDistribution.sample(action_selection_probs);
 		actionWasOptimal = optimal_action_dist[chosenAction] == Floats.max(optimal_action_dist);
 		
 		
@@ -435,6 +490,7 @@ public class MultiscaleModel extends Subject{
 //		System.out.println("averages: "+ Arrays.toString(averages));
 //		System.out.println("percentual:"+ Arrays.toString(percentual));
 		
+//		debug();
 		return 0;
 	}
 	
@@ -442,6 +498,7 @@ public class MultiscaleModel extends Subject{
 	public void newEpisode() {
 		super.newEpisode();
 		motionBias.newEpisode();
+		obstacle_biases.newEpisode();
 		
 		for(int i=0; i<num_layers; i++) {
 			vTraces[i].clear();
@@ -495,7 +552,9 @@ public class MultiscaleModel extends Subject{
 	@Override
 	public void newTrial() {
 		super.newTrial();
+		obstacle_biases.newTrial();
 		motionBias.newTrial();
+		
 	}
 	
 	@Override
@@ -525,6 +584,30 @@ public class MultiscaleModel extends Subject{
 		var res = (int)Math.round(angle/dtita) % numActions;
 		return res < 0 ? res + numActions : res;
 	}
+	
+	void addMultiplicativeBias(float[] bias, float[] input, float[] output) {
+		output = Floats.mul(bias, input, output);
+		var sum = Floats.sum(output);
+		
+		if(sum!=0) Floats.div(output, sum, output);
+		else {
+			System.err.println("WARNING: Probability sum is 0, setting uniform distribution (MulytiscaleModel.java)");
+			for(int i=0; i<numActions; i++) output[i] = 1/numActions;
+		}
+	}
+	
+	float[] addMultiplicativeBias(float[] bias, float[] input) {
+		var output = Floats.mul(bias, input);
+		var sum = Floats.sum(output);
+		
+		if(sum!=0) Floats.div(output, sum, output);
+		else {
+			System.err.println("WARNING: Probability sum is 0, setting uniform distribution (MulytiscaleModel.java)");
+			Floats.uniform(output);			
+		}
+		return output;
+	}
+	
 	
 	
 }
