@@ -9,8 +9,8 @@
 	<description>This project contains the extension of the multiscale model, developed in fall 2019.</description>
 
 	<properties>
-		<maven.compiler.source>10</maven.compiler.source>
-		<maven.compiler.target>10</maven.compiler.target>
+		<maven.compiler.source>11</maven.compiler.source>
+		<maven.compiler.target>11</maven.compiler.target>
 	</properties>
 
 
@@ -20,11 +20,25 @@
 			<artifactId>scs</artifactId>
 			<version>4.0.0-SNAPSHOT</version>
 		</dependency>
+		
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 			<version>3.9</version>
 		</dependency>
+		
+<!-- 		<dependency>
+		  	<groupId>com.esri.geometry</groupId>
+		  	<artifactId>esri-geometry-api</artifactId>
+		  <version>2.2.4</version>
+		</dependency> -->
+		
+		<dependency>
+		    <groupId>org.locationtech.jts</groupId>
+		    <artifactId>jts-core</artifactId>
+		    <version>1.18.1</version>
+		</dependency>
+		
 	</dependencies>
 
 	<build>

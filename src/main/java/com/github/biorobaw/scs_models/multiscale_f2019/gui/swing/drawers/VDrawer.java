@@ -1,16 +1,16 @@
-package com.github.biorobaw.scs_models.multiscale_f2019.gui.drawers;
+package com.github.biorobaw.scs_models.multiscale_f2019.gui.swing.drawers;
 
 
 import java.awt.Color;
 import java.awt.Graphics;
 
-import com.github.biorobaw.scs.gui.Drawer;
+import com.github.biorobaw.scs.gui.displays.scs_swing.DrawerSwing;
 import com.github.biorobaw.scs.gui.utils.GuiUtils;
 import com.github.biorobaw.scs.gui.utils.Scaler;
 import com.github.biorobaw.scs.gui.utils.Window;
 import com.github.biorobaw.scs.utils.math.Floats;
 
-public class VDrawer extends Drawer {
+public class VDrawer extends DrawerSwing {
 
 	float[] pc_x;
 	float[] pc_y;
@@ -46,7 +46,7 @@ public class VDrawer extends Drawer {
 	}
 
 	@Override
-	public void draw(Graphics g, Window<Float> panelCoordinates) {
+	public void draw(Graphics g, Window panelCoordinates) {
 		if(!doDraw) return;
 		
 		Scaler s = new Scaler(worldCoordinates, panelCoordinates, true);
@@ -72,10 +72,6 @@ public class VDrawer extends Drawer {
 
 	}
 
-	@Override
-	public void endEpisode() {
-		
-	}
 
 	@Override
 	public void updateData() {

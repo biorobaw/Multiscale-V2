@@ -1,10 +1,10 @@
-package com.github.biorobaw.scs_models.multiscale_f2019.gui.drawers;
+package com.github.biorobaw.scs_models.multiscale_f2019.gui.swing.drawers;
 
 
 import java.awt.Color;
 import java.awt.Graphics;
 
-import com.github.biorobaw.scs.gui.Drawer;
+import com.github.biorobaw.scs.gui.displays.scs_swing.DrawerSwing;
 import com.github.biorobaw.scs.gui.utils.GuiUtils;
 import com.github.biorobaw.scs.gui.utils.Scaler;
 import com.github.biorobaw.scs.gui.utils.Window;
@@ -13,7 +13,7 @@ import com.github.biorobaw.scs.utils.math.Integers;
 
 
 
-public class PCDrawer extends Drawer {
+public class PCDrawer extends DrawerSwing {
 
 	float[] pc_x;
 	float[] pc_y;
@@ -47,7 +47,7 @@ public class PCDrawer extends Drawer {
 
 
 	@Override
-	public void draw(Graphics g, Window<Float> panelCoordinates) {
+	public void draw(Graphics g, Window panelCoordinates) {
 		if(!doDraw) return;
 		
 		if(constant) drawConstant(g, panelCoordinates);
@@ -94,7 +94,7 @@ public class PCDrawer extends Drawer {
 	}
 	
 	
-	synchronized void drawConstant(Graphics g, Window<Float> panelCoordinates) {
+	void drawConstant(Graphics g, Window panelCoordinates) {
 		
 		// Scale coordinates
 		Scaler s = new Scaler(worldCoordinates, panelCoordinates, true);
@@ -142,7 +142,7 @@ public class PCDrawer extends Drawer {
 		
 	}
 	
-	void drawMultipleR(Graphics g, Window<Float> panelCoordinates) {
+	void drawMultipleR(Graphics g, Window panelCoordinates) {
 				
 		// Scale coordinates
 		Scaler s = new Scaler(worldCoordinates, panelCoordinates, true);

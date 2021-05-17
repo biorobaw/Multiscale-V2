@@ -1,22 +1,22 @@
-package com.github.biorobaw.scs_models.multiscale_f2019.gui.drawers;
+package com.github.biorobaw.scs_models.multiscale_f2019.gui.swing.drawers;
 
 import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Point;
 
+import org.locationtech.jts.geom.Coordinate;
 
-import com.github.biorobaw.scs.gui.Drawer;
+import com.github.biorobaw.scs.gui.displays.scs_swing.DrawerSwing;
 import com.github.biorobaw.scs.gui.utils.GuiUtils;
 import com.github.biorobaw.scs.gui.utils.Scaler;
 import com.github.biorobaw.scs.gui.utils.Window;
 import com.github.biorobaw.scs.utils.math.Floats;
-import com.vividsolutions.jts.geom.Coordinate;
 
-public class PolarDataDrawer extends Drawer {
+public class PolarDataDrawer extends DrawerSwing {
 	
 
-	Window<Float> localCoordinates = new Window<>(-1f,-1f,2f,2f);
+	Window localCoordinates = new Window(-1f,-1f,2f,2f);
 	GetData getData;
 	GetArrowDirection getArrow;
 	
@@ -64,7 +64,7 @@ public class PolarDataDrawer extends Drawer {
 	 * @param x		 Center of circle x coord	
 	 * @param y		 Center of circle y coord
 	 * @param radius 
-	 * @param data
+	 * @param radii
 	 */
 	
 	public PolarDataDrawer(String title,float x,float y,float radius,int dataSize,GetData getData) {
@@ -103,7 +103,7 @@ public class PolarDataDrawer extends Drawer {
 	}
 
 	@Override
-	public void draw(Graphics g, Window<Float> panelCoordinates) {
+	public void draw(Graphics g, Window panelCoordinates) {
 		if(!doDraw) return;
 		
 		Scaler s = new Scaler(localCoordinates,panelCoordinates,true);

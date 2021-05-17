@@ -1,29 +1,29 @@
-package com.github.biorobaw.scs_models.multiscale_f2019.gui.swing;
-
-import java.awt.Color;
+package com.github.biorobaw.scs_models.multiscale_f2019.gui.fx;
 
 
 import com.github.biorobaw.scs.experiment.Experiment;
 import com.github.biorobaw.scs.gui.Display;
 import com.github.biorobaw.scs.gui.DrawPanel;
-import com.github.biorobaw.scs.gui.displays.scs_swing.drawer.CycleDataDrawer;
-import com.github.biorobaw.scs.gui.displays.scs_swing.drawer.FeederDrawer;
-import com.github.biorobaw.scs.gui.displays.scs_swing.drawer.PathDrawer;
-import com.github.biorobaw.scs.gui.displays.scs_swing.drawer.RobotDrawer;
-import com.github.biorobaw.scs.gui.displays.scs_swing.drawer.RuntimesDrawer;
-import com.github.biorobaw.scs.gui.displays.scs_swing.drawer.WallDrawer;
-import com.github.biorobaw.scs.gui.utils.GuiUtils;
-import com.github.biorobaw.scs_models.multiscale_f2019.gui.swing.drawers.PCDrawer;
-import com.github.biorobaw.scs_models.multiscale_f2019.gui.swing.drawers.PolarDataDrawer;
-import com.github.biorobaw.scs_models.multiscale_f2019.gui.swing.drawers.VDrawer;
+import com.github.biorobaw.scs.gui.displays.java_fx.drawer.universe.CycleDataDrawer;
+import com.github.biorobaw.scs.gui.displays.java_fx.drawer.universe.FeederDrawer;
+import com.github.biorobaw.scs.gui.displays.java_fx.drawer.universe.PathDrawer;
+import com.github.biorobaw.scs.gui.displays.java_fx.drawer.universe.RobotDrawer;
+import com.github.biorobaw.scs.gui.displays.java_fx.drawer.universe.WallDrawer;
+import com.github.biorobaw.scs.utils.math.Doubles;
+import com.github.biorobaw.scs.gui.displays.java_fx.drawer.plot.Plot;
+import com.github.biorobaw.scs.gui.displays.java_fx.drawer.plot.RuntimesDrawer;
+import com.github.biorobaw.scs_models.multiscale_f2019.gui.fx.drawers.PCDrawer;
+import com.github.biorobaw.scs_models.multiscale_f2019.gui.fx.drawers.PolarDataDrawer;
+import com.github.biorobaw.scs_models.multiscale_f2019.gui.fx.drawers.VDrawer;
+import com.github.biorobaw.scs_models.multiscale_f2019.gui.fx.drawers.VScatterDrawer;
+import com.github.biorobaw.scs_models.multiscale_f2019.gui.fx.drawers.WallBiasHighlighterDrawer;
 import com.github.biorobaw.scs_models.multiscale_f2019.model.MultiscaleModel;
 
 public class GUI {
 	
 	// =========== PARAMETERS =====================
-	static final int   wall_thickness = 1;
-	static final Color wall_color 	  = GuiUtils.getHSBAColor(0f, 0f, 0f, 1);
-	static final Color path_color 	  = Color.RED;
+	static final float   wall_thickness = 0.01f;
+	static final float   highlighted_wall_thickness = wall_thickness * 5;
 	
 	// ============ VARIABLES =====================
 	
@@ -41,24 +41,24 @@ public class GUI {
 	public PCDrawer[] pcDrawers;
 	public VDrawer[] TDrawers;
 	public VDrawer[] VDrawers;
+	public VScatterDrawer vscatterDrawer;
 	
 	
-	public PolarDataDrawer qDrawer;
-	public PolarDataDrawer affDrawer;
+	public PolarDataDrawer probabilityDrawer;
 	public PolarDataDrawer biasDrawer;
-	public PolarDataDrawer probDrawer;
+
+	public WallBiasHighlighterDrawer wallBiasDrawer;
 	
-	public RuntimesDrawer runtimes;
+	public Plot runtimes;
 	
 	
 	final static String panel_pc = "PC Activation ";
 	final static String panel_traces = "Traces ";
 	final static String panel_value = "PC Value ";
-	final static String panel_current_q = "Current Q Value";
-	final static String panel_affordances = "Affordances";
-	final static String panel_bias = "Bias";
-	final static String panel_actions = "Actions";
+	final static String panel_probabilities = "Probabilities";
+	final static String panel_bias = "Biases";
 	final static String panel_runtimes = "Run times";
+	final static String panel_value_scatter = "Value vs PC radius";
 	
 	
 	
@@ -74,7 +74,7 @@ public class GUI {
 	private void createPanels() {
 		// =========== CREATE PANELS =================
 		// PC PANELS
-		int size = 200;
+		int size = 300;
 		for (int i = 0; i < numScales; i++) {
 			d.addPanel(new DrawPanel(size, size), panel_pc + i, 0, i, 1, 1);
 		}
@@ -89,13 +89,14 @@ public class GUI {
 			d.addPanel(new DrawPanel(size, size), panel_value + i, 2, i, 1, 1);
 		}
 		
+		// OBS: First 3 rows are reserved for
 		// ACTION SELECTION PANELS
-		d.addPanel(new DrawPanel(size,size), panel_current_q, 0, 3, 1, 1);
-		d.addPanel(new DrawPanel(size,size), panel_affordances, 1, 3, 1, 1);
-		d.addPanel(new DrawPanel(size,size), panel_bias, 2, 3, 1, 1);
-		d.addPanel(new DrawPanel(size,size), panel_actions, 0, 4, 1, 1);
+		d.addPanel(new DrawPanel(size,size), panel_bias, 0, numScales, 1, 1);
+		d.addPanel(new DrawPanel(size,size), panel_probabilities, 0, numScales+1, 1, 1);
 		
-		d.addPanel(new DrawPanel(size,size), panel_runtimes, 1, 4, 1, 1);
+		d.addPanel(new DrawPanel(size,size), panel_runtimes, 1, numScales, 1, 1);
+		d.addPanel(new DrawPanel(size,size), panel_value_scatter, 2, numScales, 1, 1);
+		
 	}
 	
 	private void createDrawers() {
@@ -104,10 +105,9 @@ public class GUI {
 
 		// Maze related drawers
 		wallDrawer = new WallDrawer( wall_thickness);
-		wallDrawer.setColor(wall_color);
 		
 		pathDrawer = new PathDrawer(model.getRobot().getRobotProxy());
-		pathDrawer.setColor(path_color);
+//		pathDrawer.setColor(path_color);
 
 		rDrawer = new RobotDrawer(model.getRobot().getRobotProxy());
 		
@@ -139,19 +139,32 @@ public class GUI {
 			var pcs = model.pcs[i];
 			VDrawers[i] = new VDrawer(pcs.xs, pcs.ys, model.vTable[i]);
 			VDrawers[i].distanceOption = 1; // use pc radis to draw PCs
+			VDrawers[i].setMinValue(0);
+			VDrawers[i].setMaxValue(1.5f);
+			VDrawers[i].fixed_range = true;
 		}
 		
 		// RL and action selection drawers
+		var num_angles = model.numActions;
+		var angles = Doubles.mul(Doubles.range(num_angles), 2*Math.PI / num_angles);
 		
-		qDrawer = new PolarDataDrawer("Q softmax",model.numActions ,() -> model.softmax );
-		affDrawer = new PolarDataDrawer("Affordances",model.numActions , ()->model.affordances.affordances);
-		biasDrawer = new PolarDataDrawer("Bias",model.numActions, ()->model.motionBias.getBias());
-		probDrawer = new PolarDataDrawer("Probs",model.numActions, ()->model.action_selection_probs);
-		probDrawer.setGetArrowFunction(()->model.chosenAction);
+		probabilityDrawer = new PolarDataDrawer("Probabilities" );
+		probabilityDrawer.addData("Q softmax", angles, () -> model.softmax);
+		probabilityDrawer.addData("Final Policy", angles, ()->model.action_selection_probs);
+		probabilityDrawer.addArrow( ()->model.chosenAction * 2*Math.PI/num_angles);
+
+		biasDrawer = new PolarDataDrawer("Biases");
+		biasDrawer.addData("Affordances", angles, ()->model.affordances.affordances);
+		biasDrawer.addData("Motion", angles, ()->model.motionBias.getBias());
+		biasDrawer.addData("Obstacle", angles, () -> model.obstacle_biases.biases);
+
+		wallBiasDrawer = new WallBiasHighlighterDrawer(highlighted_wall_thickness, model);
 		
 		int numEpisodes = Integer.parseInt(Experiment.get().getGlobal("numEpisodes").toString());
-		runtimes = new RuntimesDrawer(numEpisodes, 0, 800);
-		runtimes.doLines = false;
+		runtimes = new RuntimesDrawer(0, 0, numEpisodes, 800);
+//		runtimes.doLines = false;
+		
+		vscatterDrawer = new VScatterDrawer(-0.1, 1.1,model.pcs, model.vTable);
 	}
 	
 	public void addDrawersToPanels() {
@@ -161,11 +174,12 @@ public class GUI {
 		// UNIVERSE PANEL
 		d.addDrawer("universe", "pcs", pcDrawers[0] );
 		d.addDrawer("universe", "value", VDrawers[0]);
+		d.addDrawer("universe", "wall bias", wallBiasDrawer);
 		d.addDrawer("universe", "maze", wallDrawer );
 		d.addDrawer("universe", "feeders", fDrawer);
 		d.addDrawer("universe", "path", pathDrawer);
-		d.addDrawer("universe", "robot", rDrawer);
 		d.addDrawer("universe", "cycle info", new CycleDataDrawer());
+		d.addDrawer("universe", "robot", rDrawer);
 		
 		// RUNTIMES
 		d.addDrawer(panel_runtimes, "runtimes", runtimes);
@@ -193,10 +207,9 @@ public class GUI {
 		
 		
 		// ACTION SELECTION PANELS:
-		d.addDrawer(panel_current_q, "qDrawer", qDrawer);
-		d.addDrawer(panel_affordances, "affDrawer", affDrawer);
+		d.addDrawer(panel_probabilities, "pDrawer", probabilityDrawer);
 		d.addDrawer(panel_bias, "biasDrawer", biasDrawer);
-		d.addDrawer(panel_actions, "probDrawer", probDrawer);
+		d.addDrawer(panel_value_scatter, panel_value_scatter, vscatterDrawer);
 		
 		
 		
