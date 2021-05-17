@@ -24,7 +24,7 @@ public class PlaceCellBins {
 	private PlaceCells pc_bins[][];
 	private PlaceCells dummyBin = new PlaceCells();
 	private int active_x_id, active_y_id; // x and y indeces of the active bin
-	public PlaceCells active_pcs;
+	public PlaceCells active_pcs = dummyBin;
 	
 	/**
 	 * Create and initialize the bins
@@ -165,7 +165,7 @@ public class PlaceCellBins {
 	}
 		
 	public void clear() {
-		active_pcs = null;
+		active_pcs = dummyBin;
 	}
 	
 	public boolean circleIntersectsRectangle(float cx, float cy, float radius, float left, float top, float right, float bottom)
