@@ -320,8 +320,8 @@ public class PlaceCells {
 								+ e.getGlobal("trial") + " " 
 								+ e.getGlobal("episode") + " " 
 								+ e.getGlobal("cycle"));
-			e.display.updateData();
-			e.display.repaint();
+//			e.display.updateData();
+//			e.display.repaint();
 //			try {
 //				System.in.read();
 //			} catch (IOException e1) {
