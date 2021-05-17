@@ -16,7 +16,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 public class PolarDataDrawer extends Drawer {
 	
 
-	Window<Float> localCoordinates = new Window<>(-1f,-1f,2f,2f);
+	Window localCoordinates = new Window(-1f,-1f,2f,2f);
 	GetData getData;
 	GetArrowDirection getArrow;
 	
@@ -103,7 +103,7 @@ public class PolarDataDrawer extends Drawer {
 	}
 
 	@Override
-	public void draw(Graphics g, Window<Float> panelCoordinates) {
+	public void draw(Graphics g, Window panelCoordinates) {
 		if(!doDraw) return;
 		
 		Scaler s = new Scaler(localCoordinates,panelCoordinates,true);

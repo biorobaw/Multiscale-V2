@@ -46,7 +46,7 @@ public class PCDrawer extends Drawer {
 
 
 	@Override
-	public void draw(Graphics g, Window<Float> panelCoordinates) {
+	public void draw(Graphics g, Window panelCoordinates) {
 		if(!doDraw) return;
 		
 		if(constant) drawConstant(g, panelCoordinates);
@@ -90,7 +90,7 @@ public class PCDrawer extends Drawer {
 		PlaceCells get();
 	}
 	
-	synchronized void drawConstant(Graphics g, Window<Float> panelCoordinates) {
+	void drawConstant(Graphics g, Window panelCoordinates) {
 		
 		// Scale coordinates
 		Scaler s = new Scaler(worldCoordinates, panelCoordinates, true);
@@ -138,7 +138,7 @@ public class PCDrawer extends Drawer {
 		
 	}
 	
-	void drawMultipleR(Graphics g, Window<Float> panelCoordinates) {
+	void drawMultipleR(Graphics g, Window panelCoordinates) {
 				
 		// Scale coordinates
 		Scaler s = new Scaler(worldCoordinates, panelCoordinates, true);
