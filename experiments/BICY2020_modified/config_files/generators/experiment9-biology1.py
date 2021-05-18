@@ -15,7 +15,7 @@ mazeWidth   = 2.2
 mazeHeight  = 3
 num_obstacles  = [0, 6, 11, 23] 
 configs_per_num_obstalces = 1
-episodesPerStartingLocation = 10000
+episodesPerStartingLocation = 4000
 
 mazes       = [f'M1{i:02d}{j:02d}.xml' for i in num_obstacles for j in range(0,configs_per_num_obstalces)]
 map_num_obstacles = {f'{mazesPath}/{m}' : int(m[2:4]) for m in mazes}
@@ -30,7 +30,7 @@ experiment_DF = dataFrame('experiment', experiment)
 group_DF      = dataFrame('group',      group)
 ratIds_DF     = dataFrame('run_id',     rat_ids)
 pc_layers_DF  = dataFrame('pc_files', [pc_path + f for f in ['u56_10.csv']])
-traces_DF     = dataFrame('traces', [ 0.8 ])
+traces_DF     = dataFrame('traces', [ 0.4 ])
 
 
 
