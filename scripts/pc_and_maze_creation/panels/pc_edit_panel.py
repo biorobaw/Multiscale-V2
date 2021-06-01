@@ -189,7 +189,7 @@ class PanelPCEdit(QWidget):
         df.to_csv(name, index=False)
 
     def load(self):
-        name = QFileDialog().getOpenFileName(self, 'Open File', filter="*.csv;*.py")[0]
+        name = QFileDialog().getOpenFileName(self, 'Open File', filter="*.csv; *.py")[0]
         self.load_from_file(name)
 
     def load_from_file(self, file_name):

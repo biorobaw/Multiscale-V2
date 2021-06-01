@@ -252,10 +252,9 @@ class GViewPlotting(QGraphicsView):
             s = 1 + event.angleDelta().y() / 120 * 0.1
             self.scale(s, s)
         else:
-            if event.angleDelta().x() != 0:
-                self.horizontalScrollBar().wheelEvent(event)
-            else:
-                self.verticalScrollBar().wheelEvent(event)
+            is_x_bar = event.angleDelta().x() != 0
+            bar = self.horizontalScrollBar() if is_x_bar else self.verticalScrollBar()
+            bar.event(event)
 
 
 
