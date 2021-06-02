@@ -263,7 +263,7 @@ class PanelMazeEdit(QWidget):
             f.write('</world>\n')
 
     def load(self):
-        name = QFileDialog().getOpenFileName(self, 'Open File', '', "*.xml;*.py")[0]
+        name = QFileDialog().getOpenFileName(self, 'Open File', '', "*.xml; *.py")[0]
         self.load_from_file(name)
 
     def load_from_file(self, file_name):
