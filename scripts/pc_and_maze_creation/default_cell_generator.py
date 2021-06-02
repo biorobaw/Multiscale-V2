@@ -13,7 +13,7 @@ def load_pc_df():
                 [-1  ,-1.4, 0.01],
                 [-1  , 0.1, 0.01],
                 [1   , 0.1, 0.01],
-                [0.5,  1, 0.02]
+                [0.5,  1,  0.02]
             ]
         )
 
@@ -28,7 +28,10 @@ def load_pc_df():
                                     [-1  ,-1.4, 0.01],
                                     [0.1 , 1.2, 0.02 ]
                                 ])
-    return pd.DataFrame(columns=['x', 'y', 'r'])
+    # return pd.DataFrame(columns=['x', 'y', 'r'])
+    nx = 10
+    radius = 0.56
+    return distribute_uniformly(-1.1, 1.1, nx, -1.5, 1.5, int(np.ceil(nx*3.0/2.2)),radius)
     # return start_points_obstacle_experiment
     #return pd.concat([maze8_manual2(), dummy_points], ignore_index=True)
     
@@ -43,7 +46,6 @@ def load_pc_df():
 def maze8_manual2():
 
     pcs = pd.DataFrame(columns=['x', 'y', 'r'])
-
     pcs.loc[len(pcs)] = [   -0.033,     0.510,      0.16]  # pcid=1
     pcs.loc[len(pcs)] = [   -1.025,     0.403,      0.16]  # pcid=2
     pcs.loc[len(pcs)] = [    0.172,     0.679,      0.12]  # pcid=3
@@ -1786,3 +1788,8 @@ def add_concentric_pcs(pcs, cx, cy, num, radius, phase, distance, min, max):
         pcs.loc[len(pcs)] = [cx + distance * np.cos(phase + i * 2 * np.pi / num), 
                              cy + distance * np.sin(phase + i * 2 * np.pi / num), 
                              radius]
+
+def distribute_uniformly(mx, Mx, nx, my, My, ny, radius):
+    xs = np.tile(np.linspace(mx, Mx, nx), ny)
+    ys = np.repeat(np.linspace(my, My, ny), nx)
+    return pd.DataFrame({'x': xs, 'y': ys, 'r': radius})

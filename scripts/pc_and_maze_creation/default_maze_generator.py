@@ -1,10 +1,14 @@
 import pandas as pd
 import numpy as np
+from shapely.geometry import Point, LineString
 
 
 
 def load_maze_df():
-	walls = pd.concat([external_walls(), obstacles_maze_9(60), auxiliary_walls_maze_9()], ignore_index=True)
+	# maze for bio experiments: 
+	#		obstacle length = 0.19*sqrt(0.3538) = 0.113 # biology length * distance scale ratio 
+	# 		num obstacles: 0, 6, 11, 23
+	walls = pd.concat([external_walls(), obstacles_maze_9(23, length=0.113), auxiliary_walls_maze_9()], ignore_index=True)
 	feeders = feeders_maze_9()
 	starts  = start_pos_maze_9()
 	return walls, feeders, starts
@@ -137,22 +141,50 @@ def start_pos_maze_8():
 		]
 	)
 
+def sample_random_wall(mx, Mx, my, My, length):
+	angle = np.random.rand()*2*np.pi
+	cx = np.random.rand() * (Mx - mx - length) +  (mx + length/2)
+	cy = np.random.rand() * (My - my - length) +  (my + length/2)
 
-def obstacles_maze_9(num_walls=60):
-	maze_width = 2.2
-	maze_height = 3.0
-	half_length = 0.05
+	x1 = cx + np.cos(angle)*length/2
+	y1 = cy + np.sin(angle)*length/2
+	x2 = cx - np.cos(angle)*length/2
+	y2 = cy - np.sin(angle)*length/2
 
-	angles = np.random.rand(num_walls)*2*np.pi
-	cx = (np.random.rand(num_walls)-0.5)*(maze_width -2*half_length)
-	cy = (np.random.rand(num_walls)-0.5)*(maze_height-2*half_length)
+	return x1, y1, x2, y2
 
-	data = pd.DataFrame({
-			'x1' : cx + np.cos(angles)*half_length,
-			'y1' : cy + np.sin(angles)*half_length,
-			'x2' : cx - np.cos(angles)*half_length,
-			'y2' : cy - np.sin(angles)*half_length,
-		})
+
+
+def obstacles_maze_9(num_walls=60, maze_width = 2.2, maze_height = 3.0, length = 0.25, min_distance=0.10):
+	
+	mx = -maze_width/2
+	Mx = maze_width/2
+	my = -maze_height/2
+	My = maze_height/2
+
+
+	data = pd.DataFrame(columns=['x1', 'y1', 'x2', 'y2'])
+
+	for i in range(0, num_walls):
+
+		while True:
+
+			x1, y1, x2, y2 = sample_random_wall(mx, Mx, my, My, length)
+			wall_i = LineString( [[x1,y1], [x2,y2]] )
+
+			intersects = False
+			for j in range(0,i):
+				wj = data.loc[j]
+				wall_j = LineString( [[wj['x1'], wj['y1']], [wj['x2'], wj['y2']]] )
+
+				if wall_i.distance(wall_j) < min_distance: # assume walls intersect if distance is less than 5 cm
+					intersects = True
+					break
+
+			if not intersects:
+				data.loc[i] = [x1, y1, x2, y2]
+				break
+
 	return data
 
 def auxiliary_walls_maze_9():
@@ -176,3 +208,5 @@ def start_pos_maze_9():
                 [1   , 0.1, 0]
 		]
 	)
+
+

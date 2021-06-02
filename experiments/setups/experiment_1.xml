@@ -3,20 +3,26 @@
 
 <experiment>
 
-	<!-- removed seed="1008" from variables, seed="1977393959781007236" seed="3092299512224473078"-->
-	<variables  PROJECT="com.github.biorobaw.scs_models.multiscale_f2019" numActions="8"/>
+	<!-- removed seed="1008" from variables, seed="7461441196144289543" seed="-5156850241654287902"-->
+	<variables  PROJECT="com.github.biorobaw.scs_models.multiscale_f2019" numActions="8"  />
 	
-	<!-- SCSDisplay vs NoDisplay -->
-	<display class="$(SCS).gui.displays.NoDisplay"
-		window="-2,-2,4,4" syncDisplay="false" />
+	
+	<!-- DisplaySwing vs DisplayNone vs DisplayJavaFX -->
+	<display class="$(SCS).gui.displays.DisplayJavaFX"
+		window="-2,-2,4,4" syncDisplay="false" width="1280" height="720" record="false"/>
 		
 	<simulator
 		class="$(SCS).simulation.scs_simulator.SCSSimulator"
-		simulation_step_ms="30" simulation_speed="15" /> <!-- max speed = 15 -->
+		simulation_step_ms="30" simulation_speed="15" pause="false"/> <!-- max speed = 15 -->
 
 	<maze class="$(SCS).maze.Maze"
 		  file="$(mazeFile)" />
 
+
+	<!--  bias methods:
+				1 = wall provide reinforcement signal
+				2 = taxic bias using distance as priority
+	  -->
 	<template id="model" class="$(PROJECT).model.MultiscaleModel"
 		load_model="false"
 		numActions="$(numActions)" 
@@ -33,12 +39,22 @@
 		numY="$(numY)"
 		v_traces="$(traces)"
 		q_traces="$(traces)"
-    	pc_bin_size="0.04"
+    	pc_bin_size="0.04"  
 		
 		discountFactor="0.95" 
-		v_learningRate="0.7,0.7,0.7"
-		q_learningRate="0.7,0.7,0.7"
-		foodReward="1.0"/> <!-- discount factor 0.99, learning rate 0.7 -->
+		v_learningRate="0.4,0.7,0.7"
+		q_learningRate="0.4,0.7,0.7"
+		foodReward="1.0"
+		
+		wall_bias_method="2"
+		wall_detection_distance="2"
+		wall_reached_distance="0.1"
+		wall_reward="0.1"
+		wall_selection_weights="1, 1, 1, 1, 1, 1"
+		
+		certainty_threshold="0.2"
+		
+		/> <!-- discount factor 0.99, learning rate 0.7 -->
 
 	<template id="robot"
 			  class="$(SCS).robot.Robot">
