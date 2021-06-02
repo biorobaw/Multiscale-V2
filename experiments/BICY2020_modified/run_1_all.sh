@@ -23,14 +23,29 @@ for E in ${RUN[*]}; do
 		python scripts/circe_cluster/logFolderGenerator.py $(map $E LOG_FOLDER) $(map $E CONFIG_FILE)
 
 		CMD_ARGS="-cp target/Multiscale-F2019-1.0.0-SNAPSHOT-jar-with-dependencies.jar -Xmx1500m com.github.biorobaw.scs.Main"
+
+		MINI_BATCH="$2"		
+		[[ -z "$MINI_BATCH" ]] || LAST=$(( $MINI_BATCH - 1 ))
 		for rat_id in $(seq $MIN_RAT $MAX_RAT)
 		do
 			echo "rat $rat_id"
 			# Note: prepending "time -v" to command gives time and max memory usage of program + other metrics
-			time -v java $CMD_ARGS $(map $E CONFIG_FILE) $rat_id $(map $E LOG_FOLDER) >> serial_out.out
+			if [[ -z "$MINI_BATCH" ]]; then
+				time -v java $CMD_ARGS $(map $E CONFIG_FILE) $rat_id $(map $E LOG_FOLDER) >> serial_out.out
+				[ $? -eq 0 ] || FAILED_IDS="$FAILED_IDS, $rat_id"
+			else
+				java $CMD_ARGS $(map $E CONFIG_FILE) $rat_id $(map $E LOG_FOLDER) >> serial_out.out &
+				# PIDS+=($!)
 
+				# check if last job to commit, if it is, then wait
+				if [[ "$(( $rat_id %  $MINI_BATCH ))" == "$LAST" || "$rat_id" == "$MAX_RAT" ]]; then
+					echo "waiting"
+					wait
+				fi
+
+			fi
 			# check exit status
-			[ $? -eq 0 ] || FAILED_IDS="$rat_id, $FAILED_IDS"
+			
 
 		done
 
