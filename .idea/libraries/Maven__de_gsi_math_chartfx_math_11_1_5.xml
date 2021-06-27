@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: de.gsi.math:chartfx-math:11.1.5">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/de/gsi/math/chartfx-math/11.1.5/chartfx-math-11.1.5.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/de/gsi/math/chartfx-math/11.1.5/chartfx-math-11.1.5-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/de/gsi/math/chartfx-math/11.1.5/chartfx-math-11.1.5-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

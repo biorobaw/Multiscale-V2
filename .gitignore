@@ -7,9 +7,16 @@ slurm*.out
 
 *.pyc
 .idea/
+!/.idea/
+.idea/**/workspace.xml
+.idea/**/statistics.xml
+.idea/**/shelf
+
 __pycache__/
 --mode=client/
 venv/
 
 *.sublime-project
 *.sublime-workspace
+
+
