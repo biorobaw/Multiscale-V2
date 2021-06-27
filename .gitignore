@@ -8,9 +8,7 @@ slurm*.out
 *.pyc
 .idea/
 !/.idea/
-.idea/**/workspace.xml
-.idea/**/statistics.xml
-.idea/**/shelf
+
 
 __pycache__/
 --mode=client/
