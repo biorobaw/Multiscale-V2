@@ -2,7 +2,7 @@ import os
 
 if not os.path.exists("../scs"):
     print("[+] cloning scs...")
-    os.system("git clone git@github.com:biorobaw/scs.git ../")
+    os.system("git clone https://github.com/biorobaw/scs.git ../scs")
 else:
     print("[+] skip cloning scs")
 
