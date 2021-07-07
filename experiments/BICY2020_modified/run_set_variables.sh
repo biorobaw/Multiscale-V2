@@ -63,7 +63,7 @@ declare -A E10=( ["NAME"]=experiment10-choosingMetrics  ["BATCH_SIZE"]=100 ["RAT
 # E10[MAX_RAT]=29
 #E9[MIN_CONFIG]=0
 # E9[MAX_CONFIG]=0
-declare -A E11=( ["NAME"]=experiment11-article2  ["BATCH_SIZE"]=100 ["RATS"]=100 ["SAMPLE_RATE"]=1  )
+declare -A E11=( ["NAME"]=experiment11-article2  ["BATCH_SIZE"]=100 ["RATS"]=100 ["SAMPLE_RATE"]=5  )
 
 for E in ${RUN[*]}; do
 	eval "$E[LOG_FOLDER]=\$LOG_FOLDER/\$(map $E NAME)"
