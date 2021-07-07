@@ -1,5 +1,6 @@
-import sys
+import sys, os, ast
 import importlib.util as loader
+from multiprocessing import Pool
 from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, \
                             QWidget, QVBoxLayout, QTableWidget, \
                             QHeaderView, QCheckBox, QTableWidgetItem, \
@@ -15,7 +16,9 @@ import MazeParser
 from data.Wall import Wall
 from data.Feeder import Feeder
 from data.StartPos import StartPos
-from tools.path_planning.planner import find_path, generate_maze_metrics
+from tools.path_planning.precision_planner import find_path, generate_maze_metrics
+
+
 
 class PanelMazeEdit(QWidget):
 
@@ -34,12 +37,14 @@ class PanelMazeEdit(QWidget):
     def __init__(self, *args, **kwargs):
         super(PanelMazeEdit, self).__init__(*args, **kwargs)
         self.setMinimumSize(100, 100)
+        self.pool = None
+        self.maze_metrics = None
 
         # create data container:
         self.walls = []
         self.feeders = []
         self.start_positions = []
-        self.last_file_loaded = 'default_maze_generator.py'
+        self.last_file_loaded = 'data_generators/default_maze_generator.py'
 
         # create the layout for the panel
         layout_pane = QVBoxLayout()
@@ -213,10 +218,11 @@ class PanelMazeEdit(QWidget):
                 return
         else:
             feeder = Feeder(id, x, y, None)
-        self.feeders += [feeder]
-
-        # feeder.object_changed.connect(self.select_feeder)
-        self.feeder_added.emit(feeder)
+        
+        if feeder not in self.feeders:
+            self.feeders += [feeder]
+            # feeder.object_changed.connect(self.select_feeder)
+            self.feeder_added.emit(feeder)
 
     def add_start_pos(self, x=0, y=-1.5, w=0, start_pos_str=""):
         # create start_pos
@@ -226,10 +232,11 @@ class PanelMazeEdit(QWidget):
                 return
         else:
             start_pos = StartPos(x, y, w, None)
-        self.start_positions += [start_pos]
 
-        # start_pos.object_changed.connect(self.select_wall)
-        self.start_pos_added.emit(start_pos)
+        if start_pos not in self.start_positions:
+            self.start_positions += [start_pos]
+            # start_pos.object_changed.connect(self.select_wall)
+            self.start_pos_added.emit(start_pos)
 
     def save(self):
         name = QFileDialog().getSaveFileName(self, 'Save File')[0]
@@ -270,6 +277,7 @@ class PanelMazeEdit(QWidget):
         if file_name == '':
             return
 
+
         walls, feeders, start_positions = pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
         try:
             if file_name.endswith(".xml"):
@@ -278,9 +286,26 @@ class PanelMazeEdit(QWidget):
                 spec = loader.spec_from_file_location("maze_loader_file", file_name)
                 loader_module = loader.module_from_spec(spec)
                 spec.loader.exec_module(loader_module)
-                walls, feeders, start_positions = loader_module.load_maze_df()
+
+                if hasattr(loader_module, 'load_maze_df'):
+                    walls, feeders, start_positions = loader_module.load_maze_df()
+                else: 
+                    print(f'Function "load_maze_df" not implemented in file {file_name}')
+
+                
         except:
             print(f'ERROR: unable to load the file {self.last_file_loaded}')
+
+        try:
+            metrics_folder, maze_file_name = os.path.split(file_name)
+            metrics_file_name = os.path.join(metrics_folder,'mazeMetrics.csv')
+            metrics = pd.read_csv(metrics_file_name)
+            metrics = metrics[metrics.maze == maze_file_name].copy().reset_index(drop=True)
+            self.maze_metrics = metrics
+        except:
+            self.maze_metrics = None
+            print('Maze metric file not found in maze folder.')
+            
 
         for index, row in walls.iterrows():
             self.add_wall(float(row['x1']), float(row['y1']),
@@ -293,6 +318,10 @@ class PanelMazeEdit(QWidget):
         for index, row in start_positions.iterrows():
             #Currently we only display feeders, we do not allow editting them
             self.add_start_pos(float(row['x']), float(row['y']), float(row['w']))
+
+        if self.maze_metrics is not None:
+            paths = [ast.literal_eval(p) for p in self.maze_metrics.path.values]
+            self.signal_paths_added.emit(paths)
 
 
         self.last_file_loaded = file_name
@@ -319,13 +348,32 @@ class PanelMazeEdit(QWidget):
         self.signal_clear_paths.emit()
         i = 0
         paths = []
-        for goal in self.feeders:
-            for start in self.start_positions:
-                path, distance = find_path(goal, start, self.walls )
-                print(i, f'[{goal}]', f'[{start}]', distance, path)
-                i+=1
-                paths += [path]
+        pickable_walls = [w.pickable() for w in self.walls]
+        args = [ (start.pickable(), goal.pickable(), pickable_walls) for goal in self.feeders for start in self.start_positions]
+        args = [ (i,) + a for (i,a) in zip(range(len(args)), args) ]
+
+        if self.pool is None:
+            self.pool = Pool(len(args))
+            self.pool.starmap_async(find_path, args, chunksize=1, callback = self.path_planning_done)
+                # self.path_planning_done(results)
+        else:
+            print("THREAD POOL ALREADY RUNNING")
+
+
+
+    def path_planning_done(self, results):
+        # separate and print results
+        paths = [ path for (path, distance) in results]
+        distances = [ distance for (path, distance) in results ]
+        steps = [ len(p)-1 for p in paths]
+        print ( *zip(range(len(distances)), steps, distances))
+        
+        self.pool.terminate()
+        self.pool = None
+
+        # signal to the gui
         self.signal_paths_added.emit(paths)
+        
 
     def create_all_maze_metrics(self):
         folder = QFileDialog().getExistingDirectory(self, 'Choose folder with mazes', '')

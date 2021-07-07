@@ -107,3 +107,24 @@ class StartPos(QWidget):
             print('PC parse error')
             return None
 
+    def pickable(self):
+        return PickableStartPos(self.x(), self.y(), self.w())
+
+    def __eq__(self, pos):
+        return abs(self.x() - pos.x()) < 0.001 and abs(self.y() - pos.y()) < 0.001
+
+    __hash__ = QWidget.__hash__
+
+class PickableStartPos:
+    def __init__(self, x, y, w):
+        self.data = [x, y, w] 
+
+    def x(self):
+        return self.data[0]
+
+    def y(self):
+        return self.data[1]
+
+    def w(self):
+        return self.data[2]
+

@@ -17,6 +17,7 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__(*args, **kwargs)
 
         self.setWindowTitle("Maze and pc editor")
+        self.setAcceptDrops(True)
 
         # add main widget and create its layout
         widget_main = QWidget()
@@ -30,6 +31,7 @@ class MainWindow(QMainWindow):
         # layout.addWidget(splitter)
         pane_edit = QTabWidget()
         pane_plot = PanelDataPlotting()
+        self.pane_plot = pane_plot
         splitter.addWidget(pane_edit)
         splitter.addWidget(pane_plot)
         splitter.setStretchFactor(1, 1)
@@ -59,6 +61,9 @@ class MainWindow(QMainWindow):
 
         self.action_do_path_planner.triggered.connect(tab_maze.perform_path_planning)
         self.action_create_maze_metrics.triggered.connect(tab_maze.create_all_maze_metrics)
+
+        self.action_create_layers.triggered.connect(tab_pcs.create_layers)
+        self.action_create_layer_metrics.triggered.connect(tab_pcs.create_layer_metrics)
 
 
     def load_dafault_data(self):
@@ -91,12 +96,44 @@ class MainWindow(QMainWindow):
                 print("widget has no attribute 'delete_selection'")
 
     def createMenus(self):
-        self.menu_tools = self.menuBar().addMenu('&Tools')
+        # MENU MAZE
+        self.menu_maze = self.menuBar().addMenu('&Maze')
+
         self.action_do_path_planner = QAction('Do &Path Planning')
         self.action_create_maze_metrics = QAction('Create all &Maze Metrics')
 
-        self.menu_tools.addAction(self.action_do_path_planner)
-        self.menu_tools.addAction(self.action_create_maze_metrics)
+        self.menu_maze.addAction(self.action_do_path_planner)
+        self.menu_maze.addAction(self.action_create_maze_metrics)
+
+        # MENU LAYERS 
+        self.menu_layers = self.menuBar().addMenu('&Layers')
+
+        self.action_create_layers = QAction('Create &Layers')
+        self.action_create_layer_metrics = QAction('Create all Layer &Metrics')
+
+        self.menu_layers.addAction(self.action_create_layers)
+        self.menu_layers.addAction(self.action_create_layer_metrics)
+
+    def dragEnterEvent(self, event):
+        if event.mimeData().hasUrls():
+            event.accept()
+        else:
+            event.ignore()
+
+    def dropEvent(self, event):
+        files = [u.toLocalFile() for u in event.mimeData().urls()]
+
+        control = QApplication.keyboardModifiers() == Qt.ControlModifier
+        
+        if not control:
+            active_tab = self.pane_edit.currentWidget()
+            active_tab.clear()
+
+        for f in files:
+            self.tab_maze.load_from_file(f)
+            self.tab_pcs.load_from_file(f)
+            self.pane_plot.gview.fit_scene_in_view(force_fit = True)
+
 
 
         

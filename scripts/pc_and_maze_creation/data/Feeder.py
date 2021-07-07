@@ -108,3 +108,25 @@ class Feeder(QWidget):
             print('PC parse error')
             return None
 
+    def pickable(self):
+        return PickableFeeder(self.id(), self.x(), self.y())   
+
+    def __eq__(self, f2):
+        return abs(self.x() - f2.x()) < 0.001 and abs(self.y() - f2.y()) < 0.001
+
+    __hash__ = QWidget.__hash__
+
+class PickableFeeder:
+
+    def __init__(self, id,  x, y):
+        self.data = [x, y, id]
+
+
+    def x(self):
+        return self.data[0]
+
+    def y(self):
+        return self.data[1]
+
+    def id(self):
+        return self.data[2]

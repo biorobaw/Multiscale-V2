@@ -114,3 +114,23 @@ class Wall(QWidget):
         else:
             print('Wall parse error')
             return None
+
+    def pickable(self):
+        return PickableWall(self.x1(), self.y1(), self.x2(), self.y2())
+
+class PickableWall:
+
+    def __init__(self, x1, y1, x2, y2):
+        self.data = [x1, y1, x2, y2]
+
+    def x1(self):
+        return self.data[0]
+
+    def y1(self):
+        return self.data[1]
+
+    def x2(self):
+        return self.data[2]
+
+    def y2(self):
+        return self.data[3]

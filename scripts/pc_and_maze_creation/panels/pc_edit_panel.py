@@ -1,4 +1,4 @@
-import sys
+import sys, os
 import importlib.util as loader
 
 from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, \
@@ -23,7 +23,7 @@ class PanelPCEdit(QWidget):
 
         # create data container:
         self.pcs = []
-        self.last_file_loaded = "default_cell_generator.py"
+        self.last_file_loaded = "data_generators/default_cell_generator.py"
 
         # create the layout for the panel
         layout_pane = QVBoxLayout()
@@ -204,7 +204,12 @@ class PanelPCEdit(QWidget):
                 spec = loader.spec_from_file_location("pc_loader_file", file_name)
                 loader_module = loader.module_from_spec(spec)
                 spec.loader.exec_module(loader_module)
-                df = loader_module.load_pc_df()
+                
+                if hasattr(loader_module, 'load_pc_df'):
+                    df = loader_module.load_pc_df()
+                else: 
+                    print(f'Function "load_pc_df" no implemented in file {file_name}')
+
 
             except:
                 print("ERROR: the python script couldnt be loaded, check syntax errors in the script")
@@ -229,6 +234,13 @@ class PanelPCEdit(QWidget):
         for t in tokens:
             self.add_entry(pc_str = t)
 
+    def create_layers(self):
+        generator_file = 'data_generators/pc_layer_generator.py'
+        print('Running script: ', generator_file)
+        os.system(f'python {generator_file}')
+        print('Done generating layers')
 
+    def create_layer_metrics(self):
+        print('DUMMY: creating layer metrics')
 
 

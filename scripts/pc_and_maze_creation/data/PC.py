@@ -104,3 +104,20 @@ class PlaceCell(QWidget):
             print('PC parse error')
             return None
 
+    def pickable(self):
+        return PickablePlaceCell(self.x(), self.y(), self.r())
+
+class PickablePlaceCell:
+
+    def __init__(self, x, y, r):
+        self.data = [x, y, r]
+
+
+    def x(self):
+        return self.data[0]
+
+    def y(self):
+        return self.data[1]
+
+    def r(self):
+        return self.data[2]

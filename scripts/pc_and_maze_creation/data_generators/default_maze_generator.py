@@ -8,7 +8,11 @@ def load_maze_df():
 	# maze for bio experiments: 
 	#		obstacle length = 0.19*sqrt(0.3538) = 0.113 # biology length * distance scale ratio 
 	# 		num obstacles: 0, 6, 11, 23
-	walls = pd.concat([external_walls(), obstacles_maze_9(23, length=0.113), auxiliary_walls_maze_9()], ignore_index=True)
+	# maze for robot experiments:
+	#		obstacle length 25cm
+	#		num obstacles: 0, 10, 20, 30, 40, 50, 60
+	# NOTE: min distance between obstacles set to 10cm
+	walls = pd.concat([external_walls(), obstacles_maze_9(10, length=0.25), auxiliary_walls_maze_9()], ignore_index=True)
 	feeders = feeders_maze_9()
 	starts  = start_pos_maze_9()
 	return walls, feeders, starts

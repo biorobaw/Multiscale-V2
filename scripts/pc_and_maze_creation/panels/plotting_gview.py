@@ -209,8 +209,8 @@ class GViewPlotting(QGraphicsView):
             del self.graphics[key]
             self.fit_scene_in_view()
 
-    def fit_scene_in_view(self):
-        if self.auto_fit:
+    def fit_scene_in_view(self, force_fit = False):
+        if self.auto_fit or force_fit:
             b = self.scene().itemsBoundingRect()
             if b.width() > 0 and b.height() > 0:
                 self.view_rect = b
