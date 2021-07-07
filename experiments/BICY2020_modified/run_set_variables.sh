@@ -27,12 +27,13 @@ RUN=()
 #RUN+=(E7)
 #RUN+=(E8)
 # RUN+=(E9)
-RUN+=(E10)
+# RUN+=(E10)
+RUN+=(E11)
 
 # Each experiment requires parameters: 
 #	NAME : name of the experiment
 #	BATCH_SIZE : the number of rats executed together by each slurm process
-#	RATS : number of rats per config
+#	RATS : number of rats per config, used to find missing rats
 #	SAMPLE_RATE : states every how many episodes should we log results
 #!/bin/sh
 # OPTIONAL parameters:
@@ -62,6 +63,7 @@ declare -A E10=( ["NAME"]=experiment10-choosingMetrics  ["BATCH_SIZE"]=100 ["RAT
 # E10[MAX_RAT]=29
 #E9[MIN_CONFIG]=0
 # E9[MAX_CONFIG]=0
+declare -A E11=( ["NAME"]=experiment11-article2  ["BATCH_SIZE"]=100 ["RATS"]=100 ["SAMPLE_RATE"]=1  )
 
 for E in ${RUN[*]}; do
 	eval "$E[LOG_FOLDER]=\$LOG_FOLDER/\$(map $E NAME)"

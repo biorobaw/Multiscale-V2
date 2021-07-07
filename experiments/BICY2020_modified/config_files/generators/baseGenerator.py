@@ -24,8 +24,8 @@ def oneXone(df1,df2):
 def allXall(df1,df2):
   return df1.merge(df2,on='key',sort=False)
   
-def createConfigColumn(df):
-  configs = [ 'c{}'.format(i) for i in range(len(df.index))]
+def createConfigColumn(df, init_value = 0):
+  configs = [ 'c{}'.format(init_value + i) for i in range(len(df.index))]
   return oneXone(dataFrame('config',configs), df)   
   
 def saveResult(df,fileName):
@@ -39,7 +39,7 @@ def numStartLocations(mazeFile):
   return len(pos)
   
 def generateMazeDF(mazePath,mazes):
-  fullMazePaths = [ mazePath +'/'+ m for m in mazes ]
+  fullMazePaths = [ os.path.join(mazePath, m) for m in mazes ]
   mazeDF = dataFrame('mazeFile',fullMazePaths)
   
   git_root = get_git_root()

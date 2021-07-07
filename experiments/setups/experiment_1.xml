@@ -4,11 +4,14 @@
 <experiment>
 
 	<!-- removed seed="1008" from variables, seed="7461441196144289543" seed="-5156850241654287902"-->
-	<variables  PROJECT="com.github.biorobaw.scs_models.multiscale_f2019" numActions="8"  />
+	<variables  PROJECT="com.github.biorobaw.scs_models.multiscale_f2019" numActions="8"
+		certainty_threshold="1"
+		wall_bias_method="0"
+	/>
 	
 	
 	<!-- DisplaySwing vs DisplayNone vs DisplayJavaFX -->
-	<display class="$(SCS).gui.displays.DisplayJavaFX"
+	<display class="$(SCS).gui.displays.DisplayNone"
 		window="-2,-2,4,4" syncDisplay="false" width="1280" height="720" record="false"/>
 		
 	<simulator
@@ -19,8 +22,9 @@
 		  file="$(mazeFile)" />
 
 
-	<!--  bias methods:
-				1 = wall provide reinforcement signal
+	<!--  obstacle bias methods:
+				0 = no obstacle bias
+				1 = obstacles provide reinforcement signal
 				2 = taxic bias using distance as priority
 	  -->
 	<template id="model" class="$(PROJECT).model.MultiscaleModel"
@@ -42,19 +46,19 @@
     	pc_bin_size="0.04"  
 		
 		discountFactor="0.95" 
-		v_learningRate="0.4,0.7,0.7"
-		q_learningRate="0.4,0.7,0.7"
+		v_learningRate="0.7,0.7,0.7"
+		q_learningRate="0.7,0.7,0.7"
 		foodReward="1.0"
 		
-		wall_bias_method="2"
+		wall_bias_method="$(wall_bias_method)"
 		wall_detection_distance="2"
 		wall_reached_distance="0.1"
 		wall_reward="0.1"
 		wall_selection_weights="1, 1, 1, 1, 1, 1"
 		
-		certainty_threshold="0.2"
-		
-		/> <!-- discount factor 0.99, learning rate 0.7 -->
+		certainty_threshold="$(certainty_threshold)"
+
+	/> <!-- discount factor 0.99, learning rate 0.7 -->
 
 	<template id="robot"
 			  class="$(SCS).robot.Robot">

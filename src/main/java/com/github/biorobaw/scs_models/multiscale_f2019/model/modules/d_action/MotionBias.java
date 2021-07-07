@@ -7,9 +7,9 @@ public class MotionBias {
 	float[] biases;
 	float uniform_value;
 	
-	int episodesToHalfLife = 50;
+	int episodesToHalfLife;
 	float decay = (float)(1f/Math.pow(2, 1f/episodesToHalfLife));
-	float interpolationValue = 1f/decay; // set to 1/decay since it is multiplied by decay before initial episode
+	float interpolation_value = 1f/decay; // set to 1/decay since it is multiplied by decay before initial episode
 	float interpolationComplement;
 	
 	private boolean compute_bias;
@@ -17,7 +17,7 @@ public class MotionBias {
 	final float sameDirectionBias = 0.83f;
 	final float closestDirectionBias = 0.06f;
 	final float otherDirections = (1-sameDirectionBias-2*closestDirectionBias)/5;
-	float[] precalculatedBias = new float[] {
+	float[] initial_bias = new float[] {
 				sameDirectionBias,
 				closestDirectionBias,
 				otherDirections,
@@ -35,7 +35,7 @@ public class MotionBias {
 		
 		this.episodesToHalfLife = episodesToHalfLife;
 		this.decay = (float)(1f/Math.pow(2, 1f/episodesToHalfLife));
-		this.interpolationValue = 1f/decay;
+		this.interpolation_value = 1f/decay;
 		
 		biases = new float[numActions];
 		interpolatedBias = new float[numActions];
@@ -56,19 +56,22 @@ public class MotionBias {
 	
 	
 	public void newEpisode(){
+
+		// new episode, initialize bias to uniform distribution (bias should not be computed on first cycle)
 		compute_bias = false;
-		interpolationValue *=decay;
-		for(int i=0;i<numActions;i++) {
-			biases[i] = uniform_value;
-			
-			// interpolate the bias with a uniform so that the bias decays over time
-			Floats.mul(precalculatedBias, interpolationValue, interpolatedBias);
-			Floats.add(interpolatedBias, (1-interpolationValue)*uniform_value, interpolatedBias);
-		}
+		Floats.constant(uniform_value, biases); // new episode,
+
+
+		// compute precalculated bias by interpolating
+		// note: bias = initial_bias* gamma^episode + (1-gamma^episode) * uniform
+		interpolation_value *=decay;
+		Floats.mul(initial_bias, interpolation_value, interpolatedBias);
+		Floats.add(interpolatedBias, (1- interpolation_value)*uniform_value, interpolatedBias);
 	}
 	
 	public void newTrial(){
-		interpolationValue = 1f/decay; // set to 1/decay since at new episode it gets multiplied by decay
+		// initialize interpolation value
+		interpolation_value = 1f/decay; // set to 1/decay since at each new episode it gets multiplied by decay
 	}
 	
 	public float[] getBias() {

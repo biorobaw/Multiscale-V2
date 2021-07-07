@@ -188,7 +188,7 @@ public class MultiscaleModel extends Subject{
 		certainty_threshold 		= xml.getFloatAttribute("certainty_threshold");
 		var wall_selection_weights 	= xml.getFloatArrayAttribute("wall_selection_weights");
 		int numStartingPositions 	= Integer.parseInt(Experiment.get().getGlobal("numStartingPositions"));
-		motionBias 				= new MotionBias(numActions, 50*numStartingPositions);
+		motionBias 				= new MotionBias(numActions, 2000*numStartingPositions);
 		softmax 				= new float[numActions];
 		possible 				= new float[numActions];
 		action_selection_probs 	= new float[numActions];
@@ -424,22 +424,27 @@ public class MultiscaleModel extends Subject{
 //		learning_dist = softmax;
 //		optimal_action_dist = biased;
 			
-		// METHOD 2
+		// METHOD 2, get soft max then calculate certainty:
 		Floats.softmaxWithWeights(qValues, aff_values, softmax);
-		
 		float non_zero = Floats.sum(aff_values);
 		float certainty = 1 - Floats.entropy(softmax, non_zero > 1 ? non_zero : 2f);
-//		System.out.prin tln("Certainty: " + certainty );
-		
-		var bias_motion = motionBias.calculateBias(chosenAction);
-		var bias_obstacles = obstacle_bias_method==2 ? 
-				obstacle_biases.calculateBias(pos) :
-				Floats.constant(1, numActions);
+
 
 		// If Q policy is not certain enough, use bias, else, don't use it
+//		System.out.prin tln("Certainty: " + certainty );
 		if(certainty < certainty_threshold ) {
+
+			// calculate motion bias
+			var bias_motion = motionBias.calculateBias(chosenAction);
+
+			// calculate obstacle bias if necessary
+			if(obstacle_bias_method==2) {
+				var bias_obstacles = obstacle_biases.calculateBias(pos);
+				Floats.mul(bias_motion, bias_obstacles, action_selection_probs);
+			} else Floats.copy(bias_motion, action_selection_probs);
+
+
 			// Combine bias, then add bias to softmax to get resulting probabilities
-			Floats.mul(bias_motion, bias_obstacles, action_selection_probs);		
 			addMultiplicativeBias(action_selection_probs, softmax, action_selection_probs);
 		} else Floats.copy(softmax,action_selection_probs);
 		
