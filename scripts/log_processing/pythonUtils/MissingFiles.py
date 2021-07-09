@@ -3,23 +3,23 @@ from os.path import join as join_path
 from os import listdir
 from sys import argv
 import re
-
+import pandas as pd
 
 if __name__ == '__main__':
 
-    configs_folder = join_path(argv[1], 'configs', '')
-    search_file = configs_folder + 'c{}/' + argv[2].replace('#ID', '{}')
-    num_rats = int(argv[3])
+    log_folder = argv[1]
+    configs_folder = join_path(log_folder, 'configs', '')
+    search_file = configs_folder + '{}/' + argv[2].replace('#ID', '{}')    
+    all_configs = pd.read_csv(join_path(log_folder,'configs.csv'),sep='\t')
 
-    config_list = [int(f[1:]) for f in listdir(configs_folder) if re.match('c\\d+$', f)]
-    print('configs: ', len(config_list))
+    missing_ids = [ str(index) for index, row in all_configs.iterrows()
+                                if not exists(search_file.format(row['config'], row['run_id']))]
 
-    
-    missing_ids = [ str(c*num_rats + r) for c in config_list 
-                                        for r in range(num_rats)
-                                        if not exists(search_file.format(c, r))]
-
-    totalMissing = len(missing_ids)
-    print('num missing:', totalMissing)
-    if totalMissing > 0:
+    total_missing = len(missing_ids)
+    print()
+    print(f'TOTAL MISSING: {total_missing} / {len(all_configs)}')
+    print()
+    if total_missing > 0:
         print('missingIds: ', ','.join(missing_ids))
+
+    print()
