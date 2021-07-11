@@ -37,6 +37,7 @@ else
   batchSize=$3
   min_indiv=$4
   max_indiv=$5
+  do_missing=$6
   batchID=$SLURM_ARRAY_TASK_ID
   baseID=`expr $batchSize \* $batchID`
   maxID=`expr $batchSize - 1`
@@ -45,6 +46,8 @@ else
   for i in $(seq 0 $maxID)
   do
     configId=`expr $baseID + $i`
+
+    [ $do_missing == 'DO_MISSING' ] && configId=`cat $baseLogFolder/missing.csv | cut -d "," -f $(expr $configId + 1)`
     
     if [ \( -z "$min_indiv" -o "$min_indiv" -le "$configId" \) -a \( -z "$max_indiv" -o "$configId" -le "$max_indiv" \) ]; then
 

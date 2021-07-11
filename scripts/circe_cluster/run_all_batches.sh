@@ -6,7 +6,7 @@ batchSize=$3
 
 min_indiv=$4 # optional parameter, if non given min indiv will be 0 (min rat in config file)
 max_indiv=$5 # optional paraneter, if non given max indiv will be the last rat in the config file
-
+do_missing=$6
 
 #note: base is used since sbatch -a cannot produce any integer
 #      thus the range to be executed is (base+fromIndiv) to (base+toIndiv) 
@@ -43,8 +43,8 @@ echo "executing indivs: $fromIndiv to $toIndiv in ($maxBatch + 1) batches of $ba
 
 #execute each line
 #outputFilePattern="${baseLogFolder}/slurmOut/slurm-%A_%a.out"
-echo "sbatch -a $minBatch-$maxBatch ./scripts/circe_cluster/one_batch.sh $configFile $baseLogFolder $batchSize"
-idMessage=`sbatch -a $minBatch-$maxBatch ./scripts/circe_cluster/one_batch.sh $configFile $baseLogFolder $batchSize $fromIndiv $toIndiv`
+echo "sbatch -a $minBatch-$maxBatch ./scripts/circe_cluster/one_batch.sh $configFile $baseLogFolder $batchSize $fromIndiv $toIndiv $do_missing"
+idMessage=`sbatch -a $minBatch-$maxBatch ./scripts/circe_cluster/one_batch.sh $configFile $baseLogFolder $batchSize $fromIndiv $toIndiv $do_missing`
 ratsId=`echo $idMessage | cut -d " " -f 4`
 echo $ratsId
 #sbatch --qos=preempt -p mri2016 --dependency=afterok:$ratsId scripts/postProcess.sh $logPath
