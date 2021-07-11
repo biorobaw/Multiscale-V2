@@ -7,9 +7,9 @@ CHECK_FILE="r#ID-steps.bin"
 
 for E in ${RUN[*]}; do
 	echo "sh python $SCRIPT_2_CHECK $(map $E LOG_FOLDER) $CHECK_FILE"
-	python $SCRIPT_2_CHECK $(map $E LOG_FOLDER) $CHECK_FILE
+	#python $SCRIPT_2_CHECK $(map $E LOG_FOLDER) $CHECK_FILE
 
-	num_missing=`awk -F ',' '{print NF}' $baseLogFolder/missing.csv`
+	num_missing=`awk -F ',' '{print NF}' $(map $E LOG_FOLDER)/missing.csv`
 	if [ -z "$num_missing" ]; then
 	    echo 'no missing'
 	else
