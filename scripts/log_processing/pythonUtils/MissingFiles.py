@@ -23,3 +23,6 @@ if __name__ == '__main__':
         print('missingIds: ', ','.join(missing_ids))
 
     print()
+
+    with open(join_path(log_folder,'missing.csv'),'w') as f:
+        f.write(','.join(missing_ids))
