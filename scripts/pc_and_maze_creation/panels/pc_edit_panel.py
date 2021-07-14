@@ -1,4 +1,4 @@
-import sys, os
+import sys, os, subprocess
 import importlib.util as loader
 
 from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, \
@@ -241,6 +241,7 @@ class PanelPCEdit(QWidget):
         print('Done generating layers')
 
     def create_layer_metrics(self):
-        print('DUMMY: creating layer metrics')
-
+        generator_file = 'data_generators/pc_layer_metrics.py'
+        print(f'Running cmd: python {generator_file}')
+        subprocess.run(['python', generator_file], shell=True, check=True)
 
