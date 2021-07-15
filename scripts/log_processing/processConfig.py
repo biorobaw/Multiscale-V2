@@ -178,7 +178,7 @@ def process_and_save_location_runtimes(run_times, location, config_folder, confi
 
     # normalize and store nomalized results
     for col in ['mean', 'std', 'min', '25%', '50%', '75%', 'max']:
-        summary[col] = (summary[col] / normalizer).astype(np.float32)
+        summary[col] = summary[col].astype(np.float32)
 
     summary.to_sql('rat_summaries_errors', db, if_exists='append', index=False)
 
@@ -233,7 +233,7 @@ def process_config(base_folder, config, sample_rate):
 
     # process aggregated results
     print('processing aggregated results...')
-    process_and_save_runtimes(mean_run_times, np.uint8(location), config_folder, config_number, db)
+    process_and_save_location_runtimes(mean_run_times, np.uint8(location), config_folder, config_number, db)
 
     print('TOTAL TIME: {}'.format(time.time() - t1))
     # current, peak = tracemalloc.get_traced_memory()
