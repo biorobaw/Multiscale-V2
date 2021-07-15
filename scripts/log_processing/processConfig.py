@@ -218,7 +218,7 @@ def process_config(base_folder, config, sample_rate):
     # aggregate rat run_times by location
     print('aggregating rats...')
     mean_run_times = all_run_times.groupby(['episode', 'rat'])['steps', 'errors', 'deltaV'] \
-        .mean()
+        .mean() \
         .reset_index()
     mean_run_times.steps = mean_run_times.steps.astype(np.float32)
     mean_run_times.errors = mean_run_times.errors.astype(np.float32)
