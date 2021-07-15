@@ -25,7 +25,7 @@ def create_db_and_tables(config_folder):
                    "   episode  INTEGER, "
                    "   rat      INTEGER, "
                    "   steps       REAL, "
-                   "   normalized  REAL, "
+                   "   errors      REAL, "
                    "   deltaV      REAL, "
                    "   PRIMARY KEY ( config, location, episode, rat ) "
                    " ) "  # removed WITHOUT ROWID since sqlite version on circe does not support it
@@ -51,7 +51,7 @@ def create_db_and_tables(config_folder):
                      """  # removed WITHOUT ROWID since sqlite version on circe does not support it
 
     cursor.execute(summary_schema.format("rat_summaries"))
-    cursor.execute(summary_schema.format("rat_summaries_normalized"))
+    cursor.execute(summary_schema.format("rat_summaries_errors"))
 
     seed_table_schema = """
         CREATE TABLE rat_seeds
@@ -67,20 +67,17 @@ def create_db_and_tables(config_folder):
 
 
 
-def get_maze_metrics(base_folder, config, step_size):
+# def get_maze_metrics(base_folder, config, step_size):
+def get_maze_metrics(base_folder, config):
     # find maze of the config
     configs = pd.read_csv(base_folder + 'configs.csv', sep='\t')
     configs = configs.drop(columns=['run_id']).drop_duplicates()
     configs = configs.set_index(['config'])
     config_maze = os.path.basename(configs.loc[config]['mazeFile'])
 
-    # find maze metrics (calculate geometric mean and add it to DF)
+    # find maze metrics (calculate max error of all  locations per episode and add it to DF)
     maze_metrics = pd.read_csv(base_folder + "mazes/mazeMetrics.csv")
-    metric_gmean = maze_metrics.groupby('maze')['distance'].apply(stats.gmean).reset_index(name='distance')
-    metric_gmean['pos'] = -1
-    maze_metrics = maze_metrics.append(metric_gmean, ignore_index=True, sort=True)
     maze_metrics = maze_metrics.set_index(['maze', 'pos']).loc[config_maze]
-    maze_metrics['minSteps'] = maze_metrics['distance'] / step_size
     return maze_metrics
 
 def merge_runtimes_from_all_rats(config_folder, sample_rate):
@@ -139,10 +136,9 @@ def merge_seeds_from_all_rats(config_folder, config_number):
     })
 
 
-def process_and_save_runtimes(run_times, location, normalizer, config_folder, config_number, db):
+def process_and_save_location_runtimes(run_times, location, config_folder, config_number, db):
     # save run times
     run_times = run_times.copy()
-    run_times['normalized'] = run_times['steps'] / normalizer
     run_times.to_sql('rat_runtimes', db, if_exists='append', index=False)
 
 
@@ -169,8 +165,8 @@ def process_and_save_runtimes(run_times, location, normalizer, config_folder, co
     summary['count']   = summary['count'].astype(np.uint8)
     summary.episode = summary.episode.astype(np.uint16)
     for col in summary.columns.drop(['count', 'episode']):
-        m_type = np.float32 if col not in ['mean', 'std'] and location != -1 else np.float32
-        summary[col] = summary[col].astype(m_type)
+        # m_type = np.float32 if col not in ['mean', 'std'] and location != -1 else np.float32
+        summary[col] = summary[col].astype(np.float32)
 
     # add location and config to dataframe
     summary.insert(loc=0, column='location', value=location)
@@ -184,7 +180,7 @@ def process_and_save_runtimes(run_times, location, normalizer, config_folder, co
     for col in ['mean', 'std', 'min', '25%', '50%', '75%', 'max']:
         summary[col] = (summary[col] / normalizer).astype(np.float32)
 
-    summary.to_sql('rat_summaries_normalized', db, if_exists='append', index=False)
+    summary.to_sql('rat_summaries_errors', db, if_exists='append', index=False)
 
 
 def process_config(base_folder, config, sample_rate):
@@ -195,15 +191,14 @@ def process_config(base_folder, config, sample_rate):
     base_folder = os.path.join(base_folder, '')
     config_folder = os.path.join(base_folder, 'configs', config, '')
     config_number = np.uint16(config[1:])  # drop letter c and parse number
-    step_size = np.float32(0.08)
 
     # get maze metrics:
-    maze_metrics = get_maze_metrics(base_folder, config, step_size)
+    maze_metrics = get_maze_metrics(base_folder, config)
 
     # merge results from all rats
     all_run_times = merge_runtimes_from_all_rats(config_folder, sample_rate)
     all_run_times.insert(loc=0, column='config', value=config_number)
-    all_run_times['normalized'] = np.float32(0)
+    all_run_times['errors'] = (all_run_times.steps / all_run_times.location.map(dict(maze_metrics.steps)) - 1).astype(np.float32)
     all_seeds = merge_seeds_from_all_rats(config_folder, config_number)
 
 
@@ -217,31 +212,28 @@ def process_config(base_folder, config, sample_rate):
     # divide results according to location and process them
     for location, run_times in all_run_times.groupby('location'):
         print('Processing location {}...'.format(location))
-        normalizer = np.float32(maze_metrics['minSteps'].iloc[location])
-        process_and_save_runtimes(run_times, np.uint8(location), normalizer, config_folder, config_number, db)
+        process_and_save_location_runtimes(run_times, np.uint8(location), config_folder, config_number, db)
         print()
 
     # aggregate rat run_times by location
     print('aggregating rats...')
-    mean_run_times = all_run_times.groupby(['episode', 'rat'])['steps'] \
-        .apply(stats.gmean) \
-        .reset_index(name='steps')
+    mean_run_times = all_run_times.groupby(['episode', 'rat'])['steps', 'errors', 'deltaV'] \
+        .mean()
+        .reset_index()
     mean_run_times.steps = mean_run_times.steps.astype(np.float32)
+    mean_run_times.errors = mean_run_times.errors.astype(np.float32)
+    mean_run_times.deltaV = mean_run_times.deltaV.astype(np.float32)
 
-    normalizer = np.float32(maze_metrics['minSteps'].iloc[-1])
+
     location = np.uint8(-1)
     mean_run_times['location'] = location
     mean_run_times['config'] = config_number
     # add back location and
 
-    mean_deltaV = all_run_times.groupby(['episode', 'rat'])['deltaV'] \
-        .mean() \
-        .reset_index(name='deltaV')
-    mean_run_times['deltaV'] = mean_deltaV.deltaV.astype(np.float32)
 
     # process aggregated results
     print('processing aggregated results...')
-    process_and_save_runtimes(mean_run_times, np.uint8(location), normalizer, config_folder, config_number, db)
+    process_and_save_runtimes(mean_run_times, np.uint8(location), config_folder, config_number, db)
 
     print('TOTAL TIME: {}'.format(time.time() - t1))
     # current, peak = tracemalloc.get_traced_memory()
