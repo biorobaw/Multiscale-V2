@@ -17,8 +17,8 @@ for E in ${RUN[*]}; do
 	[[ -z "$(map $E MAX_RAT)" ]] && MAX_RAT=$numRats || MAX_RAT=$(map $E MAX_RAT) 
 
 	# if max and min configs were not defined, then define them
-	[[ -z "$(map $E MIN_CONFIG)" ]] && MIN_CONFIG=$(($MIN_RAT / $(map $E RATS))) || MIN_CONFIG=$(map $E MIN_CONFIG)
-	[[ -z "$(map $E MAX_CONFIG)" ]] && MAX_CONFIG=$(($MAX_RAT / $(map $E RATS))) || MAX_CONFIG=$(map $E MAX_CONFIG)
+	[[ -z "$(map $E MIN_CONFIG)" ]] && MIN_CONFIG=$(config "$(map $E LOG_FOLDER)/configs.csv" "$MIN_RAT"  ) || MIN_CONFIG=$(map $E MIN_CONFIG)
+	[[ -z "$(map $E MAX_CONFIG)" ]] && MAX_CONFIG=$(config "$(map $E LOG_FOLDER)/configs.csv" "$MAX_RAT"  ) || MAX_CONFIG=$(map $E MAX_CONFIG)
 
 	if [ "${1,,}" == "serial" ]; then
 		for c_id in $(seq $MIN_CONFIG $MAX_CONFIG)

@@ -2,6 +2,9 @@
 
 # AUXILIARY FUNCTION
 map() { eval "echo \${$1[$2]}"; }
+config() {
+	python scripts/utils/rat_to_config.py	$1 $2
+}
 
 # FOLDERS
 EXPERIMENT_FOLDER="experiments/BICY2020_modified"
@@ -15,6 +18,7 @@ SCRIPT_3_PROCESS_CONFIG="scripts/circe_cluster/configuration_process_results.sh"
 SCRIPT_3_PLOT_PATHS=$EXPERIMENT_FOLDER/post_processing/plot_paths.py
 SCRIPT_4_MERGE="scripts/log_processing/mergeConfigs.py"
 SCRIPT_5_PLOT_EXPERIMENT=$EXPERIMENT_FOLDER/post_processing/plot_experiments.py
+
 
 # EXPERIMENTS
 RUN=()
@@ -63,6 +67,7 @@ declare -A E10=( ["NAME"]=experiment10-choosingMetrics  ["BATCH_SIZE"]=100 ["SAM
 #E9[MIN_CONFIG]=0
 # E9[MAX_CONFIG]=0
 declare -A E11=( ["NAME"]=experiment11-article2  ["BATCH_SIZE"]=10 ["SAMPLE_RATE"]=5  )
+# E11[MAX_RAT]=355
 
 for E in ${RUN[*]}; do
 	eval "$E[LOG_FOLDER]=\$LOG_FOLDER/\$(map $E NAME)"
