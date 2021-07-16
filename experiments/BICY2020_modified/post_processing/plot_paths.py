@@ -65,6 +65,7 @@ def plot_config(experiment_folder, config, config_id):
         '8': [format_maze ],
         '9': [format_maze ],
         '10': [format_maze ],
+        '11': [format_maze, format_pc_file, format_trace ],
     }
     config_title = apply_formatters(config, e_formatters[experiment_name])
     save_name = os.path.join(figure_folder, 'paths_' + config_title + '.pdf')

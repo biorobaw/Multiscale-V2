@@ -15,6 +15,7 @@ LOG_FOLDER=$EXPERIMENT_FOLDER/logs
 SCRIPT_1_RUN_ALL="scripts/circe_cluster/run_all_batches.sh"
 SCRIPT_2_CHECK="scripts/log_processing/pythonUtils/MissingFiles.py"
 SCRIPT_3_PROCESS_CONFIG="scripts/circe_cluster/configuration_process_results.sh"
+SCRIPT_3_PLOT_PATHS_SLURM="scripts/circe_cluster/plot_paths.sh"
 SCRIPT_3_PLOT_PATHS=$EXPERIMENT_FOLDER/post_processing/plot_paths.py
 SCRIPT_4_MERGE="scripts/log_processing/mergeConfigs.py"
 SCRIPT_5_PLOT_EXPERIMENT=$EXPERIMENT_FOLDER/post_processing/plot_experiments.py
