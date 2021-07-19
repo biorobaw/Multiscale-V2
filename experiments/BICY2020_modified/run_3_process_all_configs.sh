@@ -21,16 +21,23 @@ for E in ${RUN[*]}; do
 	[[ -z "$(map $E MAX_CONFIG)" ]] && MAX_CONFIG=$(config "$(map $E LOG_FOLDER)/configs.csv" "$MAX_RAT"  ) || MAX_CONFIG=$(map $E MAX_CONFIG)
 
 	if [ "${1,,}" == "serial" ]; then
+
+
+		module add apps/python/3.7.3
+
 		# SERIAL IMPLEMENTATION NEEDS UPDATING
 		for c_id in $(seq $MIN_CONFIG $MAX_CONFIG)
 		do
 			SLURM_ARRAY_TASK_ID=$c_id
 			echo "${PATH_PLOT_SCRIPT/ENAME/$(map $E LOG_FOLDER)}"
-			eval "${PATH_PLOT_SCRIPT/ENAME/$(map $E LOG_FOLDER)}"
+			# eval "${PATH_PLOT_SCRIPT/ENAME/$(map $E LOG_FOLDER)}"
 
-			echo "bash $SCRIPT_3_PROCESS_CONFIG $(map $E LOG_FOLDER)/ $(map $E SAMPLE_RATE) $c_id"
-			bash $SCRIPT_3_PROCESS_CONFIG $(map $E LOG_FOLDER)/ $(map $E SAMPLE_RATE) c$c_id
+			echo "python ./scripts/log_processing/processConfig.py $(map $E LOG_FOLDER) c$c_id $(map $E SAMPLE_RATE)"
+			python ./scripts/log_processing/processConfig.py $(map $E LOG_FOLDER) c$c_id $(map $E SAMPLE_RATE)
+			
 		done
+
+
 	else
 
 		echo "python scripts/utils/map_configs_to_cores.py $(map $E LOG_FOLDER) 200 $MIN_CONFIG $MAX_CONFIG"
