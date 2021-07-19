@@ -146,41 +146,46 @@ def process_and_save_location_runtimes(run_times, location, config_folder, confi
 
     # summarize run times
     t = time.time()
-    summary = run_times[['episode', 'steps']] \
+    summary_steps = run_times[['episode', 'steps']] \
         .groupby(['episode']) \
         .describe() # this takes the most amount of time: approx 1 min
-    summary.columns = summary.columns.droplevel()
+    summary_steps.columns = summary_steps.columns.droplevel()
+
+    summary_errors = run_times[['episode', 'errors']] \
+        .groupby(['episode']) \
+        .describe() # this takes the most amount of time: approx 1 min
+    summary_errors.columns = summary_errors.columns.droplevel()
+
 
     # summarize deltaV and add it to summary
     dV = run_times[['episode', 'deltaV']] \
         .groupby(['episode'])\
         .mean()
-    summary = summary.join(dV)
+    summary_steps = summary_steps.join(dV)
+    summary_errors = summary_errors.join(dV)
+
 
     print('Summarizing: {}'.format(time.time() - t))
-    summary = summary.reset_index()
+    summary_steps = summary_steps.reset_index()
+    summary_errors = summary_errors.reset_index()
 
 
     # set data types to reduce memory
-    summary['count']   = summary['count'].astype(np.uint8)
-    summary.episode = summary.episode.astype(np.uint16)
-    for col in summary.columns.drop(['count', 'episode']):
-        # m_type = np.float32 if col not in ['mean', 'std'] and location != -1 else np.float32
-        summary[col] = summary[col].astype(np.float32)
+    for summary in [summary_steps, summary_errors]
+        summary['count']   = summary['count'].astype(np.uint8)
+        summary.episode = summary.episode.astype(np.uint16)
+        for col in summary.columns.drop(['count', 'episode']):
+            # m_type = np.float32 if col not in ['mean', 'std'] and location != -1 else np.float32
+            summary[col] = summary[col].astype(np.float32)
 
-    # add location and config to dataframe
-    summary.insert(loc=0, column='location', value=location)
-    summary.insert(loc=0, column='config', value=config_number)
+        # add location and config to dataframe
+        summary.insert(loc=0, column='location', value=location)
+        summary.insert(loc=0, column='config', value=config_number)
 
 
     # save the summary
-    summary.to_sql('rat_summaries', db, if_exists='append', index=False)
-
-    # normalize and store nomalized results
-    for col in ['mean', 'std', 'min', '25%', '50%', '75%', 'max']:
-        summary[col] = summary[col].astype(np.float32)
-
-    summary.to_sql('rat_summaries_errors', db, if_exists='append', index=False)
+    summary_steps.to_sql('rat_summaries', db, if_exists='append', index=False)
+    summary_errors.to_sql('rat_summaries_errors', db, if_exists='append', index=False)
 
 
 def process_config(base_folder, config, sample_rate):
