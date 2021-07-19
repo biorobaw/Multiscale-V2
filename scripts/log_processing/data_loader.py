@@ -24,7 +24,7 @@ def load_config_file(base_folder):
 def load_summaries(db, config_indices, location):
     indices_str = ','.join(map(str, config_indices))
     df = pd.read_sql_query("select config, location, episode, [50%] as steps "
-                           "from rat_summaries_normalized "
+                           "from rat_summaries_errors "
                            "where config in ({}) "
                            "AND location = {}"
                            .format(indices_str, np.uint8(location)), db)
@@ -54,7 +54,7 @@ def load_deltaV(db, config_indices, location):
 def load_episode_runtimes(db, config_indices, location, episode):
     episode = np.uint16(episode)
     indices_str = ','.join(map(str, config_indices))
-    df = pd.read_sql_query("select config, location, episode, normalized as steps "
+    df = pd.read_sql_query("select config, location, episode, errors as steps "
                            "from rat_runtimes "
                            "where episode={} "
                            "AND config in ({}) "

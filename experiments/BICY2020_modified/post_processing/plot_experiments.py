@@ -8,7 +8,9 @@ import sqlite3
 import numpy as np
 import ntpath
 
-sys.path.append(git.Repo('.', search_parent_directories=True).git.rev_parse("--show-toplevel"))
+
+git_root = git.Repo('.', search_parent_directories=True).rev_parse("--show-toplevel")
+sys.path.append(git_root)
 from scripts.log_processing.plotting import *
 
 
@@ -298,6 +300,28 @@ def plot_experiment_8(figure_folder, configs, sample_rate, db):
                                         legend_title, legend_values, plot_title, obstacle_figure_folder)
 
 
+def plot_experiment_11(figure_folder, configs, sample_rate, db):
+
+
+    # layers of minimum coverage:
+    min_layers = ['u04_40', 'u08_21', 'u12_14', 'u16_11', 'u20_09', 'u24_07', 'u28_06', 'u32_06', 'u36_06', 'u40_05', 'u44_05', 'u48_04', 'u52_04', 'u56_04']
+
+    # first plot locally uniform experiment: 
+    # for each original layer (bigger than 16), compare single layer + added cells at goal + added cells at gap
+
+    print('Plotting locally uniform experiment')
+    locally_uniform_folder = os.path.join(figure_folder,'locally_uniform/')
+    make_folder(locally_uniform_folder)
+    for m in ['M0', 'M1']:
+        maze_configs = configs[configs.mazeFile.str.contains(m)]
+        m_min_uniform_configs = maze_configs[pc_files.std.contains]
+
+
+
+
+
+    # get layer metrics
+    layer_metrics = pd.read_csv(os.path.join(git_root,'experiments/pc_layers/layer_metrics.csv'))
 
 
 def format_pc_file(file_name):
@@ -332,6 +356,7 @@ def plot_experiment(folder):
     experiment_map['7'] = ( plot_experiment7, 5)
     experiment_map['8'] = ( plot_experiment_8, 5)
     experiment_map['9'] = ( plot_experiment_8, 5)
+    experiment_map['11'] = ( plot_experiment_11, 5)
 
     # plot the experiment
     e = experiment_map[experiment_name]
