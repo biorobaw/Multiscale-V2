@@ -171,7 +171,7 @@ def process_and_save_location_runtimes(run_times, location, config_folder, confi
 
 
     # set data types to reduce memory
-    for summary in [summary_steps, summary_errors]
+    for summary in [summary_steps, summary_errors]:
         summary['count']   = summary['count'].astype(np.uint8)
         summary.episode = summary.episode.astype(np.uint16)
         for col in summary.columns.drop(['count', 'episode']):
