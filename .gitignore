@@ -9,7 +9,7 @@ slurm*.out
 .idea/
 !/.idea/
 
-
+.ipynb_checkpoints/
 __pycache__/
 --mode=client/
 venv/
