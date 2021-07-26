@@ -46,8 +46,8 @@
     	pc_bin_size="0.04"  
 		
 		discountFactor="0.95" 
-		v_learningRate="0.7,0.7,0.7"
-		q_learningRate="0.7,0.7,0.7"
+		v_learningRate="0.4,0.7,0.7"
+		q_learningRate="0.4,0.7,0.7"
 		foodReward="1.0"
 		
 		wall_bias_method="$(wall_bias_method)"

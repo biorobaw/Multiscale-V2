@@ -188,7 +188,7 @@ public class MultiscaleModel extends Subject{
 		certainty_threshold 		= xml.getFloatAttribute("certainty_threshold");
 		var wall_selection_weights 	= xml.getFloatArrayAttribute("wall_selection_weights");
 		int numStartingPositions 	= Integer.parseInt(Experiment.get().getGlobal("numStartingPositions"));
-		motionBias 				= new MotionBias(numActions, 2000*numStartingPositions);
+		motionBias 				= new MotionBias(numActions, 50*numStartingPositions);
 		softmax 				= new float[numActions];
 		possible 				= new float[numActions];
 		action_selection_probs 	= new float[numActions];
