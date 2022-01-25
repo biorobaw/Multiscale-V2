@@ -54,7 +54,7 @@ def load_deltaV(db, config_indices, location):
 def load_episode_runtimes(db, config_indices, location, episode):
     episode = np.uint16(episode)
     indices_str = ','.join(map(str, config_indices))
-    df = pd.read_sql_query("select config, location, episode, errors as steps "
+    df = pd.read_sql_query("select config, location, rat, episode, errors as steps "
                            "from rat_runtimes "
                            "where episode={} "
                            "AND config in ({}) "
@@ -67,6 +67,20 @@ def load_episode_runtimes(db, config_indices, location, episode):
     df.steps = df.steps.astype(np.float32)
     return df
 
+def load_all_runtimes_smaller_than_threshold(db, config_indices, location, threshold):
+    indices_str = ','.join(map(str, config_indices))
+    df = pd.read_sql_query(f"select config, location, rat, episode, errors as steps "
+                           f"from rat_runtimes "
+                           f"where config in ({indices_str}) "
+                           f"AND location = {np.uint8(location)} "
+                           f"AND errors < {threshold}"
+                           , db)
+    # adjust data types to reduce memory size
+    df.config = df.config.astype(np.uint16)
+    df.location = df.location.astype(np.uint8)
+    df.episode = df.episode.astype(np.uint16)
+    df.steps = df.steps.astype(np.float32)
+    return df
 
 
 

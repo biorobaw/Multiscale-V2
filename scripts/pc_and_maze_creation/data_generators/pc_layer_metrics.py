@@ -1,6 +1,6 @@
 import pandas as pd
 import git, sys, os, numpy as np
-from shapely.geometry import Point, LineString
+from shapely.geometry import Point, LineString, Polygon
 from multiprocessing import Pool
 import glob, time
 
@@ -41,6 +41,8 @@ def calculate_all_metrics(base_folder, file_path):
     metrics['mean radius'             ]  = average_radius(pcs)
     metrics['mean distance'           ]  = average_distance_between_centers(pcs)
     metrics['normalized mean distance']  = metrics['mean distance'] / metrics['mean radius']
+    metrics['normalized mean distance density']  = metrics['mean radius'] / metrics['mean distance']
+    metrics['coverage'                ]  = coverage(pcs)
 
     print(f'finished {file_path} in {time.time() - start_time}')
 
@@ -55,9 +57,16 @@ def average_radius(pcs):
 def total_area(pcs):
     return np.pi * (pcs['r'] * pcs['r']).sum()
 
-def total_area_clipped(pcs):
-    # TODO
-    pass
+default_maze_coords = [[-1.1,-1.5], [1.1,-1.5], [1.1,1.5], [-1.1,1.5]]
+def coverage(pcs, maze_coords = default_maze_coords):
+    maze = Polygon(maze_coords)
+
+    def intersection_area(pc):
+        circle = Point(pc['x'], pc['y']).buffer(pc['r'], 1000)
+        return maze.intersection(circle).area
+
+    total_intersection_area = pcs.apply(intersection_area, axis=1).sum()
+    return total_intersection_area / maze.area
 
 def average_distance_between_centers(pcs):
     num_pcs = len(pcs)
