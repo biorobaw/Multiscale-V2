@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="us-ascii"?>
+
+<world>
+	
+	<generator class="$(SCS).maze.mazes.Rectangle"
+			    x1="-1.1" y1="-1.5" 
+			    x2="1.1"  y2="1.5" />
+
+	
+
+
+	
+</world>
+

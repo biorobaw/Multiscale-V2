@@ -74,6 +74,10 @@ class GViewPlotting(QGraphicsView):
         self.pen_start_pos.setWidthF(0.02)
         self.pen_start_pos.setColor(QColor('green'))
 
+        self.brush_start_pos = QBrush()
+        # self.brush_start_pos.setWidthF(0.02)
+        self.brush_start_pos.setColor(QColor('green'))
+
 
 
     def add_wall(self, wall):
@@ -114,7 +118,8 @@ class GViewPlotting(QGraphicsView):
         y = start_pos.y()
         r = self.start_pos_drawing_radius
 
-        g_point = self.scene().addEllipse(x - r, y - r, 2 * r, 2 * r, self.pen_start_pos)
+        g_point = self.scene().addEllipse(x - r, y - r, 2 * r, 2 * r, pen = self.pen_start_pos, brush = self.brush_start_pos)
+        g_point.setZValue(-1)
         # g_point.setFlag(QGraphicsItem.ItemIsMovable)
 
         start_pos.signal_modified.connect(self.update_start_pos)
@@ -178,12 +183,15 @@ class GViewPlotting(QGraphicsView):
             graphic.hide()
         else:
             pen = self.pen_start_pos_selected if start_pos.selected() else self.pen_start_pos
+            brush = self.brush_start_pos
             graphic.show()
             graphic.setPen(pen)
+            graphic.setBrush(brush)
             x = start_pos.x()
             y = start_pos.y()
             r = self.start_pos_drawing_radius
             graphic.setRect(x-r, y-r, 2*r, 2*r)
+            graphic.setZValue(-1)
 
     def update_pc(self, pc):
         pc_graphics = self.graphics[pc]
