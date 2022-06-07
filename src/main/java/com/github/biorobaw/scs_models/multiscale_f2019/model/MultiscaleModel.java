@@ -28,6 +28,7 @@ import com.github.biorobaw.scs_models.multiscale_f2019.model.modules.b_state.Pla
 import com.github.biorobaw.scs_models.multiscale_f2019.model.modules.b_state.QTraces;
 import com.github.biorobaw.scs_models.multiscale_f2019.model.modules.c_rl.ObstacleBiases;
 import com.github.biorobaw.scs_models.multiscale_f2019.model.modules.d_action.MotionBias;
+import com.github.biorobaw.scs_models.multiscale_f2019.robot.modules.distance_sensing.MySCSDistanceSensor;
 
 public class MultiscaleModel extends Subject{
 	
@@ -52,7 +53,7 @@ public class MultiscaleModel extends Subject{
 	public SlamModule slam;
 	public FeederModule feederModule;
 	public ObstacleBiases obstacle_biases;
-	public DistanceSensingModule distance_sensors;
+	public MySCSDistanceSensor distance_sensors;
 	
 	
 	// Model Variables: state
@@ -274,6 +275,8 @@ public class MultiscaleModel extends Subject{
 		for(int i=0; i<numActions; i++) {
 			distances[i] = ego_distances[(i + id0) % numActions];
 		}
+
+		float distance_to_closest_subgoal = distance_sensors.getDistanceToClosestSubgoal();
 		
 		tocs[0] = Debug.toc(tics[0]);
 		

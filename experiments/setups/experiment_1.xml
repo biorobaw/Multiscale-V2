@@ -11,7 +11,7 @@
 	
 	
 	<!-- DisplaySwing vs DisplayNone vs DisplayJavaFX -->
-	<display class="$(SCS).gui.displays.DisplayNone"
+	<display class="$(SCS).gui.displays.DisplayJavaFX"
 		window="-2,-2,4,4" syncDisplay="false" width="1280" height="720" record="false"/>
 		
 	<simulator
@@ -66,8 +66,8 @@
 		<module class="$(SCS).robot.modules.localization.GlobalLocalization"/>
 		<module class="$(SCS).robot.modules.FeederModule" 
 				max_feeding_distance="0.1"/><!-- feeding distance is optional, defaults to 0.1m -->	
-		<module class="$(SCS).robot.modules.distance_sensing.SCSWallDistanceSensors"
-			 	num_sensors="$(numActions)"/>  
+		<module class="$(PROJECT).robot.modules.distance_sensing.MySCSDistanceSensor"
+			 	num_sensors="$(numActions)"/>  <!-- originally: SCSWallDistanceSensors from SCS -->
 	</template>
 
 	<groups>

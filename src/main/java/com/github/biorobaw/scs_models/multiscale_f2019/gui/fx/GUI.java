@@ -12,11 +12,7 @@ import com.github.biorobaw.scs.gui.displays.java_fx.drawer.universe.WallDrawer;
 import com.github.biorobaw.scs.utils.math.Doubles;
 import com.github.biorobaw.scs.gui.displays.java_fx.drawer.plot.Plot;
 import com.github.biorobaw.scs.gui.displays.java_fx.drawer.plot.RuntimesDrawer;
-import com.github.biorobaw.scs_models.multiscale_f2019.gui.fx.drawers.PCDrawer;
-import com.github.biorobaw.scs_models.multiscale_f2019.gui.fx.drawers.PolarDataDrawer;
-import com.github.biorobaw.scs_models.multiscale_f2019.gui.fx.drawers.VDrawer;
-import com.github.biorobaw.scs_models.multiscale_f2019.gui.fx.drawers.VScatterDrawer;
-import com.github.biorobaw.scs_models.multiscale_f2019.gui.fx.drawers.WallBiasHighlighterDrawer;
+import com.github.biorobaw.scs_models.multiscale_f2019.gui.fx.drawers.*;
 import com.github.biorobaw.scs_models.multiscale_f2019.model.MultiscaleModel;
 
 public class GUI {
@@ -36,6 +32,7 @@ public class GUI {
 	public PathDrawer pathDrawer;
 	public RobotDrawer rDrawer;
 	public FeederDrawer fDrawer;
+	public RobotDistanceRingDrawer distance2subgoalDrawer;
 
 	int numScales;
 	public PCDrawer[] pcDrawers;
@@ -112,6 +109,9 @@ public class GUI {
 		rDrawer = new RobotDrawer(model.getRobot().getRobotProxy());
 		
 		fDrawer = new FeederDrawer(0.1f);
+
+		distance2subgoalDrawer = new RobotDistanceRingDrawer(model.getRobot().getRobotProxy(),
+				() -> model.distance_sensors.getDistanceToClosestSubgoal());
 		
 		
 		// PC drawers
@@ -179,6 +179,7 @@ public class GUI {
 		d.addDrawer("universe", "feeders", fDrawer);
 		d.addDrawer("universe", "path", pathDrawer);
 		d.addDrawer("universe", "cycle info", new CycleDataDrawer());
+		d.addDrawer("universe", "subgoal distance", distance2subgoalDrawer);
 		d.addDrawer("universe", "robot", rDrawer);
 		
 		// RUNTIMES
