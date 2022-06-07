@@ -17,6 +17,7 @@ from data.Wall import Wall
 from data.Feeder import Feeder
 from data.StartPos import StartPos
 from tools.path_planning.precision_planner import find_path, generate_maze_metrics
+from tools.subgoal_calculator import calculate_all_subgoal_distances
 
 
 
@@ -379,4 +380,11 @@ class PanelMazeEdit(QWidget):
         folder = QFileDialog().getExistingDirectory(self, 'Choose folder with mazes', '')
         if folder is not None and folder != "":
             generate_maze_metrics(folder)
+
+    def calculate_all_subgoal_distances(self):
+        folder = QFileDialog().getExistingDirectory(self, 'Choose folder with mazes', '')
+        if folder is not None and folder != "":
+            calculate_all_subgoal_distances(folder)
+        else:
+            print('nothing to calculate')
 

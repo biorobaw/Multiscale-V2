@@ -61,6 +61,7 @@ class MainWindow(QMainWindow):
 
         self.action_do_path_planner.triggered.connect(tab_maze.perform_path_planning)
         self.action_create_maze_metrics.triggered.connect(tab_maze.create_all_maze_metrics)
+        self.action_calculate_subgoal_distances.triggered.connect(tab_maze.calculate_all_subgoal_distances)
 
         self.action_create_layers.triggered.connect(tab_pcs.create_layers)
         self.action_create_layer_metrics.triggered.connect(tab_pcs.create_layer_metrics)
@@ -101,9 +102,11 @@ class MainWindow(QMainWindow):
 
         self.action_do_path_planner = QAction('Do &Path Planning')
         self.action_create_maze_metrics = QAction('Create all &Maze Metrics')
+        self.action_calculate_subgoal_distances = QAction('Calculate subgoal distances')
 
         self.menu_maze.addAction(self.action_do_path_planner)
         self.menu_maze.addAction(self.action_create_maze_metrics)
+        self.menu_maze.addAction(self.action_calculate_subgoal_distances)
 
         # MENU LAYERS 
         self.menu_layers = self.menuBar().addMenu('&Layers')
