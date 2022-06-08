@@ -7,9 +7,12 @@ import com.github.biorobaw.scs.gui.displays.java_fx.drawer.DrawerFX;
 import com.github.biorobaw.scs.utils.math.Floats;
 import com.github.biorobaw.scs.utils.math.Integers;
 
+import com.github.biorobaw.scs_models.multiscale_f2019.model.modules.b_state.PlaceCellBins;
+import com.github.biorobaw.scs_models.multiscale_f2019.model.modules.b_state.PlaceCells;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
+import java.util.Vector;
 
 
 public class PCDrawer extends DrawerFX {
@@ -18,6 +21,8 @@ public class PCDrawer extends DrawerFX {
 	final static double GRAY_VALUE = 180.0/256;
 	final static Color GRAY = new Color(GRAY_VALUE, GRAY_VALUE, GRAY_VALUE, 1);
 	
+	PlaceCells cells;    // pointer to the actual place cells
+	PlaceCellBins bins;  // point to the actual place cell bins
 	float[] pc_x;		 // x coordinate of each cell
 	float[] pc_y;		 // y coordinate of each cell
 	float[] pc_r;		 // radius of each cell
@@ -26,25 +31,19 @@ public class PCDrawer extends DrawerFX {
 	float[] activations; // activity of active cells
 	int[] ids;			 // ids of active cells
 	
-	GetActiveValues getActiveValues; // function to get activity of active cells
-	GetActiveIds getActiveIds;		 // function to get ids of active cells
-	
 	float radius = -1; // used when all pcs have the same radius
-	boolean constant = false;
-	
+
 //	HashMap<Integer, Float> values = new HashMap<>();
 	
 
-	public PCDrawer(float[] pc_x, float[] pc_y, float[] pc_r, GetActiveValues getActiveValues, GetActiveIds getActiveIds) {
-		this.getActiveValues = getActiveValues;
-		this.getActiveIds = getActiveIds;
-		this.pc_x = pc_x;
-		this.pc_y = pc_y;
-		this.pc_r  = pc_r;
-		
+	public PCDrawer(PlaceCells cells, PlaceCellBins bins) {
+		this.cells = cells;
+		this.bins = bins;
+		this.pc_x = cells.xs;
+		this.pc_y = cells.ys;
+		this.pc_r = cells.rs;
 		num_cells = pc_x.length;
 		radius = Floats.max(pc_r);
-		constant = radius == Floats.min(pc_r);
 	}
 
 
@@ -56,9 +55,16 @@ public class PCDrawer extends DrawerFX {
 
 	@Override
 	public void updateData() {
-		ids = getActiveIds.get();
-		if(ids!=null) {
-			activations = Floats.copy(getActiveValues.get());
+		// must check if number of cells is still the same, if not, must copy new cells
+
+		this.pc_x = cells.xs;
+		this.pc_y = cells.ys;
+		this.pc_r = cells.rs;
+		num_cells = pc_x.length;
+
+		ids = bins.active_pcs.ids;
+		if(ids != null) {
+			activations = Floats.copy(bins.active_pcs.as);
 		}
 		
 	}
@@ -74,15 +80,6 @@ public class PCDrawer extends DrawerFX {
 //		alpha = (float)Math.sqrt(alpha);
 		return  new Color(0f, 0.9f, alpha, beta);
 	}
-	
-	public  interface GetActiveValues {
-		float[] get();
-	}
-	
-	public interface GetActiveIds {
-		int[] get();
-	}
-	
 
 
 	@Override
@@ -92,39 +89,50 @@ public class PCDrawer extends DrawerFX {
 	
 	class DrawerGraphics extends DrawerScene {
 
-		Circle base_circles[] = new Circle[num_cells];
-		Circle active_circles[] = new Circle[num_cells];
+		Vector<Circle> base_circles = new Vector<>();
+		Vector<Circle> active_circles = new Vector<>();
 		
 		int[] old_ids = new int[] {};
 		
 		public DrawerGraphics(PanelFX panel) {
 			super(panel);
-			for(int i=0; i<num_cells; i++) {
-				base_circles[i] = new Circle(pc_x[i], pc_y[i], pc_r[i], GRAY);
-				root.getChildren().add(base_circles[i]);
-			}
-			
-			for(int i=0; i<num_cells; i++) {
-				active_circles[i] = new Circle(pc_x[i], pc_y[i], pc_r[i], Color.TRANSPARENT);
-				root.getChildren().add(active_circles[i]);
-			}
+			addCells();
 		}
 		
 
 
 		@Override
 		public void update() {
+			// add new cells if necessary:
+			addCells();
+
 			// clear old ids:
 			for(var id : old_ids)
-				active_circles[id].setFill(Color.TRANSPARENT);
+				active_circles.get(id).setFill(Color.TRANSPARENT);
 			if(ids == null) return;
 			old_ids = Integers.copy(ids);
 			
 			for(int i = 0; i < old_ids.length; i++) {
-				
-				active_circles[old_ids[i]].setFill(getColor(activations[i]));
+				var active = active_circles.get(old_ids[i]);
+				active.setFill(getColor(activations[i]));
+				active.toFront();
 			}
 			
+		}
+
+		private void addCells(){
+			int current_count = base_circles.size();
+			for(int i=current_count; i<num_cells; i++) {
+				var c = new Circle(pc_x[i], pc_y[i], pc_r[i], GRAY);
+				base_circles.add( c );
+				root.getChildren().add( c );
+			}
+
+			for(int i=current_count; i<num_cells; i++) {
+				var c = new Circle(pc_x[i], pc_y[i], pc_r[i], Color.TRANSPARENT);
+				active_circles.add(c);
+				root.getChildren().add(c);
+			}
 		}
 		
 	}

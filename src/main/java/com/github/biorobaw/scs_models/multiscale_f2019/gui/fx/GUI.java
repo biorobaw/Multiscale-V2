@@ -36,7 +36,7 @@ public class GUI {
 
 	int numScales;
 	public PCDrawer[] pcDrawers;
-	public VDrawer[] TDrawers;
+	public TDrawer[] TDrawers;
 	public VDrawer[] VDrawers;
 	public VScatterDrawer vscatterDrawer;
 	
@@ -117,28 +117,21 @@ public class GUI {
 		// PC drawers
 		pcDrawers = new PCDrawer[numScales];
 		for (int i = 0; i < numScales; i++) {
-			var pc_bin = model.pc_bins[i];
-			var pcs = model.pcs[i];
-			pcDrawers[i] = new PCDrawer(pcs.xs, pcs.ys, pcs.rs,
-						 				() -> pc_bin.active_pcs.as,
-						 				() -> pc_bin.active_pcs.ids);
+			pcDrawers[i] = new PCDrawer(model.pcs[i], model.pc_bins[i]);
 		}
 		
 		// Trace drawers:
-		TDrawers = new VDrawer[numScales];
+		TDrawers = new TDrawer[numScales];
 		for (int i = 0; i < numScales; i++) {
-			var t = model.vTraces[i];
-			var pcs = model.pcs[i];
-			TDrawers[i] = new VDrawer(pcs.xs, pcs.ys, t.traces[0]);
+			TDrawers[i] = new TDrawer(model.pcs[i], model.vTraces[i], 0);
 			TDrawers[i].setMinValue(0);
 		}
 		
 		// V drawers
 		VDrawers = new VDrawer[numScales];
 		for (int i = 0; i < numScales; i++) {
-			var pcs = model.pcs[i];
-			VDrawers[i] = new VDrawer(pcs.xs, pcs.ys, model.vTable[i]);
-			VDrawers[i].distanceOption = 1; // use pc radis to draw PCs
+			VDrawers[i] = new VDrawer( model.pcs[i], model.vTable, i);
+			VDrawers[i].distanceOption = 1; // use pc radius to draw PCs
 			VDrawers[i].setMinValue(0);
 			VDrawers[i].setMaxValue(1.5f);
 			VDrawers[i].fixed_range = true;
@@ -173,7 +166,7 @@ public class GUI {
 		
 		// UNIVERSE PANEL
 		d.addDrawer("universe", "pcs", pcDrawers[0] );
-		d.addDrawer("universe", "value", VDrawers[0]);
+//		d.addDrawer("universe", "value", VDrawers[0]);
 		d.addDrawer("universe", "wall bias", wallBiasDrawer);
 		d.addDrawer("universe", "maze", wallDrawer );
 		d.addDrawer("universe", "feeders", fDrawer);

@@ -1,0 +1,2 @@
+config	experiment	group	mazeFile	numStartingPositions	pc_files	pc_generation_threshold pc_generation_method	pc_generation_radii	traces	numEpisodes	run_id
+c0	experiments/setups/experiment_1.xml	g1	experiments/mazes/obstacles/M600.xml	7	experiments/pc_layers/empty.csv	0.15	layer	0.24	0.0	70000	0

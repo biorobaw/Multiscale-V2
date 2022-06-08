@@ -1,14 +1,10 @@
 package com.github.biorobaw.scs_models.multiscale_f2019.gui.fx.drawers;
 
 
-
-import java.text.DecimalFormat;
-import java.util.Vector;
-
 import com.github.biorobaw.scs.gui.displays.java_fx.PanelFX;
 import com.github.biorobaw.scs.gui.displays.java_fx.drawer.DrawerFX;
 import com.github.biorobaw.scs.utils.math.Floats;
-
+import com.github.biorobaw.scs_models.multiscale_f2019.model.modules.b_state.EligibilityTraces;
 import com.github.biorobaw.scs_models.multiscale_f2019.model.modules.b_state.PlaceCells;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
@@ -16,45 +12,44 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.scene.transform.Translate;
 
-public class VDrawer extends DrawerFX {
+import java.text.DecimalFormat;
+import java.util.Vector;
+
+public class TDrawer extends DrawerFX {
 
 	PlaceCells pcs;
 	float[] pc_x;		 // x coordinate of each cell
 	float[] pc_y;		 // y coordinate of each cell
 	int num_cells;
 
-	float[][] vtables;
-	int layer;
-	float[] v_copy = null;	// copy of values
+	EligibilityTraces traces;
+	float[] t_copy = null;	// copy of values
 
 
 	public int distanceOption = 1; //0 to use predefined radius, 1 to use minDist and choose automatically
 	double radius = 0.01;
-		
+
 	float maxValue = Float.NEGATIVE_INFINITY;
 	float minValue = 0; // min value, below this value, no hue is used
-	
+
 	float maxData = 0;
 	float minData = 0;
-	
+
 	public boolean fixed_range = false;
-	
+
 	/**
-	 * 
-	 * @param get_xs function to get pcs x coordinate
-	 * @param get_ys function to get pcs y coordinate
-	 * @param get_vs function to get pcs values
+	 *
+	 * @param cells place cells associated to the traces
+	 * @param traces the eligibility traces of the cells
 	 * @param distance_option 0 to use fixed radius, 1 to choose automatically according to pc spacing
 	 */
-	public VDrawer(PlaceCells cells, float[][] vtables, int layer, int distance_option) {
+	public TDrawer(PlaceCells cells, EligibilityTraces traces, int distance_option) {
 		this.pcs = cells;
-		this.vtables = vtables;
-		this.layer = layer;
+		this.traces = traces;
 
-		this.v_copy = Floats.copy(vtables[layer]);
+		this.t_copy = Floats.copy(traces.traces[0]); // traces of value function, thus dim=0
 		this.pc_x = pcs.xs;
 		this.pc_y = pcs.ys;
 		num_cells = pc_x.length;
@@ -72,24 +67,24 @@ public class VDrawer extends DrawerFX {
 			radius = Math.sqrt(radius)/2;
 		}
 
-		
-		
+
+
 	}
 
-	public VDrawer(PlaceCells cells, float[][] vtables, int layer){
-		this(cells,vtables,layer,1);
+	public TDrawer(PlaceCells cells, EligibilityTraces traces){
+		this(cells,traces,1);
 	}
 
 	@Override
 	public void updateData() {
 
-		this.v_copy = Floats.copy(vtables[layer]);
+		this.t_copy = Floats.copy(traces.traces[0]);
 		this.pc_x = pcs.xs;
 		this.pc_y = pcs.ys;
 		num_cells = pc_x.length;
 
-		maxData = Floats.max(v_copy);
-		minData = Floats.min(v_copy);
+		maxData = Floats.max(t_copy);
+		minData = Floats.min(t_copy);
 		if(!fixed_range) maxValue = maxData;
 		
 //		if(maxValue == 0) maxValue = Float.NEGATIVE_INFINITY;
@@ -153,7 +148,7 @@ public class VDrawer extends DrawerFX {
 
 			// set color of all cells
 			for(int i=0; i<num_cells; i++) {
-				cells.get(i).setFill(getColor(v_copy[i],maxValue));
+				cells.get(i).setFill(getColor(t_copy[i],maxValue));
 			}
 			label_range.setText("Range: " + format.format(minData) + " ~ " + format.format(maxData));
 		}

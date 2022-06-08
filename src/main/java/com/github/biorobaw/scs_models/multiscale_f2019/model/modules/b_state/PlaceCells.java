@@ -5,6 +5,8 @@ package com.github.biorobaw.scs_models.multiscale_f2019.model.modules.b_state;
 
 import java.util.HashMap;
 
+import com.github.biorobaw.scs.utils.math.Doubles;
+import com.github.biorobaw.scs.utils.math.Integers;
 import org.apache.commons.lang3.ArrayUtils;
 
 import com.github.biorobaw.scs.experiment.Experiment;
@@ -40,6 +42,7 @@ public class PlaceCells {
 	public float[] ns; // normalized activation
 	
 	public float total_a; // the total activation of the layer (the sum)
+	public float max_a = 0;
 	
 	/**
 	 * Load place cells from a csv file with columns: x, y, r
@@ -107,7 +110,7 @@ public class PlaceCells {
 	 * Create a single layer of tesselated place cells.
 	 * @param mazeWidth The width of the maze
 	 * @param mazeHeight The height of the maze
-	 * @param pcSizes The size (radius) of the place cells
+	 * @param pcSize The size (radius) of the place cells
 	 * @param numPCx The number of pcs in the x direction
 	 */
 	public PlaceCells(float mazeWidth, float mazeHeight, float pcSize, int numPCx) {
@@ -190,7 +193,7 @@ public class PlaceCells {
 	 * @param ymin	The min y value for each layer
 	 * @param ymax	The max y value for each layer
 	 * @param ynum	The number of pcs in the x direction for each layer
-	 * @param radii	The maximum activation radius for each layer
+	 * @param radius	The maximum activation radius for each layer
 	 */
 	public PlaceCells(float xmin, float xmax, int xnum, float ymin, float ymax, int ynum, float radius) {
 		num_cells = xnum*ynum;
@@ -294,18 +297,21 @@ public class PlaceCells {
 	 */
 	public float activate(float x, float y) {
 		total_a = 0;
+		max_a = 0;
 		for(int i=0; i<num_cells; i++) {
 			var dx = xs[i] - x;
 			var dy = ys[i] - y;
 			var r2 = dx*dx + dy*dy;
 //			System.out.println("r2: " +r2 + " " + r2s[i] );
 			if(r2 <= r2s[i]) {
-				as[i] = (float)Math.exp(ks[i]*r2);
-				total_a +=as[i];
+				var a = (float)Math.exp(ks[i]*r2);
+				as[i] = a;
+				total_a += a;
+				if(a > max_a) max_a = a;
 			}
 			else as[i] = 0;
 		}
-		return total_a;
+		return max_a;
 	}
 	
 	/**
@@ -314,7 +320,7 @@ public class PlaceCells {
 	 */
 	public void normalize(float value) {
 		if(value==0) {
-			System.err.println("ERROR: Division by 0, place cells normalization failed");
+			System.err.println("ERROR (PlaceCells.java): Division by 0, place cells normalization failed");
 			var e = Experiment.get();
 			System.err.println("Trial-Episode-cycle: " 
 								+ e.getGlobal("trial") + " " 
@@ -447,5 +453,25 @@ public class PlaceCells {
 		return pcs;
 	}
 	
-	
+	public void addCell(int id, float x, float y, float r){
+
+		// Calculate derived pc params:
+		float r_tolerance = r + numerical_error_tolerance;
+		var r2 = r_tolerance*r_tolerance;
+		var k = (float) Math.log(min_activation)/r2;
+
+
+		// total number of cells in the set
+		num_cells++;
+		xs = Floats.concat(xs, x);
+		ys = Floats.concat(ys, y);
+		rs = Floats.concat(rs, r);
+		r2s = Floats.concat(r2s, r2);
+		ids = Integers.concat(ids, id);
+
+		ks = Floats.concat(ks, k);
+		as = Floats.concat(as, 1);
+		ns = Floats.concat(ns, 0);
+
+	}
 }

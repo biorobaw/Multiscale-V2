@@ -4,9 +4,15 @@
 <experiment>
 
 	<!-- removed seed="1008" from variables, seed="7461441196144289543" seed="-5156850241654287902"-->
+	<!-- These are default values, do not modify unless you know what you are doing-->
 	<variables  PROJECT="com.github.biorobaw.scs_models.multiscale_f2019" numActions="8"
 		certainty_threshold="1"
 		wall_bias_method="0"
+		pc_generation_threshold="-1"
+		pc_generation_method="none"
+		pc_generation_radii=""
+		pc_modulation="none"
+
 	/>
 	
 	
@@ -16,7 +22,7 @@
 		
 	<simulator
 		class="$(SCS).simulation.scs_simulator.SCSSimulator"
-		simulation_step_ms="30" simulation_speed="15" pause="false"/> <!-- max speed = 15 -->
+		simulation_step_ms="30" simulation_speed="15" pause="true"/> <!-- max speed = 15 -->
 
 	<maze class="$(SCS).maze.Maze"
 		  file="$(mazeFile)" />
@@ -34,6 +40,10 @@
 		mazeHeight="3.0"
 		
 		pc_files="$(pc_files)"
+	    pc_generation_threshold="$(pc_generation_threshold)"
+	    pc_generation_method="$(pc_generation_method)"
+	    pc_generation_radii="$(pc_generation_radii)"
+		pc_modulation="$(pc_modulation)"
 		pcSizes="$(pcSizes)"
 		minX="$(minX)"
 		maxX="$(maxX)"
@@ -92,6 +102,9 @@
 								cycles="4000"/> 
 			<noFoodLeftCondition class="$(SCS).tasks.cycle.condition.food.NoFoodLeft" /> 
 		</cycleTasks>
+		<trialTasks>
+			<logPlaceCells class="$(PROJECT).tasks.LogPlaceCells" subject_id="sub_1" />
+		</trialTasks>
 	</trial>
 
 

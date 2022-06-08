@@ -35,15 +35,15 @@ public class PlaceCellBins {
 	 * @param maxy the maxy coordinate to divide space
 	 * @param bin_size the size of the bins in both x and y direction
 	 */
-	public PlaceCellBins(PlaceCells pcs, float bin_size) {
+	public PlaceCellBins(PlaceCells pcs, float minx, float maxx, float miny, float maxy, float bin_size) {
 		// store bin size
 		this.bin_size = bin_size;
 		
 		// find min and max coordinates in which pcs are active
-		minx = Floats.min(Floats.sub(pcs.xs, pcs.rs));
-		miny = Floats.min(Floats.sub(pcs.ys, pcs.rs));
-		maxx = Floats.max(Floats.add(pcs.xs, pcs.rs));
-		maxy = Floats.max(Floats.add(pcs.ys, pcs.rs));
+		this.minx = minx;
+		this.miny = miny;
+		this.maxx = maxx;
+		this.maxy = maxy;
 //		System.out.println("mx,Mx,my,My: " + minx + " " + maxx + " " + miny + " " + maxy);
 		
 		
@@ -77,8 +77,8 @@ public class PlaceCellBins {
 			System.out.println("PC " + id +": " + x + " " + y);
 			
 			// get bins that the place field may intersect
-			var minBins = getBin(x-r, y-r);
-			var maxBins = getBin(x+r, y+r);
+			var minBins = getBin(Math.max(x-r, minx), Math.max(y-r, miny));
+			var maxBins = getBin(Math.min(x+r, maxx), Math.min(y+r, maxy));
 
 			// fix values out of range
 			if(minBins[0] < 0 ) minBins[0] = 0;
@@ -176,6 +176,46 @@ public class PlaceCellBins {
 	   float dy = closestY - cy;
 
 	   return ( dx * dx + dy * dy ) <= radius * radius;
+	}
+
+	public void addCell(int id, float x, float y, float r){
+
+		// iterate bins and add cell
+
+		// get bins that the place field may intersect
+		var minBins = getBin(Math.max(x-r, minx), Math.max(y-r, miny));
+		var maxBins = getBin(Math.min(x+r, maxx), Math.min(y+r, maxy));
+
+		// fix values out of range
+		if(minBins[0] < 0 ) minBins[0] = 0;
+		if(minBins[1] < 0 ) minBins[1] = 0;
+		if(maxBins[0] >= xbins ) maxBins[0] = xbins-1;
+		if(maxBins[1] >= ybins ) maxBins[1] = ybins-1;
+
+		int bins_modified = 0;
+		for(int i=minBins[0]; i <=maxBins[0] ; i++) {
+			float min_bin_x = minx + i*bin_size;
+			float max_bin_x = min_bin_x + bin_size;
+
+			for(int j=minBins[1]; j<=maxBins[1]; j++) {
+				float min_bin_y = miny + j*bin_size;
+				float max_bin_y = min_bin_y + bin_size;
+
+				// if place cell intersects bin, add it
+				if(circleIntersectsRectangle(x, y, r, min_bin_x, max_bin_y, max_bin_x, min_bin_y)) {
+					pc_bins[i][j].addCell(id, x, y, r);
+					bins_modified++;
+				}
+
+			}
+
+		}
+
+		averageBinSize += bins_modified/ (xbins*ybins);
+
+
+
+
 	}
 
 }

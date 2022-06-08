@@ -3,16 +3,11 @@ package com.github.biorobaw.scs_models.multiscale_f2019.model;
 
 
 
-import java.io.IOException;
-import java.util.Arrays;
-
 import com.github.biorobaw.scs.experiment.Experiment;
 import com.github.biorobaw.scs.experiment.Subject;
-import com.github.biorobaw.scs.gui.Display;
 import com.github.biorobaw.scs.gui.displays.DisplaySwing;
 import com.github.biorobaw.scs.robot.commands.TranslateXY;
 import com.github.biorobaw.scs.robot.modules.FeederModule;
-import com.github.biorobaw.scs.robot.modules.distance_sensing.DistanceSensingModule;
 import com.github.biorobaw.scs.robot.modules.localization.SlamModule;
 import com.github.biorobaw.scs.simulation.SimulationControl;
 import com.github.biorobaw.scs.utils.Debug;
@@ -31,7 +26,11 @@ import com.github.biorobaw.scs_models.multiscale_f2019.model.modules.d_action.Mo
 import com.github.biorobaw.scs_models.multiscale_f2019.robot.modules.distance_sensing.MySCSDistanceSensor;
 
 public class MultiscaleModel extends Subject{
-	
+
+	// Model Parameters: Place cells
+	public double pc_generation_threshold;
+	public String pc_generation_method;
+
 	// Model Parameters: RL
 	public float[] v_traceDecay;
 	public float[] q_traceDecay;
@@ -44,11 +43,11 @@ public class MultiscaleModel extends Subject{
 	// Model Parameters: Action Space
 	public int numActions;
 	public float certainty_threshold = 1;
-	
+
 	// Model Parameters: Wall Bias option
 	final int obstacle_bias_method; // 1 = wall reward, 2 = bias to closest elements
 
-	
+
 	// Model Variables: input
 	public SlamModule slam;
 	public FeederModule feederModule;
@@ -59,6 +58,7 @@ public class MultiscaleModel extends Subject{
 	// Model Variables: state
 	public PlaceCells[] pcs;
 	public PlaceCellBins[] pc_bins;
+	public PCgereratorInterface pc_generator;
 	
 	public EligibilityTraces[] vTraces;
 	public QTraces[] qTraces;
@@ -85,7 +85,7 @@ public class MultiscaleModel extends Subject{
 	// GUI
 	com.github.biorobaw.scs_models.multiscale_f2019.gui.swing.GUI gui_old;
 	GUI gui;
-	
+
 	public MultiscaleModel(XML xml) {
 		super(xml);
 		
@@ -110,16 +110,41 @@ public class MultiscaleModel extends Subject{
 		// joystick = new JoystickModule();
 		
 		// ======== MODEL STATE =======================
-		
+
+		var pc_modulation = xml.getAttribute("pc_modulation");
+
 		var pc_bin_size  = xml.getFloatAttribute("pc_bin_size");
-		pcs = PlaceCells.load(xml);	
+		pcs = PlaceCells.load(xml);
 		num_layers = pcs.length;
 		
 		pc_bins = new PlaceCellBins[num_layers];
 		for(int i=0; i<num_layers; i++)
-			pc_bins[i] = new PlaceCellBins(pcs[i], pc_bin_size);
+			pc_bins[i] = new PlaceCellBins(pcs[i], -1.15f ,1.15f, -1.55f, 1.55f, pc_bin_size );
 	
-		
+		// pc generation model:
+		pc_generation_threshold  = xml.getFloatAttribute("pc_generation_threshold");
+		pc_generation_method = xml.getAttribute("pc_generation_method");
+		System.out.println("PC generation method: " + pc_generation_method);
+		pc_generator = switch(pc_generation_method) {
+			case "none" -> ((layer, closest_subgoal) -> 0f);
+			case "layer" -> {
+				System.out.println("PC generation radii: " + xml.getAttribute("pc_generation_radii"));
+				var layer_radii = xml.getFloatArrayAttribute("pc_generation_radii");
+				yield ((layer, closest_subgoal) -> layer_radii[layer]);
+			}
+			case "subgoal" -> {
+				System.out.println("PC GEN METHOD NOT YET IMPLEMENTED");
+				System.exit(-1);
+				yield ((layer, closest_subgoal) -> 0f);
+			}
+			default -> {
+				System.out.println("ERROR: PC Generation method does not exist");
+				System.exit(-1);
+				yield ((layer, closest_subgoal) -> 0f);
+			}
+		};
+
+
 		
 		// ======== TRACES =============================
 		
@@ -209,7 +234,7 @@ public class MultiscaleModel extends Subject{
 		if(Experiment.get().display instanceof DisplaySwing) {
 			gui_old = new com.github.biorobaw.scs_models.multiscale_f2019.gui.swing.GUI(this);
 		} else gui = new GUI(this);
-		
+
 	}
 
 	static public long cycles = 0;
@@ -279,12 +304,20 @@ public class MultiscaleModel extends Subject{
 		float distance_to_closest_subgoal = distance_sensors.getDistanceToClosestSubgoal();
 		
 		tocs[0] = Debug.toc(tics[0]);
+
 		
 		tics[1] = Debug.tic();
 		// calculate state
 		float totalActivity =0;
-		for(int i=0; i<num_layers; i++) 
-			totalActivity+=pc_bins[i].activateBin((float)pos.getX(), (float)pos.getY());
+		for(int i=0; i<num_layers; i++) {
+
+			// If there are no pcs with activity above threshold, create a new pc
+			if( pc_bins[i].activateBin((float) pos.getX(), (float) pos.getY()) < pc_generation_threshold) {
+				addCellToLayer(i, (float)pos.getX(), (float)pos.getY(), distance_to_closest_subgoal, 0, Floats.constant(0,numActions));
+				pc_bins[i].activateBin((float) pos.getX(), (float) pos.getY()) ;
+			}
+			totalActivity += pc_bins[i].active_pcs.total_a;
+		}
 		for(int i=0; i<num_layers; i++) pc_bins[i].active_pcs.normalize(totalActivity);
 		tocs[1] = Debug.toc(tics[1]);
 		
@@ -616,6 +649,41 @@ public class MultiscaleModel extends Subject{
 		return output;
 	}
 	
-	
+	void addCellToLayer(int layer, float x, float y, float closest_subgoal, float initial_v, float initial_q[] ){
+
+		// TODO: as pcs are now generated incrementally, current data structures are very inefficient.
+
+		// Choose x, y, r and id
+		float r = pc_generator.choose_radius(layer, closest_subgoal);
+		int id = pcs[layer].num_cells;
+
+		// Add cell to layer and bins
+		pcs[layer].addCell(id, x, y, r);
+		pc_bins[layer].addCell(id, x, y, r);
+
+		// Associate v value to cell (add entry in the copy as well)
+		vTable[layer] = Floats.concat(vTable[layer], initial_v);
+		vTableCopy[layer] = Floats.concat(vTableCopy[layer], 0);
+		var old_qlayer = qTable[layer];
+
+		// Associate q values to place cell
+		qTable[layer] = new float[old_qlayer.length+1][numActions];
+		for(int i=0; i< old_qlayer.length; i++)
+			for(int j=0; j < numActions; j++)
+				qTable[layer][i][j] = old_qlayer[i][j];
+		for(int j=0; j < numActions; j++)
+			qTable[layer][old_qlayer.length][j] = initial_q[j];
+
+		// Add v and q traces
+		vTraces[layer].addTrace();
+		qTraces[layer].addTrace();
+
+		// review how changes affect gui
+	}
+
+
+	interface PCgereratorInterface {
+		float choose_radius(int layer, float closest_subgoal);
+	}
 	
 }

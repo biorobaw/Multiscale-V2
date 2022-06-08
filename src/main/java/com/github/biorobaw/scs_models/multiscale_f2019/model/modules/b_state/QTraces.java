@@ -1,11 +1,14 @@
 package com.github.biorobaw.scs_models.multiscale_f2019.model.modules.b_state;
 
+import com.github.biorobaw.scs.utils.math.Floats;
+import com.github.biorobaw.scs.utils.math.Integers;
+
 import java.util.HashSet;
 
 public class QTraces {
 	
 	private final int dimensions;	// number of dimensions (actions)
-	private final int num_traces;	// number of traces
+	private int num_traces;	// number of traces
 	private final float decay_rate; // the decay rate
 	private final int init_count;	// initial number of decays until trace is assumed to be 0
 	
@@ -101,7 +104,14 @@ public class QTraces {
 		non_zero.clear();			
 	}
 
+	public void addTrace(){
+		for(int i=0; i<dimensions; i++){
+			traces[i] = Floats.concat(traces[i], 0);
+		}
+		counter = Integers.concat(counter, 0);
+		num_traces++;
 
+	}
 	
 	
 	
