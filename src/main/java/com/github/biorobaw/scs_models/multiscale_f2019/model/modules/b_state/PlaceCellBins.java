@@ -25,6 +25,7 @@ public class PlaceCellBins {
 	private PlaceCells dummyBin = new PlaceCells();
 	private int active_x_id, active_y_id; // x and y indeces of the active bin
 	public PlaceCells active_pcs = dummyBin;
+	public PlaceCells previous_pcs = dummyBin;
 	
 	/**
 	 * Create and initialize the bins
@@ -127,14 +128,18 @@ public class PlaceCellBins {
 			}
 		averageBinSize/=(xbins*ybins);
 	}
-	
+
+	public void storeOldBin(){
+		previous_pcs = active_pcs.copyState();
+	}
+
 	/**
 	 * Computes the activation of all cell in the bin containing the given point
 	 * @param x The point's x cooridnate
 	 * @param y The point's y coordinate
 	 * @return  returs the total activation of the active bin
 	 */
-	public float activateBin(float x, float y) {
+	public float activateBin(float x, float y, float modulator) {
 		if( minx < x && x < maxx && miny < y && y < maxy ) {
 			active_x_id = (int)Math.floor((x-minx)/bin_size);
 			active_y_id = (int)Math.floor((y-miny)/bin_size);
@@ -148,7 +153,7 @@ public class PlaceCellBins {
 //		System.out.println("active " + active_x_id + " " + active_y_id + " " + x + " " + y + pc_bins.length + " " + pc_bins[0].length );
 //		System.out.println("x,y: " + x + " " + y +" " +  active_x_id + " " + active_y_id);
 //		System.out.println("active length: " + active_pcs.num_cells);
-		return active_pcs.activate(x, y);
+		return active_pcs.activate(x, y, modulator);
 	}
 	
 	/**
@@ -165,7 +170,7 @@ public class PlaceCellBins {
 	}
 		
 	public void clear() {
-		active_pcs = dummyBin;
+		previous_pcs = active_pcs = dummyBin;
 	}
 	
 	public boolean circleIntersectsRectangle(float cx, float cy, float radius, float left, float top, float right, float bottom)
@@ -217,5 +222,6 @@ public class PlaceCellBins {
 
 
 	}
+
 
 }

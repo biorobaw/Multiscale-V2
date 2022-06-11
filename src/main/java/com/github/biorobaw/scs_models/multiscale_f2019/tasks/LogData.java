@@ -4,6 +4,7 @@ import com.github.biorobaw.scs.experiment.Experiment;
 import com.github.biorobaw.scs.simulation.scripts.Script;
 import com.github.biorobaw.scs.utils.files.BinaryFile;
 import com.github.biorobaw.scs.utils.files.XML;
+import com.github.biorobaw.scs.utils.math.Integers;
 import com.github.biorobaw.scs_models.multiscale_f2019.model.MultiscaleModel;
 import com.github.biorobaw.scs_models.multiscale_f2019.tasks.SetInitialPosition;
 
@@ -79,6 +80,19 @@ public class LogData implements Script {
 		
 		// save seed
 		BinaryFile.saveBinaryVector(new long[] {e.getGlobal("seed")}, prefix + "seed.bin", true);
+
+		for(int i=0; i<model.pcs.length; i++) System.out.println("PCS(" + i +"): " + model.pcs[i].num_cells);
+		int positions = SetInitialPosition.getNumberOfStrartingPositions();
+		int final_trial_steps = 0;
+		var last_episodes = stepsTaken.length -1;
+		for(int i=0; i<positions; i++) {
+			final_trial_steps += stepsTaken[last_episodes-i];
+//			System.out.println(""+ startPositions[last_episodes-i] + " " + stepsTaken[last_episodes-i]);
+		}
+		System.out.println("FINAL STEPS TAKEN: " + final_trial_steps);
+		System.out.println("TOTAL STEPS TAKEN: " + Integers.sum(stepsTaken));
+
+
 		
 	}
 	

@@ -165,7 +165,8 @@ public class GUI {
 		// ======== ADD DRAWERS TO PANELS ============
 		
 		// UNIVERSE PANEL
-		d.addDrawer("universe", "pcs", pcDrawers[0] );
+		for(int i=0; i<pcDrawers.length; i++)
+			d.addDrawer("universe", "pcs " + i, pcDrawers[i] );
 //		d.addDrawer("universe", "value", VDrawers[0]);
 		d.addDrawer("universe", "wall bias", wallBiasDrawer);
 		d.addDrawer("universe", "maze", wallDrawer );

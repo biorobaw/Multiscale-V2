@@ -51,22 +51,11 @@ public class VScatterDrawer extends Plot {
 		this.values_pointer = values;
 		num_cells = Integers.constant(0, pcs.length);
 
-		updateMinMaxRadius();
 		resize_plot(0, -1.5, 0.60, 1.5);
 
 
 		this.values = new float[values.length][];
 
-	}
-
-	void updateMinMaxRadius(){
-		for(int layer=0; layer<pcs.length; layer++){
-			var pcs_layer = pcs[layer];
-			for(int i=num_cells[layer]; i< pcs_layer.num_cells; i++){
-				if(pcs_layer.rs[i] < min_radius) min_radius = pcs_layer.rs[i];
-				if(pcs_layer.rs[i] > max_radius) max_radius = pcs_layer.rs[i];
-			}
-		}
 	}
 
 	@Override
@@ -154,14 +143,13 @@ public class VScatterDrawer extends Plot {
 				var v_circlesi = v_circles[i];
 				for(int j=0; j < num_cells[i]; j++) {
 					var jitter_x = amplitude*(2*random.nextDouble()-1);
-					var e = new Ellipse(pci.rs[i] + jitter_x, 0, circle_radius_x, circle_radius_y);
+					var e = new Ellipse(pci.rs[j] + jitter_x, 0, circle_radius_x, circle_radius_y);
 					e.setFill(color);
 					v_circlesi.add(e);
 					children.add(e);
 				}
 
 			}
-			System.out.println("Resizing plot  " + min_radius + " " +  max_radius);
 		}
 		
 

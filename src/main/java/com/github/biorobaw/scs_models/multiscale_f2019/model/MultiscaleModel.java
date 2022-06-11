@@ -24,11 +24,12 @@ import com.github.biorobaw.scs_models.multiscale_f2019.model.modules.b_state.QTr
 import com.github.biorobaw.scs_models.multiscale_f2019.model.modules.c_rl.ObstacleBiases;
 import com.github.biorobaw.scs_models.multiscale_f2019.model.modules.d_action.MotionBias;
 import com.github.biorobaw.scs_models.multiscale_f2019.robot.modules.distance_sensing.MySCSDistanceSensor;
+import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
 public class MultiscaleModel extends Subject{
 
 	// Model Parameters: Place cells
-	public double pc_generation_threshold;
+	public float[] pc_generation_threshold;
 	public String pc_generation_method;
 
 	// Model Parameters: RL
@@ -42,7 +43,7 @@ public class MultiscaleModel extends Subject{
 
 	// Model Parameters: Action Space
 	public int numActions;
-	public float certainty_threshold = 1;
+	public float certainty_threshold;
 
 	// Model Parameters: Wall Bias option
 	final int obstacle_bias_method; // 1 = wall reward, 2 = bias to closest elements
@@ -56,9 +57,13 @@ public class MultiscaleModel extends Subject{
 	
 	
 	// Model Variables: state
+	public boolean independent_pcs;
 	public PlaceCells[] pcs;
 	public PlaceCellBins[] pc_bins;
 	public PCgereratorInterface pc_generator;
+	public float[] pc_modulator_array;
+	public PCmodulationInterface pc_modulator;
+	public float[] layer_radii = null;
 	
 	public EligibilityTraces[] vTraces;
 	public QTraces[] qTraces;
@@ -68,7 +73,6 @@ public class MultiscaleModel extends Subject{
 	public float[][] vTableCopy; // a copy made to compare changes between start and end of episode
 	public float     episodeDeltaV; // max abs difference between vTable and vTableCopy
 	public float[][][] qTable;  // q[layer][pc][action]
-	public Float oldStateValue = null;
 	public float[] qValues;
 	
 	// Model Variables: action selection
@@ -78,13 +82,14 @@ public class MultiscaleModel extends Subject{
 	public float[] possible; // probability after applying affordances
 	public float[] action_selection_probs;
 	public int chosenAction;
-	public boolean actionWasOptimal = false;
-	
+	private float[] learning_dist;
+
 	
 	
 	// GUI
 	com.github.biorobaw.scs_models.multiscale_f2019.gui.swing.GUI gui_old;
 	GUI gui;
+
 
 	public MultiscaleModel(XML xml) {
 		super(xml);
@@ -111,7 +116,7 @@ public class MultiscaleModel extends Subject{
 		
 		// ======== MODEL STATE =======================
 
-		var pc_modulation = xml.getAttribute("pc_modulation");
+		independent_pcs = xml.getBooleanAttribute("independent_pcs");
 
 		var pc_bin_size  = xml.getFloatAttribute("pc_bin_size");
 		pcs = PlaceCells.load(xml);
@@ -122,14 +127,15 @@ public class MultiscaleModel extends Subject{
 			pc_bins[i] = new PlaceCellBins(pcs[i], -1.15f ,1.15f, -1.55f, 1.55f, pc_bin_size );
 	
 		// pc generation model:
-		pc_generation_threshold  = xml.getFloatAttribute("pc_generation_threshold");
+		pc_generation_threshold  = xml.getFloatArrayAttribute("pc_generation_threshold");
 		pc_generation_method = xml.getAttribute("pc_generation_method");
 		System.out.println("PC generation method: " + pc_generation_method);
+		System.out.println("PC generation threshold: "+ Floats.toString(pc_generation_threshold) );
 		pc_generator = switch(pc_generation_method) {
 			case "none" -> ((layer, closest_subgoal) -> 0f);
 			case "layer" -> {
 				System.out.println("PC generation radii: " + xml.getAttribute("pc_generation_radii"));
-				var layer_radii = xml.getFloatArrayAttribute("pc_generation_radii");
+				layer_radii = xml.getFloatArrayAttribute("pc_generation_radii");
 				yield ((layer, closest_subgoal) -> layer_radii[layer]);
 			}
 			case "subgoal" -> {
@@ -144,7 +150,51 @@ public class MultiscaleModel extends Subject{
 			}
 		};
 
+		// PC layer modulation:
+		var pc_modulation_method = xml.getAttribute("pc_modulation_method");
+		System.out.println("PC modulation method: " + pc_modulation_method);
+		pc_modulator_array = Floats.constant(1, pcs.length); // Default modulator values
+		pc_modulator = switch (pc_modulation_method){
+			case "none" -> ( (closest_subgoal_distance) -> {});
+			case "method1" -> {
+				if(layer_radii==null){
+					System.out.println("ERROR (MultiscaleModel.java): " +
+							"pc modulation method 1 is incompatible because layer_radii was not defined");
+					System.exit(-1);
+				}
 
+				var sin22_5 = 1  ; // Math.sin(Math.toRadians(22.5));
+				yield (closest_subgoal_distance) -> {
+					// This method assumes best distance is proportional to distance to closest subgoal
+					// proportionality ratio chosen based on
+					// the number of actions and areas where action should remain constant
+					var best_radius = closest_subgoal_distance * sin22_5;
+
+					// find field size closest to best radius:
+					Floats.constant(0,pc_modulator_array);
+					var closet = Double.POSITIVE_INFINITY;
+					var best_id = 0;
+					for(int i=0; i<pcs.length; i++){
+						var diff = Math.abs(best_radius - layer_radii[i]);
+						if(diff < closet){
+							closet = diff;
+							best_id = i;
+						}
+					}
+					pc_modulator_array[best_id] = 1;
+//					System.out.println("best: " + closest_subgoal_distance + " " +best_radius + " " + best_id);
+
+//					if(best_id + 1 < pcs.length) pc_modulator_array[best_id + 1 ] = 0.5f;
+//					if(best_id - 1 >= 0) pc_modulator_array[best_id - 1 ] = 0.5f;
+
+				};
+			}
+			default -> {
+				System.out.println("ERROR: PC Modulation method does not exist");
+				System.exit(-1);
+				yield (a)->{};
+			}
+		};
 		
 		// ======== TRACES =============================
 		
@@ -156,9 +206,10 @@ public class MultiscaleModel extends Subject{
 		
 		
 		// need to find average number of active place cells:
-		float average_active_pcs = 0;
-		for (var bins : pc_bins) average_active_pcs += bins.averageBinSize;
-		System.out.println("average active pcs: " + average_active_pcs);
+//		float average_active_pcs = 0;
+//		for (var bins : pc_bins) average_active_pcs += bins.averageBinSize;
+//		System.out.println("average active pcs: " + average_active_pcs);
+
 
 		//  create traces
 		for(int i=0; i<num_layers; i++) {
@@ -239,17 +290,11 @@ public class MultiscaleModel extends Subject{
 
 	static public long cycles = 0;
 	static final int num_tics = 10;
-	static public long  tics[]= new long[num_tics];
-	static public float  tocs[]= new float[num_tics];
-	static public float averages[]=new float[num_tics];
+	static public long[]  tics= new long[num_tics];
+	static public float[]  tocs= new float[num_tics];
+	static public float[] averages=new float[num_tics];
 	
-	private void debug() {
-		var old_value = ((DisplaySwing)Experiment.get().display).setSync(true);
-		Experiment.get().display.updateData();
-//		Experiment.get().display.repaint();
-		((DisplaySwing)Experiment.get().display).setSync(old_value);
-		SimulationControl.setPause(true);
-	}
+
 	
 	@Override
 	public long runModel() {
@@ -268,241 +313,44 @@ public class MultiscaleModel extends Subject{
 //		boolean is_above_debug_cycle = is_debug_episode && cycle >= debug_cycle;
 
 //		if(is_debug_cycle) {
-//				SimulationControl.togglePause();
-//			}
-//		int a =1;
-//		while(a!=0);
-		
-//		System.out.println("cycle: " + cycles);
-
+//			System.out.println("cycle: " + cycles);
+//			simulationPauseAndPaint();
+//		}
 		
 		// ================= END DEBUG =================================
 		
+		
+		// profile full code
 		tics[tics.length-1] = Debug.tic();
 		
-		
+		// GET ROBOT INPUTS
 		tics[0] = Debug.tic();
-		// get inputs
-		var pos = slam.getPosition();
-		var orientation = slam.getOrientation2D();
-		float reward = feederModule.ate() ? foodReward : 0f;
-		
-		if(obstacle_bias_method == 1)
-			if(reward == 0) {
-				reward = obstacle_biases.getReward(pos);
-	//			if (reward > 0) System.out.println(cycles + "Wall reward: " + reward);
-			}
-		
-		// get alocentric distances from egocentric measures:
-		float[] ego_distances = distance_sensors.getDistances();
-		float[] distances = new float[numActions];
-		int id0 = angle_to_index(orientation);
-		for(int i=0; i<numActions; i++) {
-			distances[i] = ego_distances[(i + id0) % numActions];
-		}
-
-		float distance_to_closest_subgoal = distance_sensors.getDistanceToClosestSubgoal();
-		
+		inputs.get();
 		tocs[0] = Debug.toc(tics[0]);
 
-		
+
+		// CALCULATE CURRENT STATE
 		tics[1] = Debug.tic();
-		// calculate state
-		float totalActivity =0;
-		for(int i=0; i<num_layers; i++) {
-
-			// If there are no pcs with activity above threshold, create a new pc
-			if( pc_bins[i].activateBin((float) pos.getX(), (float) pos.getY()) < pc_generation_threshold) {
-				addCellToLayer(i, (float)pos.getX(), (float)pos.getY(), distance_to_closest_subgoal, 0, Floats.constant(0,numActions));
-				pc_bins[i].activateBin((float) pos.getX(), (float) pos.getY()) ;
-			}
-			totalActivity += pc_bins[i].active_pcs.total_a;
-		}
-		for(int i=0; i<num_layers; i++) pc_bins[i].active_pcs.normalize(totalActivity);
+		updatePlaceCells();
 		tocs[1] = Debug.toc(tics[1]);
-		
-		// DEBUG BLOCK
-		
-//		if(reward>0) {
-//			
-//			var old_value = ((SCSDisplay)Experiment.get().display).setSync(true);
-//			Experiment.get().display.updateData();
-//			Experiment.get().display.repaint();
-//			((SCSDisplay)Experiment.get().display).setSync(old_value);
-//			SimulationControl.setPause(true);
-//		}
 
-		//		if(is_above_debug_cycle) {
-//			
-//			System.out.println("Traces");
-//			var traces = vTraces[0].traces[0];
-//			var non_zero = vTraces[0].non_zero[0];
-//			for(var id : non_zero ) {
-//				System.out.println(id + " : " + String.format("%.3f",traces[id]));
-//			}
-//			
-//			var pcs = pc_bins[0].active_pcs;
-//			System.out.println("PC (ns,vs): ");
-//			float debug_bootstrap = 0;
-//			for(int j=0; j<pcs.num_cells; j++ ) {
-//				System.out.println(pcs.ids[j] + 
-//						" : "   + String.format("%.3f", pcs.ns[j]) 
-//						+ ","   + String.format("%.3f", vTable[0][pcs.ids[j]]));
-//				debug_bootstrap+= vTable[0][pcs.ids[j]] * pcs.ns[j];
-//			}
-//			System.out.println("bootstrap: " + debug_bootstrap);
-//			System.out.println();
-//						
-//		}
-		
+
+
+
+
+		// UPDATE RL WEIGHTS AND CALCULATE Q VALUES
 		tics[2] = Debug.tic();
-		// If not initial cycle, update state and action values
-		if(oldStateValue!=null) {			
-			// calculate bootstraps
-			float bootstrap = reward;
-			if(reward==0 ) {
-				// only calculate next state value if non terminal state
-				float value = 0;
-				for(int i=0; i<num_layers; i++) {
-					var pcs = pc_bins[i].active_pcs;
-					for(int j=0; j<pcs.num_cells; j++ ) {
-						value+= vTable[i][pcs.ids[j]]*pcs.ns[j];
-					}
-				}
-				bootstrap+= value*discountFactor;
-			}
-			
-			// calculate rl error
-			float error = bootstrap - oldStateValue;
-			
-			// update RL
-			// DEBUG CODE BLOCK
-//			boolean toggle_pause = false;
-//			int 	cell_id;
-//			float 	maxDV = 0;;
-			
-			for(int i=0; i<num_layers; i++) {
-				// update V
-				// v = v + error*learning_rate*trace
-				if(actionWasOptimal || error >0  || true) {
-					var traces = vTraces[i].traces[0];
-					for(var id : vTraces[i].non_zero[0]) {
-						// DEBUG CODE BLOCK
-//						if(Math.abs(error*v_learningRate[i]*traces[id]) > 1) {
-//							toggle_pause = true;
-//							maxDV = error*v_learningRate[i]*traces[id];
-//							System.out.println(id + " " + traces[id] + " " + error + " " + v_learningRate[i]);
-//						}
-						vTable[i][id]+=  error*v_learningRate[i]*traces[id];
-					}
-				}
-			
-				
-				// update Q
-				for(int j=0; j<numActions; j++) {
-					var traces = qTraces[i].traces[j];
-					for(var id : qTraces[i].non_zero)
-						qTable[i][id][j] += error*q_learningRate[i]*traces[id];
-				}
-			}
-	
-			// DEBUG CODE BLOCK
-//			if(toggle_pause) {
-//
-//				SimulationControl.togglePause();
-//			}
-			
-		}
+		if(independent_pcs) independent_cells_update(inputs.reward);
+		else regular_rl_update(inputs.reward);
 		tocs[2] = Debug.toc(tics[2]);
-		
-		
-		// calculate V,Q
-		tics[3] = Debug.tic();
-		oldStateValue = 0f;
-		qValues = new float[numActions];
-		
-
-		
-		for(int i=0; i<num_layers; i++) {
-			var pcs = pc_bins[i].active_pcs;
-			var ids = pcs.ids;
-			
-//			System.out.println(Arrays.toString(pcs.ns));
-			for(int j=0; j<pcs.num_cells; j++) {
-				var activation = pcs.ns[j];
-				oldStateValue+= vTable[i][ids[j]]*activation;
-
-				for(int k=0; k<numActions; k++)
-					qValues[k]+= qTable[i][ids[j]][k]*activation;	
-			}
-		}
-		
-
-		
-		tocs[3] = Debug.toc(tics[3]);
-		
-		// perform action selection
-		tics[4] = Debug.tic();
-//		System.out.println(Arrays.toString(qValues));
-		
-
-		var aff_values = affordances.calculateAffordances(distances);
-		float[] learning_dist;
-		float[] optimal_action_dist;
-		
-		// METHOD 1
-//		Floats.softmax(qValues, softmax);
-//		Floats.mul(softmax, aff_values, possible);
-//		var p_sum = Floats.sum(possible);
-//		if(p_sum == 0 ) Floats.div(aff_values, Floats.sum(aff_values), possible);
-//		else Floats.div(possible, p_sum, possible);
-//		var biased = motionBias.addBias(chosenAction, possible);
-//		learning_dist = softmax;
-//		optimal_action_dist = biased;
-			
-		// METHOD 2, get soft max then calculate certainty:
-		Floats.softmaxWithWeights(qValues, aff_values, softmax);
-		float non_zero = Floats.sum(aff_values);
-		float certainty = 1 - Floats.entropy(softmax, non_zero > 1 ? non_zero : 2f);
 
 
-		// If Q policy is not certain enough, use bias, else, don't use it
-//		System.out.prin tln("Certainty: " + certainty );
-		if(certainty < certainty_threshold ) {
-
-			// calculate motion bias
-			var bias_motion = motionBias.calculateBias(chosenAction);
-
-			// calculate obstacle bias if necessary
-			if(obstacle_bias_method==2) {
-				var bias_obstacles = obstacle_biases.calculateBias(pos);
-				Floats.mul(bias_motion, bias_obstacles, action_selection_probs);
-			} else Floats.copy(bias_motion, action_selection_probs);
+		// PERFORM ACTION SELECTION
+		actionSelection();
 
 
-			// Combine bias, then add bias to softmax to get resulting probabilities
-			addMultiplicativeBias(action_selection_probs, softmax, action_selection_probs);
-		} else Floats.copy(softmax,action_selection_probs);
 		
-				
-		
-		learning_dist = softmax;
-//		optimal_action_dist = softmax;
-		optimal_action_dist = action_selection_probs;
-		
-		
-//		Floats.softmaxWithWeights(qValues, biased, biased);
-		
-		
-		chosenAction = DiscreteDistribution.sample(action_selection_probs);
-		actionWasOptimal = optimal_action_dist[chosenAction] == Floats.max(optimal_action_dist);
-		
-		
-		
-		tocs[4] = Debug.toc(tics[4]);
-
-		
-		// update traces
+		// UPDATE TRACES
 		tics[5] = Debug.tic();
 		for(int i=0; i<num_layers; i++) {
 			var pcs = pc_bins[i].active_pcs;
@@ -513,12 +361,14 @@ public class MultiscaleModel extends Subject{
 //			System.out.println("m,M T: " + Floats.min(vTraces[i].traces[0]) + " " + Floats.max(vTraces[i].traces[0]));
 		}
 		
-		// perform action
+		// PERFROM ACTION
 		double tita = 2*Math.PI/numActions*chosenAction;
 		robot.getRobotProxy().send_command(new TranslateXY(0.08f*(float)Math.cos(tita), 0.08f*(float)Math.sin(tita)));
 		feederModule.eatAfterMotion();
 		tocs[5] = Debug.toc(tics[5]);
-		
+
+
+		// PROFILING CODE:
 		tocs[tocs.length-1] = Debug.toc(tics[tocs.length-1]);
 		if(cycles==1) {
 			Floats.copy(tocs,averages);
@@ -526,6 +376,7 @@ public class MultiscaleModel extends Subject{
 			Floats.mul(averages, 0.95f, averages);
 			Floats.add(averages, Floats.mul(tocs, 0.05f), averages);
 		}
+
 //		var percentual = Floats.div(averages, averages[tocs.length-1]/100f);
 //		System.out.println("instants: "+ Arrays.toString(tocs));
 //		System.out.println("averages: "+ Arrays.toString(averages));
@@ -534,7 +385,16 @@ public class MultiscaleModel extends Subject{
 //		debug();
 		return 0;
 	}
-	
+
+	private void simulationPauseAndDisplay() {
+		// This is old code - might need reviewing
+		var old_value = Experiment.get().display.setSync(true);
+		Experiment.get().display.updateData();
+		Experiment.get().display.repaint();
+		Experiment.get().display.setSync(old_value);
+		SimulationControl.setPause(true);
+	}
+
 	@Override
 	public void newEpisode() {
 		super.newEpisode();
@@ -547,12 +407,10 @@ public class MultiscaleModel extends Subject{
 			pc_bins[i].clear();
 		}
 	
-		oldStateValue = null;
 		chosenAction = -1;
-		actionWasOptimal = false;
+
 		
-		
-		// copy state values:
+		// copy state values to measure changes per episode:
 		for(int i=0; i < num_layers; i++)
 			vTableCopy[i] = Floats.copy(vTable[i]);
 				
@@ -578,7 +436,7 @@ public class MultiscaleModel extends Subject{
 		
 		// DEBUG CODE BLOCK
 //		if(episodeDeltaV > 1) {
-//			System.out.println("" + Experiment.get().getGlobal("episode") 
+//			System.out.println("" + Experiment.get().getGlobal("episode")
 //					+ ", " + cell_id
 //					+ ": " + episodeDeltaV);
 //			System.out.println("ERROR: DeltaV = " + episodeDeltaV);
@@ -611,13 +469,7 @@ public class MultiscaleModel extends Subject{
 	@Override
 	public void endExperiment() {
 		super.endExperiment();
-		
-		// TODO: erase try catch
-//		try {
-//			System.in.read();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
+
 	}
 	
 	int angle_to_index(float angle) {
@@ -627,13 +479,13 @@ public class MultiscaleModel extends Subject{
 	}
 	
 	void addMultiplicativeBias(float[] bias, float[] input, float[] output) {
-		output = Floats.mul(bias, input, output);
+		Floats.mul(bias, input, output);
 		var sum = Floats.sum(output);
 		
 		if(sum!=0) Floats.div(output, sum, output);
 		else {
-			System.err.println("WARNING: Probability sum is 0, setting uniform distribution (MulytiscaleModel.java)");
-			for(int i=0; i<numActions; i++) output[i] = 1/numActions;
+			System.err.println("WARNING: Probability sum is 0, setting uniform distribution (MultiscaleModel.java)");
+			for(int i=0; i<numActions; i++) output[i] = 1.0f/numActions;
 		}
 	}
 	
@@ -648,10 +500,76 @@ public class MultiscaleModel extends Subject{
 		}
 		return output;
 	}
-	
-	void addCellToLayer(int layer, float x, float y, float closest_subgoal, float initial_v, float initial_q[] ){
+
+
+	interface PCgereratorInterface {
+		float choose_radius(int layer, float closest_subgoal);
+	}
+
+	interface PCmodulationInterface {
+		void calculate_layer_modulators(float closest_subgoal_distance);
+	}
+
+
+	ModelInputs inputs = new ModelInputs();
+	class ModelInputs {
+
+		private Vector3D pos = null;
+		private float orientation;
+		private float reward;
+		private float[] distances;
+		private float distance_to_closest_subgoal;
+
+		void get() {
+			pos = slam.getPosition();
+			orientation = slam.getOrientation2D();
+			reward = feederModule.ate() ? foodReward : 0f;
+
+			// obstacle_bias_method 1 gives a reward for reaching walls
+			if(obstacle_bias_method == 1)
+				if(reward == 0) {
+					reward = obstacle_biases.getReward(pos);
+//				if (reward > 0) System.out.println(cycles + "Wall reward: " + reward);
+				}
+
+			// get alocentric distances from egocentric measures:
+			float[] ego_distances = distance_sensors.getDistances();
+			distances = new float[numActions];
+			int id0 = angle_to_index(orientation);
+			for(int i=0; i<numActions; i++) {
+				distances[i] = ego_distances[(i + id0) % numActions];
+			}
+			distance_to_closest_subgoal = distance_sensors.getDistanceToClosestSubgoal();
+		}
+	}
+
+	void updatePlaceCells(){
+		var pos = inputs.pos;
+		var distance_to_closest_subgoal = inputs.distance_to_closest_subgoal;
+
+		pc_modulator.calculate_layer_modulators(distance_to_closest_subgoal);
+		float totalActivity =0;
+		for(int i=0; i<num_layers; i++) {
+
+			// save old state:
+			var bins_i = pc_bins[i];
+			bins_i.storeOldBin();
+
+			// If there are no pcs with activity above threshold, create a new pc
+			var modulator = pc_modulator_array[i];
+			if( bins_i.activateBin((float) pos.getX(), (float) pos.getY(), modulator) < pc_generation_threshold[i] ) {
+				addCellToLayer(i, (float)pos.getX(), (float)pos.getY(), distance_to_closest_subgoal, 0, Floats.constant(0,numActions));
+				bins_i.activateBin((float) pos.getX(), (float) pos.getY(), modulator) ;
+			}
+			totalActivity += pc_bins[i].active_pcs.total_a;
+		}
+		for(int i=0; i<num_layers; i++) pc_bins[i].active_pcs.normalize(totalActivity);
+	}
+
+	void addCellToLayer(int layer, float x, float y, float closest_subgoal, float initial_v, float[] initial_q ){
 
 		// TODO: as pcs are now generated incrementally, current data structures are very inefficient.
+		// Note: this does not seem to have a great impact on the code, but it does on the gui
 
 		// Choose x, y, r and id
 		float r = pc_generator.choose_radius(layer, closest_subgoal);
@@ -669,21 +587,138 @@ public class MultiscaleModel extends Subject{
 		// Associate q values to place cell
 		qTable[layer] = new float[old_qlayer.length+1][numActions];
 		for(int i=0; i< old_qlayer.length; i++)
-			for(int j=0; j < numActions; j++)
-				qTable[layer][i][j] = old_qlayer[i][j];
+			Floats.copy(old_qlayer[i], qTable[layer][i]);
+
 		for(int j=0; j < numActions; j++)
-			qTable[layer][old_qlayer.length][j] = initial_q[j];
+			Floats.copy(initial_q, qTable[layer][old_qlayer.length]);
 
 		// Add v and q traces
 		vTraces[layer].addTrace();
 		qTraces[layer].addTrace();
 
-		// review how changes affect gui
 	}
 
 
-	interface PCgereratorInterface {
-		float choose_radius(int layer, float closest_subgoal);
+	void regular_rl_update(float reward){
+
+		// IF NOT FIRST CYCLE, UPDATE RL WEGIHTS
+		if(chosenAction!=-1) {
+			// calculate bootstraps
+			float bootstrap = reward;
+			if(reward==0 ) {
+				// only calculate next state value if non terminal state
+				float value = 0;
+				for(int i=0; i<num_layers; i++) {
+					value += calculate_V(pc_bins[i].active_pcs, vTable[i]);
+				}
+				bootstrap+= value*discountFactor;
+			}
+
+			// calculate old value:
+			float old_value = 0;
+			for(int i=0; i<num_layers; i++) {
+				old_value += calculate_V(pc_bins[i].previous_pcs, vTable[i]);
+			}
+
+			// calculate rl error
+			float error = bootstrap - old_value;
+
+			// update RL
+			for(int i=0; i<num_layers; i++) {
+				// update V
+				// v = v + error*learning_rate*trace
+				var traces = vTraces[i].traces[0];
+				for(var id : vTraces[i].non_zero[0]) {
+					vTable[i][id] +=  v_learningRate[i]*traces[id]*error;
+				}
+
+				// update Q
+				for(int j=0; j<numActions; j++) {
+					traces = qTraces[i].traces[j];
+					for(var id : qTraces[i].non_zero)
+						qTable[i][id][j] += q_learningRate[i]*traces[id]*error;
+				}
+			}
+		}
+
+		// CALCULATE Q VALUES:
+		tics[3] = Debug.tic();
+		qValues = new float[numActions];
+		for(int i=0; i<num_layers; i++) {
+			var pcs = pc_bins[i].active_pcs;
+			var ids = pcs.ids;
+
+			for(int j=0; j<pcs.num_cells; j++) {
+				for(int k=0; k<numActions; k++)
+					qValues[k]+= qTable[i][ids[j]][k]*pcs.ns[j];
+			}
+		}
+		tocs[3] = Debug.toc(tics[3]);
+
 	}
-	
+
+	void independent_cells_update(float reward){
+
+	}
+
+
+	void actionSelection(){
+
+		tics[4] = Debug.tic();
+//		System.out.println(Arrays.toString(qValues));
+		var aff_values = affordances.calculateAffordances(inputs.distances);
+
+		// METHOD 1
+//		Floats.softmax(qValues, softmax);
+//		Floats.mul(softmax, aff_values, possible);
+//		var p_sum = Floats.sum(possible);
+//		if(p_sum == 0 ) Floats.div(aff_values, Floats.sum(aff_values), possible);
+//		else Floats.div(possible, p_sum, possible);
+//		var biased = motionBias.addBias(chosenAction, possible);
+//		learning_dist = softmax;
+
+		// METHOD 2, get soft max then calculate certainty:
+		Floats.softmaxWithWeights(qValues, aff_values, softmax);
+		float non_zero = Floats.sum(aff_values);
+		float certainty = 1 - Floats.entropy(softmax, non_zero > 1 ? non_zero : 2f);
+
+
+		// If Q policy is not certain enough, use bias, else, don't use it
+//		System.out.prin tln("Certainty: " + certainty );
+		if(certainty < certainty_threshold ) {
+
+			// calculate motion bias
+			var bias_motion = motionBias.calculateBias(chosenAction);
+
+			// calculate obstacle bias if necessary
+			if(obstacle_bias_method==2) {
+				var bias_obstacles = obstacle_biases.calculateBias(inputs.pos);
+				Floats.mul(bias_motion, bias_obstacles, action_selection_probs);
+			} else Floats.copy(bias_motion, action_selection_probs);
+
+
+			// Combine bias, then add bias to softmax to get resulting probabilities
+			addMultiplicativeBias(action_selection_probs, softmax, action_selection_probs);
+		} else Floats.copy(softmax,action_selection_probs);
+
+
+
+		learning_dist = softmax;
+
+
+//		Floats.softmaxWithWeights(qValues, biased, biased);
+
+
+		chosenAction = DiscreteDistribution.sample(action_selection_probs);
+
+		tocs[4] = Debug.toc(tics[4]);
+	}
+
+
+	float calculate_V(PlaceCells pcs, float[] values){
+		float value = 0;
+		for(int j=0; j<pcs.num_cells; j++ ) value+= values[pcs.ids[j]]*pcs.ns[j];
+		return value;
+	}
+
 }

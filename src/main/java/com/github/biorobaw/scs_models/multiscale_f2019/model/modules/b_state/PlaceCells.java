@@ -287,6 +287,14 @@ public class PlaceCells {
 		return this;
 		
 	}
+
+	public PlaceCells copyState(){
+		var new_pcs = new PlaceCells(this.xs, this.ys, this.rs, this.ks, this.ids);
+		Floats.copy(as, new_pcs.as);
+		Floats.copy(ns, new_pcs.ns);
+		new_pcs.total_a = total_a;
+		return new_pcs;
+	}
 	
 	/**
 	 * Computes the activation of each place cell.
@@ -295,7 +303,7 @@ public class PlaceCells {
 	 * @param y The robot's current y coordinate
 	 * @return Returns the total activation of the set
 	 */
-	public float activate(float x, float y) {
+	public float activate(float x, float y, float modulator) {
 		total_a = 0;
 		max_a = 0;
 		for(int i=0; i<num_cells; i++) {
@@ -305,9 +313,10 @@ public class PlaceCells {
 //			System.out.println("r2: " +r2 + " " + r2s[i] );
 			if(r2 <= r2s[i]) {
 				var a = (float)Math.exp(ks[i]*r2);
-				as[i] = a;
-				total_a += a;
-				if(a > max_a) max_a = a;
+				var a_modulated = modulator*a; // used for RL
+				as[i] = a_modulated;
+				total_a += a_modulated; // used for RL
+				if(a > max_a) max_a = a; // used to detect when we need to create a new cell, thus not modulated
 			}
 			else as[i] = 0;
 		}

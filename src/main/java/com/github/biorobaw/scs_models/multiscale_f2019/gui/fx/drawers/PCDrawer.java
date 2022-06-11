@@ -34,7 +34,7 @@ public class PCDrawer extends DrawerFX {
 	float radius = -1; // used when all pcs have the same radius
 
 //	HashMap<Integer, Float> values = new HashMap<>();
-	
+
 
 	public PCDrawer(PlaceCells cells, PlaceCellBins bins) {
 		this.cells = cells;
@@ -65,6 +65,8 @@ public class PCDrawer extends DrawerFX {
 		ids = bins.active_pcs.ids;
 		if(ids != null) {
 			activations = Floats.copy(bins.active_pcs.as);
+		} else {
+			activations = new float[0]; // dummy, not active cells
 		}
 		
 	}
@@ -107,13 +109,17 @@ public class PCDrawer extends DrawerFX {
 			addCells();
 
 			// clear old ids:
-			for(var id : old_ids)
+			for(var id : old_ids){
 				active_circles.get(id).setFill(Color.TRANSPARENT);
+				active_circles.get(id).setVisible(false);
+			}
 			if(ids == null) return;
 			old_ids = Integers.copy(ids);
 			
 			for(int i = 0; i < old_ids.length; i++) {
 				var active = active_circles.get(old_ids[i]);
+				if(activations[i] == 0) continue;
+				active.setVisible(true);
 				active.setFill(getColor(activations[i]));
 				active.toFront();
 			}
@@ -123,15 +129,20 @@ public class PCDrawer extends DrawerFX {
 		private void addCells(){
 			int current_count = base_circles.size();
 			for(int i=current_count; i<num_cells; i++) {
-				var c = new Circle(pc_x[i], pc_y[i], pc_r[i], GRAY);
+				var c = new Circle(pc_x[i], pc_y[i], pc_r[i], Color.TRANSPARENT);
+				c.setStroke(Color.GRAY);
+					c.setStrokeWidth(0.01);
 				base_circles.add( c );
 				root.getChildren().add( c );
+				c.toBack();
 			}
 
 			for(int i=current_count; i<num_cells; i++) {
 				var c = new Circle(pc_x[i], pc_y[i], pc_r[i], Color.TRANSPARENT);
 				active_circles.add(c);
 				root.getChildren().add(c);
+				c.setVisible(false);
+
 			}
 		}
 		

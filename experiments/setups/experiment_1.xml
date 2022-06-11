@@ -11,7 +11,8 @@
 		pc_generation_threshold="-1"
 		pc_generation_method="none"
 		pc_generation_radii=""
-		pc_modulation="none"
+		pc_modulation_method="none"
+		independent_pcs="false"
 
 	/>
 	
@@ -22,7 +23,7 @@
 		
 	<simulator
 		class="$(SCS).simulation.scs_simulator.SCSSimulator"
-		simulation_step_ms="30" simulation_speed="15" pause="true"/> <!-- max speed = 15 -->
+		simulation_step_ms="30" simulation_speed="15" pause="false"/> <!-- max speed = 15 -->
 
 	<maze class="$(SCS).maze.Maze"
 		  file="$(mazeFile)" />
@@ -40,10 +41,11 @@
 		mazeHeight="3.0"
 		
 		pc_files="$(pc_files)"
+		independent_pcs="$(independent_pcs)"
 	    pc_generation_threshold="$(pc_generation_threshold)"
 	    pc_generation_method="$(pc_generation_method)"
 	    pc_generation_radii="$(pc_generation_radii)"
-		pc_modulation="$(pc_modulation)"
+		pc_modulation_method="$(pc_modulation_method)"
 		pcSizes="$(pcSizes)"
 		minX="$(minX)"
 		maxX="$(maxX)"
@@ -55,9 +57,9 @@
 		q_traces="$(traces)"
     	pc_bin_size="0.04"  
 		
-		discountFactor="0.95" 
-		v_learningRate="0.4,0.7,0.7"
-		q_learningRate="0.4,0.7,0.7"
+		discountFactor="0.95"
+		v_learningRate="0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4"
+		q_learningRate="0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4"
 		foodReward="1.0"
 		
 		wall_bias_method="$(wall_bias_method)"

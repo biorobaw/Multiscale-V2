@@ -96,6 +96,7 @@ def calculate_subgoal_distances(folder, maze_file):
         walls = [ wall_to_line_string(w) for id, w in walls.iterrows() ] # Convert to line strings
         obstacles = [w for w in walls if w.length < 1.8] # only keep walls that are obstacles
         subgoal_ids = [ get_id(x, y, min_x, min_y, precision) for w in obstacles for (x,y) in w.coords]
+        subgoal_ids += [ get_id(f.x, f.y, min_x, min_y, precision) for f_id,f in feeders.iterrows() ]
         obstacle_ids = set()
         for o in obstacle_ids:
             obstacle_ids = obstacle_ids.union(get_wall_indeces(o, min_x, min_y, precision, num_x, num_y))
