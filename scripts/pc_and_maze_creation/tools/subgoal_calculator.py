@@ -1,4 +1,4 @@
-import os, sys, time
+import os, sys, time, traceback
 from shapely.geometry import Point, LineString
 import pandas as pd
 import math
@@ -61,7 +61,7 @@ neighbors = [(-1,-1),(-1,0),(-1,1),(0,-1),(0,1),(1,-1),(1,0),(1,1)]
 def get_wall_indeces(wall, min_x, min_y, precision, num_x, num_y):
     (x,y) = wall.coords[0]
     id0 = get_id(x, y, min_x, min_y, precision)
-    indices = set(id0)
+    indices = set({id0})
     process_queue = [id0]
 
     # repeat until no more elements need to be processed
@@ -85,6 +85,13 @@ def get_wall_indeces(wall, min_x, min_y, precision, num_x, num_y):
     return indices
 
 
+def not_in_outter_wall(x,y, min_x=-1.1, min_y=-1.5, max_x=1.1, max_y=1.5):
+    # note: we assume outterwalls form an axis aligned rectangle
+    dx = np.min( [np.abs(x-min_x), np.abs(x-max_x)])
+    dy = np.min( [np.abs(y-min_y), np.abs(y-max_y)])
+    return dx > 0.05 and dy > 0.05
+
+
 def calculate_subgoal_distances(folder, maze_file):
     precision = 0.005
     try:
@@ -95,10 +102,10 @@ def calculate_subgoal_distances(folder, maze_file):
         min_x, num_x, min_y, num_y = get_grid_and_coordinates(walls, precision = precision) # 5 mm grid
         walls = [ wall_to_line_string(w) for id, w in walls.iterrows() ] # Convert to line strings
         obstacles = [w for w in walls if w.length < 1.8] # only keep walls that are obstacles
-        subgoal_ids = [ get_id(x, y, min_x, min_y, precision) for w in obstacles for (x,y) in w.coords]
+        subgoal_ids = [ get_id(x, y, min_x, min_y, precision) for w in obstacles for (x,y) in w.coords if not_in_outter_wall(x,y)]
         subgoal_ids += [ get_id(f.x, f.y, min_x, min_y, precision) for f_id,f in feeders.iterrows() ]
         obstacle_ids = set()
-        for o in obstacle_ids:
+        for o in obstacles:
             obstacle_ids = obstacle_ids.union(get_wall_indeces(o, min_x, min_y, precision, num_x, num_y))
 
 
@@ -151,12 +158,13 @@ def calculate_subgoal_distances(folder, maze_file):
         return ''
 
     except:
+        traceback.print_exception(*sys.exc_info())
         return maze_file
 
 
 def finished_all_mazes(results):
     global pool
-    print('finished calculated subgoal distances:')
+    print('finished calculating subgoal distances:')
     errors = [r for r in results if r!='']
     if(len(errors)>0):
         print('Error with files: {errors}')
@@ -168,6 +176,7 @@ def finished_all_mazes(results):
 def calculate_all_subgoal_distances(folder):
     debug = False
     if debug:
+        print('debugging: calculate all subgoal distances')
         calculate_subgoal_distances('tools/samples', 'M304.xml')
         print('done')
     else:
@@ -182,5 +191,6 @@ def calculate_all_subgoal_distances(folder):
         print()
         pool = Pool(12)
         start_time = time.time()
+        print('Starting calculation of subgoal distances')
         pool.starmap_async(calculate_subgoal_distances, args, callback=finished_all_mazes)
 

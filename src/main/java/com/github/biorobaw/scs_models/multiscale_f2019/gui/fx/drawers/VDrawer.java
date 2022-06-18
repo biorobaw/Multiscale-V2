@@ -24,6 +24,7 @@ public class VDrawer extends DrawerFX {
 	PlaceCells pcs;
 	float[] pc_x;		 // x coordinate of each cell
 	float[] pc_y;		 // y coordinate of each cell
+	float[] pc_r;
 	int num_cells;
 
 	float[][] vtables;
@@ -32,7 +33,7 @@ public class VDrawer extends DrawerFX {
 
 
 	public int distanceOption = 1; //0 to use predefined radius, 1 to use minDist and choose automatically
-	double radius = 0.01;
+	public double radius = 0.01;
 		
 	float maxValue = Float.NEGATIVE_INFINITY;
 	float minValue = 0; // min value, below this value, no hue is used
@@ -57,6 +58,7 @@ public class VDrawer extends DrawerFX {
 		this.v_copy = Floats.copy(vtables[layer]);
 		this.pc_x = pcs.xs;
 		this.pc_y = pcs.ys;
+		this.pc_r = pcs.rs;
 		num_cells = pc_x.length;
 
 
@@ -86,6 +88,7 @@ public class VDrawer extends DrawerFX {
 		this.v_copy = Floats.copy(vtables[layer]);
 		this.pc_x = pcs.xs;
 		this.pc_y = pcs.ys;
+		this.pc_r = pcs.rs;
 		num_cells = pc_x.length;
 
 		maxData = Floats.max(v_copy);
@@ -111,7 +114,7 @@ public class VDrawer extends DrawerFX {
 		var s = Math.abs(val)/max;
 		if(s>1) s = 1;
 		float b = 0.8f;
-		float alpha = 0.5f;
+		float alpha = 0.05f;
 		
 		return  Color.hsb(h, s, b, alpha);
 //		var hue = Color.BLUE.getHue() + ()
@@ -154,6 +157,7 @@ public class VDrawer extends DrawerFX {
 			// set color of all cells
 			for(int i=0; i<num_cells; i++) {
 				cells.get(i).setFill(getColor(v_copy[i],maxValue));
+				if(v_copy[i] > 0 ) cells.get(i).toFront();
 			}
 			label_range.setText("Range: " + format.format(minData) + " ~ " + format.format(maxData));
 		}
@@ -161,7 +165,7 @@ public class VDrawer extends DrawerFX {
 		public void addCells(){
 			int current_count = cells.size();
 			for(int i=current_count; i<num_cells; i++) {
-				var cell = new Circle(pc_x[i], pc_y[i], radius, Color.TRANSPARENT);
+				var cell = new Circle(pc_x[i], pc_y[i], pc_r[i], Color.TRANSPARENT);
 				cells.add(cell);
 				data_panel.getChildren().add(cell);
 			}

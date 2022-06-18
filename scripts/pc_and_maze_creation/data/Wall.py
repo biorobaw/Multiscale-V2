@@ -58,17 +58,18 @@ class Wall(QWidget):
     def y2(self):
         return self.widget_y2.value()
 
-    def translate(self, vector):
-        self.widget_x1.setValue(self.x1() + vector.x())
-        self.widget_y1.setValue(self.y1() + vector.y())
-        self.widget_x2.setValue(self.x2() + vector.x())
-        self.widget_y2.setValue(self.y2() + vector.y())
+    def translate(self, vector, corner):
+        if corner!=2:
+            self.widget_x1.setValue(self.x1() + vector.x())
+            self.widget_y1.setValue(self.y1() + vector.y())
+        if corner != 1:
+            self.widget_x2.setValue(self.x2() + vector.x())
+            self.widget_y2.setValue(self.y2() + vector.y())
         self.wall_changed()
 
     def setSelected(self, new_val: bool):
         # check if value changed
         if new_val != self.is_selected:
-
             # add or remove from selected set
             if new_val:
                 Wall.all_selected.add(self)
@@ -94,6 +95,7 @@ class Wall(QWidget):
         Wall.all_selected = set()
         for wall in aux:
             wall.setSelected(False)
+        aux.clear()
 
     def delete(self):
         if self in Wall.all_selected:

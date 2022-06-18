@@ -15,6 +15,7 @@ import com.github.biorobaw.scs.utils.files.BinaryFile;
 import com.github.biorobaw.scs.utils.files.XML;
 import com.github.biorobaw.scs.utils.math.DiscreteDistribution;
 import com.github.biorobaw.scs.utils.math.Floats;
+import com.github.biorobaw.scs.utils.math.RandomSingleton;
 import com.github.biorobaw.scs_models.multiscale_f2019.gui.fx.GUI;
 import com.github.biorobaw.scs_models.multiscale_f2019.model.modules.a_input.Affordances;
 import com.github.biorobaw.scs_models.multiscale_f2019.model.modules.b_state.EligibilityTraces;
@@ -26,11 +27,15 @@ import com.github.biorobaw.scs_models.multiscale_f2019.model.modules.d_action.Mo
 import com.github.biorobaw.scs_models.multiscale_f2019.robot.modules.distance_sensing.MySCSDistanceSensor;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
+import java.util.Random;
+import java.util.Vector;
+
 public class MultiscaleModel extends Subject{
 
 	// Model Parameters: Place cells
 	public float[] pc_generation_threshold;
 	public String pc_generation_method;
+	public boolean pc_generation_active_layers_only;
 
 	// Model Parameters: RL
 	public float[] v_traceDecay;
@@ -84,11 +89,12 @@ public class MultiscaleModel extends Subject{
 	public int chosenAction;
 	private float[] learning_dist;
 
-	
+	Random random = RandomSingleton.getInstance();
 	
 	// GUI
 	com.github.biorobaw.scs_models.multiscale_f2019.gui.swing.GUI gui_old;
 	GUI gui;
+	private float[] aff_values;
 
 
 	public MultiscaleModel(XML xml) {
@@ -125,10 +131,11 @@ public class MultiscaleModel extends Subject{
 		pc_bins = new PlaceCellBins[num_layers];
 		for(int i=0; i<num_layers; i++)
 			pc_bins[i] = new PlaceCellBins(pcs[i], -1.15f ,1.15f, -1.55f, 1.55f, pc_bin_size );
-	
+
 		// pc generation model:
 		pc_generation_threshold  = xml.getFloatArrayAttribute("pc_generation_threshold");
 		pc_generation_method = xml.getAttribute("pc_generation_method");
+		pc_generation_active_layers_only = xml.getBooleanAttribute("pc_generation_active_layers_only");
 		System.out.println("PC generation method: " + pc_generation_method);
 		System.out.println("PC generation threshold: "+ Floats.toString(pc_generation_threshold) );
 		pc_generator = switch(pc_generation_method) {
@@ -154,47 +161,7 @@ public class MultiscaleModel extends Subject{
 		var pc_modulation_method = xml.getAttribute("pc_modulation_method");
 		System.out.println("PC modulation method: " + pc_modulation_method);
 		pc_modulator_array = Floats.constant(1, pcs.length); // Default modulator values
-		pc_modulator = switch (pc_modulation_method){
-			case "none" -> ( (closest_subgoal_distance) -> {});
-			case "method1" -> {
-				if(layer_radii==null){
-					System.out.println("ERROR (MultiscaleModel.java): " +
-							"pc modulation method 1 is incompatible because layer_radii was not defined");
-					System.exit(-1);
-				}
-
-				var sin22_5 = 1  ; // Math.sin(Math.toRadians(22.5));
-				yield (closest_subgoal_distance) -> {
-					// This method assumes best distance is proportional to distance to closest subgoal
-					// proportionality ratio chosen based on
-					// the number of actions and areas where action should remain constant
-					var best_radius = closest_subgoal_distance * sin22_5;
-
-					// find field size closest to best radius:
-					Floats.constant(0,pc_modulator_array);
-					var closet = Double.POSITIVE_INFINITY;
-					var best_id = 0;
-					for(int i=0; i<pcs.length; i++){
-						var diff = Math.abs(best_radius - layer_radii[i]);
-						if(diff < closet){
-							closet = diff;
-							best_id = i;
-						}
-					}
-					pc_modulator_array[best_id] = 1;
-//					System.out.println("best: " + closest_subgoal_distance + " " +best_radius + " " + best_id);
-
-//					if(best_id + 1 < pcs.length) pc_modulator_array[best_id + 1 ] = 0.5f;
-//					if(best_id - 1 >= 0) pc_modulator_array[best_id - 1 ] = 0.5f;
-
-				};
-			}
-			default -> {
-				System.out.println("ERROR: PC Modulation method does not exist");
-				System.exit(-1);
-				yield (a)->{};
-			}
-		};
+		pc_modulator = choose_modulation_method(pc_modulation_method);
 		
 		// ======== TRACES =============================
 		
@@ -557,7 +524,8 @@ public class MultiscaleModel extends Subject{
 
 			// If there are no pcs with activity above threshold, create a new pc
 			var modulator = pc_modulator_array[i];
-			if( bins_i.activateBin((float) pos.getX(), (float) pos.getY(), modulator) < pc_generation_threshold[i] ) {
+			var max_active = bins_i.activateBin((float) pos.getX(), (float) pos.getY(), modulator);
+			if( max_active < pc_generation_threshold[i] && (!pc_generation_active_layers_only || modulator > 0) ) {
 				addCellToLayer(i, (float)pos.getX(), (float)pos.getY(), distance_to_closest_subgoal, 0, Floats.constant(0,numActions));
 				bins_i.activateBin((float) pos.getX(), (float) pos.getY(), modulator) ;
 			}
@@ -600,7 +568,7 @@ public class MultiscaleModel extends Subject{
 
 
 	void regular_rl_update(float reward){
-
+//		System.out.println("Regular update");
 		// IF NOT FIRST CYCLE, UPDATE RL WEGIHTS
 		if(chosenAction!=-1) {
 			// calculate bootstraps
@@ -657,7 +625,149 @@ public class MultiscaleModel extends Subject{
 
 	}
 
+	Vector<Float> non_zero_activations = new Vector<>();
+	Vector<Float> non_zero_values = new Vector<>();
+	void add_nonzero_pcs(PlaceCells layer, float[] values){
+		for (int i = 0; i < layer.num_cells; i++) {
+			if (layer.as[i] != 0) {
+				non_zero_activations.add(layer.as[i]);
+				non_zero_values.add(values[layer.ids[i]]);
+			}
+		}
+	}
+
+
+	float sample_value(int samples){
+		float value = 0;
+		float total_a = 0;
+		for(int i=0; i <samples; i++){
+			int id = random.nextInt(non_zero_activations.size());
+			var a = non_zero_activations.get(id);
+			value += (a * non_zero_values.get(id));
+			total_a += a;
+		}
+		return value/total_a;
+	}
+
 	void independent_cells_update(float reward){
+		// NOTE: this method is experimental
+
+//		System.out.println("Independent update");
+		// IF NOT FI RST CY CLE, UPDATE RL WEGIHTS
+		if(chosenAction!=-1) {
+
+			float full_bootstrap = reward;
+			if(reward==0 ) {
+				// only calculate next state value if non terminal state
+				float value = 0;
+				for(int i=0; i<num_layers; i++) {
+					value += calculate_V(pc_bins[i].active_pcs, vTable[i]);
+				}
+				full_bootstrap+= value*discountFactor;
+			}
+
+
+			// calculate old value:
+			float old_value = 0;
+			for(int i=0; i<num_layers; i++) {
+				old_value += calculate_V(pc_bins[i].previous_pcs, vTable[i]);
+			}
+
+			// calculate rl error
+			float full_error = full_bootstrap - old_value;
+
+
+
+			// GET ARRAY OF NON ZERO TO SAMPLE indices
+			// NOTE: WE MAY PREFER TO DO THIS PER LAYER
+			non_zero_activations.clear();
+			non_zero_values.clear();
+			for(int l=0; l<num_layers; l++) {
+				add_nonzero_pcs(pc_bins[l].active_pcs, vTable[l]);
+			}
+//			System.out.println(non_zero_activations.size());
+
+
+			// sample_bootstrap
+			var constant_bootstrap= reward;
+			if(reward==0 ) {
+				constant_bootstrap += (discountFactor * sample_value(5));
+			}
+
+			// FOR EACH ACTIVE CELL IN PREVIOUS CYCLE:
+			for(int l=0; l<num_layers; l++){
+				var pcs_l = pc_bins[l].previous_pcs;
+				var values_l = vTable[l];
+
+				for(int i=0; i<pcs_l.num_cells; i++){
+					var activation_i = pcs_l.as[i];
+					if(activation_i==0) continue;
+					var id_i = pcs_l.ids[i];
+
+					// ESTIMATE BOOTSTRAP (if non terminal state)
+					var bootstrap= reward;
+					if(reward==0 ) {
+						bootstrap += (discountFactor * sample_value(5));
+					}
+					var rl_error = bootstrap-values_l[id_i];
+
+					// UPDATE VALUES
+//					values_l[id_i] +=  v_learningRate[l]*pcs_l.ns[i]*(full_bootstrap - old_value); // regular RL
+					values_l[id_i] +=  0.4*pcs_l.as[i]*(bootstrap - values_l[id_i]); // independent
+
+
+
+					// update Q
+//					var cell_policy = Floats.softmax(qTable[l][id_i]);
+					var cell_policy = Floats.softmaxWithWeights(qTable[l][id_i], aff_values);
+					for(int j=0; j<numActions; j++) {
+						var traces = qTraces[l].traces[j]; // note traces are sorted first by action then by pc
+//						qTable[l][id_i][j] += q_learningRate[l]*traces[id_i]*(full_bootstrap - old_value);
+						var delta_ij = j == chosenAction ? 1 : 0;
+						var normalizer = 1;//cell_policy[j]/learning_dist[j];// Math.min(cell_policy[j]/learning_dist[j], 0.1);
+//						System.out.println("normalizer: " + normalizer)
+//						qTable[l][id_i][j] += q_learningRate[l]*(full_bootstrap - old_value) * (delta_ij-learning_dist[j]) * pcs_l.ns[i];
+						qTable[l][id_i][j] += 0.4*normalizer*(delta_ij-learning_dist[j])*( bootstrap - values_l[id_i]) * pcs_l.as[i];
+					}
+
+				}
+
+			}
+
+		}
+
+//		// CALCULATE Q VALUES:
+//		tics[3] = Debug.tic();
+//		qValues = new float[numActions];
+//		for(int i=0; i<num_layers; i++) {
+//			var pcs = pc_bins[i].active_pcs;
+//			var ids = pcs.ids;
+//
+//			for(int j=0; j<pcs.num_cells; j++) {
+//				for(int k=0; k<numActions; k++)
+//					qValues[k]+= qTable[i][ids[j]][k]*pcs.ns[j];
+//			}
+//		}
+//		tocs[3] = Debug.toc(tics[3]);
+
+		// Calculate the softmax for each cell, then average results
+		// NOTE: we could actually avoid computing the average for each cell
+		// if instead we choose a random cell based on probabilities pcs.ns[i]
+		Floats.constant(0, softmax);
+		var cell_soft_max = Floats.constant(0, numActions);
+		for(int l=0; l<num_layers; l++) {
+			var pcs = pc_bins[l].active_pcs;
+			var ids = pcs.ids;
+
+			for(int i=0; i<pcs.num_cells; i++) {
+				int j_i = pcs.ids[i];
+				Floats.softmaxWithWeights(qTable[l][j_i], aff_values, cell_soft_max);
+				Floats.mul(cell_soft_max, pcs.ns[i], cell_soft_max);
+				Floats.add(cell_soft_max,softmax,softmax);
+			}
+		}
+		tocs[3] = Debug.toc(tics[3]);
+
 
 	}
 
@@ -666,7 +776,7 @@ public class MultiscaleModel extends Subject{
 
 		tics[4] = Debug.tic();
 //		System.out.println(Arrays.toString(qValues));
-		var aff_values = affordances.calculateAffordances(inputs.distances);
+		aff_values = affordances.calculateAffordances(inputs.distances);
 
 		// METHOD 1
 //		Floats.softmax(qValues, softmax);
@@ -678,7 +788,7 @@ public class MultiscaleModel extends Subject{
 //		learning_dist = softmax;
 
 		// METHOD 2, get soft max then calculate certainty:
-		Floats.softmaxWithWeights(qValues, aff_values, softmax);
+		if(!independent_pcs) Floats.softmaxWithWeights(qValues, aff_values, softmax);
 		float non_zero = Floats.sum(aff_values);
 		float certainty = 1 - Floats.entropy(softmax, non_zero > 1 ? non_zero : 2f);
 
@@ -719,6 +829,50 @@ public class MultiscaleModel extends Subject{
 		float value = 0;
 		for(int j=0; j<pcs.num_cells; j++ ) value+= values[pcs.ids[j]]*pcs.ns[j];
 		return value;
+	}
+
+	PCmodulationInterface choose_modulation_method(String pc_modulation_method){
+		return switch (pc_modulation_method){
+			case "none" -> ( (closest_subgoal_distance) -> {});
+			case "method1" -> {
+				if(layer_radii==null){
+					System.out.println("ERROR (MultiscaleModel.java): " +
+							"pc modulation method 1 is incompatible because layer_radii was not defined");
+					System.exit(-1);
+				}
+
+				var sin22_5 = 1  ; // Math.sin(Math.toRadians(22.5));
+				yield (closest_subgoal_distance) -> {
+					// This method assumes best distance is proportional to distance to closest subgoal
+					// proportionality ratio chosen based on
+					// the number of actions and areas where action should remain constant
+					var best_radius = closest_subgoal_distance * sin22_5;
+
+					// find field size closest to best radius:
+					Floats.constant(0,pc_modulator_array);
+					var closet = Double.POSITIVE_INFINITY;
+					var best_id = 0;
+					for(int i=0; i<pcs.length; i++){
+						var diff = Math.abs(best_radius - layer_radii[i]);
+						if(diff < closet){
+							closet = diff;
+							best_id = i;
+						}
+					}
+					pc_modulator_array[best_id] = 1;
+//					System.out.println("best: " + closest_subgoal_distance + " " +best_radius + " " + best_id);
+
+//					if(best_id + 1 < pcs.length) pc_modulator_array[best_id + 1 ] = 0.5f;
+//					if(best_id - 1 >= 0) pc_modulator_array[best_id - 1 ] = 0.5f;
+
+				};
+			}
+			default -> {
+				System.out.println("ERROR: PC Modulation method does not exist");
+				System.exit(-1);
+				yield (a)->{};
+			}
+		};
 	}
 
 }

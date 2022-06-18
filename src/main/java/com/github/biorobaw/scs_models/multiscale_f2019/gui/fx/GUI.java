@@ -131,7 +131,7 @@ public class GUI {
 		VDrawers = new VDrawer[numScales];
 		for (int i = 0; i < numScales; i++) {
 			VDrawers[i] = new VDrawer( model.pcs[i], model.vTable, i);
-			VDrawers[i].distanceOption = 1; // use pc radius to draw PCs
+			VDrawers[i].radius = 0.56;
 			VDrawers[i].setMinValue(0);
 			VDrawers[i].setMaxValue(1.5f);
 			VDrawers[i].fixed_range = true;
@@ -165,9 +165,10 @@ public class GUI {
 		// ======== ADD DRAWERS TO PANELS ============
 		
 		// UNIVERSE PANEL
+//		for(int i=0; i<pcDrawers.length; i++)
+//			d.addDrawer("universe", "pcs " + i, pcDrawers[i] );
 		for(int i=0; i<pcDrawers.length; i++)
-			d.addDrawer("universe", "pcs " + i, pcDrawers[i] );
-//		d.addDrawer("universe", "value", VDrawers[0]);
+			d.addDrawer("universe", "value " + i, VDrawers[i]);
 		d.addDrawer("universe", "wall bias", wallBiasDrawer);
 		d.addDrawer("universe", "maze", wallDrawer );
 		d.addDrawer("universe", "feeders", fDrawer);

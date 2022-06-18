@@ -12,6 +12,7 @@ from PyQt5.Qt import QApplication, QLabel, QMainWindow, \
 
 from data.PC import PlaceCell
 from data.Wall import Wall
+import numpy as np
 
 class GViewPlotting(QGraphicsView):
 
@@ -87,7 +88,8 @@ class GViewPlotting(QGraphicsView):
         y2 = wall.y2()
 
         g_line = self.scene().addLine(x1 , y1 , x2 , y2 , self.pen_wall)
-        g_line.setFlag(QGraphicsItem.ItemIsMovable)
+        # g_line.setFlag(QGraphicsItem.ItemIsMovable) # activating has issues when scrolling or resizing after double clicking
+        # g_line.setFlag(QGraphicsItem.ItemIsSelectable)
 
         wall.wall_modified.connect(self.update_wall)
         wall.wall_selected_changed.connect(self.update_wall)
@@ -256,6 +258,11 @@ class GViewPlotting(QGraphicsView):
     #         self.setInteractive(True)
 
     def wheelEvent(self, event: QWheelEvent) -> None:
+
+        # if self.dragging_wall is not None:
+        #     selection = self.dragging_wall.selected()
+        #     self.dragging_wall.setSelected(False)
+
         if event.modifiers() & Qt.ControlModifier:
             s = 1 + event.angleDelta().y() / 120 * 0.1
             self.scale(s, s)
@@ -264,7 +271,16 @@ class GViewPlotting(QGraphicsView):
             bar = self.horizontalScrollBar() if is_x_bar else self.verticalScrollBar()
             bar.event(event)
 
+        # if self.dragging_wall is not None:
+        #     self.dragging_wall.setSelected(selection)
 
+
+
+    def clicked(self,scene_x,scene_y,event):
+        # returns whether the scene coords x y where clicked or not
+        delta = event.localPos() - self.mapFromScene(scene_x, scene_y)
+        max_distance = 5
+        return np.abs(delta.x()) < max_distance and np.abs(delta.y()) < max_distance
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
 
@@ -285,19 +301,26 @@ class GViewPlotting(QGraphicsView):
 
         elif item in self.wall_from_graphics:
             self.dragging_wall = self.wall_from_graphics[item]
+            localPos = event.localPos()
+            corner1 = self.clicked(self.dragging_wall.x1(), self.dragging_wall.y1(), event)
+            corner2 = self.clicked(self.dragging_wall.x2(), self.dragging_wall.y2(), event)
+            self.corner = 1 if corner1 else 2 if corner2 else 0
             self.dragging_start_pos = self.mapToScene(event.x(), event.y())
             self.dragging_wall.setSelected(True)
+        # print('event')
 
 
 
     def mouseMoveEvent(self, event: QMouseEvent) -> None:
+        if self.dragging_start_pos is None:
+            return
         if self.dragging_pc is not None:
             scene_pos = self.mapToScene(event.x(), event.y())
             self.dragging_pc.translate(scene_pos - self.dragging_start_pos)
             self.dragging_start_pos = scene_pos
         elif self.dragging_wall is not None:
             scene_pos = self.mapToScene(event.x(), event.y())
-            self.dragging_wall.translate(scene_pos - self.dragging_start_pos)
+            self.dragging_wall.translate(scene_pos - self.dragging_start_pos, self.corner)
             self.dragging_start_pos = scene_pos
 
 

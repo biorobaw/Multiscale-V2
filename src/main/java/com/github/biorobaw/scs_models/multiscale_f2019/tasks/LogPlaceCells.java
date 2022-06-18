@@ -15,14 +15,21 @@ import java.io.IOException;
 public class LogPlaceCells implements Script {
 
 	String subject_id = "";
+	boolean log_pcs;
 
 	public LogPlaceCells(XML xml) {
 		subject_id =xml.getAttribute("subject_id");
+		log_pcs = xml.getBooleanAttribute("save_pcs");
 	}
 
 	@Override
 	public void endTrial() {
+		if(!log_pcs) {
+			System.out.println("NOT LOGGING PCS");
+			return;
+		}
 
+		System.out.println("LOGGING PCS");
 		var e = Experiment.get();
 		String logFolder = e.getGlobal("logPath").toString();
 		String ratId	 = e.getGlobal("run_id").toString();

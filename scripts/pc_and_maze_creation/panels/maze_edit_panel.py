@@ -17,8 +17,9 @@ from data.Wall import Wall
 from data.Feeder import Feeder
 from data.StartPos import StartPos
 from tools.path_planning.precision_planner import find_path, generate_maze_metrics
+import tools.path_planning.wavefront_planner as wave_planner 
 from tools.subgoal_calculator import calculate_all_subgoal_distances
-
+from tools.image_generation import plot_optimal_paths, plot_subgoal_distances
 
 
 class PanelMazeEdit(QWidget):
@@ -350,36 +351,51 @@ class PanelMazeEdit(QWidget):
         i = 0
         paths = []
         pickable_walls = [w.pickable() for w in self.walls]
-        args = [ (start.pickable(), goal.pickable(), pickable_walls) for goal in self.feeders for start in self.start_positions]
-        args = [ (i,) + a for (i,a) in zip(range(len(args)), args) ]
+        # args = [ (start.pickable(), goal.pickable(), pickable_walls) for goal in self.feeders for start in self.start_positions]
+        # args = [ (i,) + a for (i,a) in zip(range(len(args)), args) ]
+
+        # if self.pool is None:
+        #     self.pool = Pool(len(args))
+        #     self.pool.starmap_async(find_path, args, chunksize=1, callback = self.path_planning_done)
+        #         # self.path_planning_done(results)
+        # else:
+        #     print("THREAD POOL ALREADY RUNNING")
+
+
+        pickable_goals = [goal.pickable() for goal in self.feeders]
+        args = [ (pickable_walls, pickable_goals) ]
+
+        # plan_distances, previous_point, dimensions = wave_planner.wave_front_planner_from_pickles(pickable_walls, pickable_goals)
+        # paths = [ wave_planner.get_path(start.x(), start.y(), plan_distances, previous_point, dimensions) for start in self.start_positions ]
+        # self.signal_paths_added.emit(paths)
 
         if self.pool is None:
+            print('Starting wave front planner...')
             self.pool = Pool(len(args))
-            self.pool.starmap_async(find_path, args, chunksize=1, callback = self.path_planning_done)
-                # self.path_planning_done(results)
+            self.pool.starmap_async(wave_planner.wave_front_planner_from_pickles, args, chunksize=1, callback = self.path_planning_done)
         else:
             print("THREAD POOL ALREADY RUNNING")
 
 
 
     def path_planning_done(self, results):
-        # separate and print results
-        paths = [ path for (path, distance) in results]
-        distances = [ distance for (path, distance) in results ]
-        steps = [ len(p)-1 for p in paths]
-        print ( *zip(range(len(distances)), steps, distances))
+
+        plan_distances, previous_point, dimensions = results[0]
+        paths = [ wave_planner.get_path(start.x(), start.y(), plan_distances, previous_point, dimensions) for start in self.start_positions ]
         
         self.pool.terminate()
         self.pool = None
 
         # signal to the gui
         self.signal_paths_added.emit(paths)
+        print('planning done!')
         
 
-    def create_all_maze_metrics(self):
+    def calculate_all_optimal_paths(self):
         folder = QFileDialog().getExistingDirectory(self, 'Choose folder with mazes', '')
         if folder is not None and folder != "":
-            generate_maze_metrics(folder)
+            wave_planner.wave_front_planner_folder(folder)
+            # generate_maze_metrics(folder)
 
     def calculate_all_subgoal_distances(self):
         folder = QFileDialog().getExistingDirectory(self, 'Choose folder with mazes', '')
@@ -388,3 +404,33 @@ class PanelMazeEdit(QWidget):
         else:
             print('nothing to calculate')
 
+
+    def generate_all_maze_images(self):
+        folder = QFileDialog().getExistingDirectory(self, 'Choose folder with mazes', '')
+        if folder is None and folder == "":
+            return
+        
+        if self.pool is not None:
+            print('Wait till previous job is finished')
+            return
+
+        print('Starting image generation...')
+        args = [( folder, filename) for filename in os.listdir(folder) if filename.endswith(".xml") ]
+        debug = False
+        if debug:
+            generate_maze_images(*args[0])
+        else:
+            self.pool = Pool(12)
+            self.pool.starmap_async(generate_maze_images, args, chunksize=1, callback = self.finished_generating_images)
+        print('Map Started')
+
+    def finished_generating_images(self, results):
+        print('Done plotting all mazes!')
+        self.pool.terminate()
+        self.pool = None
+
+def generate_maze_images(folder, file_name):
+    # NOTE: functions used with startmap_async cannot be member methods
+    # as each function is run on a separate process
+    plot_optimal_paths.plot_file(folder + '/' + file_name)
+    plot_subgoal_distances.plot_file(folder + '/' + file_name)

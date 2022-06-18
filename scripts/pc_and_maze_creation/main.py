@@ -60,8 +60,9 @@ class MainWindow(QMainWindow):
         tab_pcs.pc_added.connect(pane_plot.gview.add_pc)
 
         self.action_do_path_planner.triggered.connect(tab_maze.perform_path_planning)
-        self.action_create_maze_metrics.triggered.connect(tab_maze.create_all_maze_metrics)
+        self.action_calculate_all_optimal_paths.triggered.connect(tab_maze.calculate_all_optimal_paths)
         self.action_calculate_subgoal_distances.triggered.connect(tab_maze.calculate_all_subgoal_distances)
+        self.action_generate_maze_images.triggered.connect(tab_maze.generate_all_maze_images)
 
         self.action_create_layers.triggered.connect(tab_pcs.create_layers)
         self.action_create_layer_metrics.triggered.connect(tab_pcs.create_layer_metrics)
@@ -97,18 +98,20 @@ class MainWindow(QMainWindow):
                 print("widget has no attribute 'delete_selection'")
 
     def createMenus(self):
-        # MENU MAZE
+        # MENU: MAZE
         self.menu_maze = self.menuBar().addMenu('&Maze')
 
-        self.action_do_path_planner = QAction('Do &Path Planning')
-        self.action_create_maze_metrics = QAction('Create all &Maze Metrics')
+        self.action_do_path_planner = QAction('Current maze path planning')
+        self.action_calculate_all_optimal_paths = QAction('Calculate all optimal paths')
         self.action_calculate_subgoal_distances = QAction('Calculate subgoal distances')
+        self.action_generate_maze_images = QAction('Generate maze images')
 
         self.menu_maze.addAction(self.action_do_path_planner)
-        self.menu_maze.addAction(self.action_create_maze_metrics)
+        self.menu_maze.addAction(self.action_calculate_all_optimal_paths)
         self.menu_maze.addAction(self.action_calculate_subgoal_distances)
+        self.menu_maze.addAction(self.action_generate_maze_images)
 
-        # MENU LAYERS 
+        # MENU: LAYERS 
         self.menu_layers = self.menuBar().addMenu('&Layers')
 
         self.action_create_layers = QAction('Create &Layers')
