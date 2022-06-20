@@ -3,7 +3,7 @@
 
 source "experiments/pc_generation_experiments/run_set_variables.sh"
 
-CHECK_FILE="r#ID-steps.bin"
+CHECK_FILE="r#ID-dummy.bin"
 
 for E in ${RUN[*]}; do
 	echo "sh python $SCRIPT_2_CHECK $(map $E LOG_FOLDER) $CHECK_FILE"

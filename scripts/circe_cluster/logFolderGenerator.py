@@ -39,4 +39,4 @@ for m in mazes:
 for e in experiments:
     shutil.copy2(e,baseFolder+"/experiments/"+os.path.basename(e))
 #copy maze metrics
-shutil.copy2('experiments/mazes/mazeMetrics.csv',baseFolder+'/mazes/mazeMetrics.csv')
+# shutil.copy2('experiments/mazes/mazeMetrics.csv',baseFolder+'/mazes/mazeMetrics.csv') # no longer needed

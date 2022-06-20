@@ -3,6 +3,7 @@
 
 source "experiments/pc_generation_experiments/run_set_variables.sh"
 
+# to run call:  ./run_1_all.sh [serial BATCH_SIZE]  # where the code inside brackets is optional
 
 for E in ${RUN[*]}; do
 
