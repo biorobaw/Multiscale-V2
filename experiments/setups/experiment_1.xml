@@ -9,16 +9,17 @@
 		certainty_threshold="1"
 		wall_bias_method="0"
 		pc_generation_threshold="-1"
+		pc_generation_active_layers_only="false"
 		pc_generation_method="none"
 		pc_generation_radii=""
 		pc_modulation_method="none"
 		independent_pcs="false"
-
+		save_pcs="false"
 	/>
 	
 	
 	<!-- DisplaySwing vs DisplayNone vs DisplayJavaFX -->
-	<display class="$(SCS).gui.displays.DisplayJavaFX"
+	<display class="$(SCS).gui.displays.DisplayNone"
 		window="-2,-2,4,4" syncDisplay="false" width="1280" height="720" record="false"/>
 		
 	<simulator
@@ -43,7 +44,8 @@
 		pc_files="$(pc_files)"
 		independent_pcs="$(independent_pcs)"
 	    pc_generation_threshold="$(pc_generation_threshold)"
-	    pc_generation_method="$(pc_generation_method)"
+		pc_generation_active_layers_only="$(pc_generation_active_layers_only)"
+		pc_generation_method="$(pc_generation_method)"
 	    pc_generation_radii="$(pc_generation_radii)"
 		pc_modulation_method="$(pc_modulation_method)"
 		pcSizes="$(pcSizes)"
@@ -105,7 +107,7 @@
 			<noFoodLeftCondition class="$(SCS).tasks.cycle.condition.food.NoFoodLeft" /> 
 		</cycleTasks>
 		<trialTasks>
-			<logPlaceCells class="$(PROJECT).tasks.LogPlaceCells" subject_id="sub_1" />
+			<logPlaceCells class="$(PROJECT).tasks.LogPlaceCells" subject_id="sub_1" save_pcs="$(save_pcs)"/>
 		</trialTasks>
 	</trial>
 

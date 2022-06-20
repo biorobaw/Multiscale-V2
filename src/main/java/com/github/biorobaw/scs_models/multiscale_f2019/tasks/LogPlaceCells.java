@@ -34,12 +34,17 @@ public class LogPlaceCells implements Script {
 		String logFolder = e.getGlobal("logPath").toString();
 		String ratId	 = e.getGlobal("run_id").toString();
 
-		//create folders
-		String prefix = logFolder  +"/r" + ratId + "-pc_layer";
 
 		var model = (MultiscaleModel)e.getSubject(subject_id);
 		for(int i=0; i<model.pcs.length; i++){
-			log_pcs(model.pcs[i], prefix + i + ".csv");
+			int radius = (int)(model.layer_radii[i]*100);
+			int threshold = (int)(model.pc_generation_threshold[i]*1000);
+			String save_name = logFolder  + "/pcs" +
+					"_r"  + radius +
+					"_T"  + threshold +
+					"_id" + ratId +
+					".csv";
+			log_pcs(model.pcs[i], save_name);
 		}
 		
 	}

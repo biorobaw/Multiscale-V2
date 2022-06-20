@@ -1,5 +1,5 @@
 config	experiment	group	mazeFile	numStartingPositions	independent_pcs	pc_files	pc_generation_threshold pc_generation_method pc_modulation_method	pc_generation_radii	traces	numEpisodes	run_id	save_pcs
-c0	experiments/setups/experiment_1.xml	g1	experiments/mazes/M8.xml	6	false	experiments/pc_layers/empty.csv	0.	layer	none	0.56	0.0	100	0	false
+c0	experiments/setups/experiment_1.xml	g1	experiments/mazes/M8.xml	6	false	experiments/pc_layers/empty.csv	0.1	layer	none	0.56	0.0	100	0	true
 c0	experiments/setups/experiment_1.xml	g1	experiments/mazes/M8.xml	6	false	experiments/pc_layers/empty.csv	0.9	layer	none	0.40	0.0	100	0	false
 c0	experiments/setups/experiment_1.xml	g1	experiments/mazes/M8.xml	6	false	experiments/pc_layers/empty.csv	0.9	layer	none	0.24	0.0	100	0	false
 c0	experiments/setups/experiment_1.xml	g1	experiments/mazes/M8.xml	6	false	experiments/pc_layers/empty.csv	0.9	layer	none	0.08	0.0	100	0	false
