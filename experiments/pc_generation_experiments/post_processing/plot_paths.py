@@ -20,6 +20,11 @@ def make_folder(folder):
 def format_scale(config):
     return f's{int(float(config["pcSizes"])*100):02d}'
 
+def format_pc_radii(config):
+    return f's{int(float(config["pc_generation_radii"])*100):02d}'
+
+def format_pc_radii(config):
+    return f's{int(float(config["pc_generation_threshold"])*100):03d}'
 
 def format_trace(config):
     return f't{float(config["traces"]):.1f}'
@@ -56,16 +61,16 @@ def plot_config(experiment_folder, config, config_id):
     # get format for configuration name
     e_formatters = {
         '1': [format_maze, format_trace, format_scale],
-        '2': [format_maze, format_scale],
-        '3': [format_maze, format_scale],
-        '4': [format_maze, lambda c: f's{c["pcSizes"]}', lambda c: f't{c["traces"]}'],
-        '5': [format_maze, format_trace, format_nx],
-        '6': [format_maze, lambda c: f's{c["pcSizes"]}', lambda c: f't{c["traces"]}'],
-        '7': [format_maze, format_pc_file, lambda c: f't{c["traces"]}'],
-        '8': [format_maze ],
-        '9': [format_maze ],
-        '10': [format_maze ],
-        '11': [format_maze, format_pc_file, format_trace ],
+        '2': [format_maze, format_pc_radii, format_threshold],
+        # '3': [format_maze, format_scale],
+        # '4': [format_maze, lambda c: f's{c["pcSizes"]}', lambda c: f't{c["traces"]}'],
+        # '5': [format_maze, format_trace, format_nx],
+        # '6': [format_maze, lambda c: f's{c["pcSizes"]}', lambda c: f't{c["traces"]}'],
+        # '7': [format_maze, format_pc_file, lambda c: f't{c["traces"]}'],
+        # '8': [format_maze ],
+        # '9': [format_maze ],
+        # '10': [format_maze ],
+        # '11': [format_maze, format_pc_file, format_trace ],
     }
     config_title = apply_formatters(config, e_formatters[experiment_name])
     save_name = os.path.join(figure_folder, 'paths_' + config_title + '.pdf')
