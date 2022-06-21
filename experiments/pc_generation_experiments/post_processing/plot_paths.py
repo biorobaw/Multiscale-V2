@@ -23,8 +23,8 @@ def format_scale(config):
 def format_pc_radii(config):
     return f's{int(float(config["pc_generation_radii"])*100):02d}'
 
-def format_pc_radii(config):
-    return f's{int(float(config["pc_generation_threshold"])*100):03d}'
+def format_threshold(config):
+    return f's{int(float(config["pc_generation_thresholdd"])*100):03d}'
 
 def format_trace(config):
     return f't{float(config["traces"]):.1f}'
