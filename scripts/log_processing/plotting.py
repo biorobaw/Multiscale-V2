@@ -207,7 +207,7 @@ def plot_paths(title, config_folder, config_df, save_name):
 
 
     # plot maze
-    maze_file = os.path.join(config_folder, '../../mazes', config_df['mazeFile'])
+    maze_file = os.path.join(config_df['mazeFile'])
     walls, feeders, start_positions = parse_maze(maze_file)
     p = p + geom_segment(aes(x='x1', y='y1', xend='x2', yend='y2'), data=walls, color='k')
     p = p + geom_point(aes(x='x', y='y'), data=feeders, color='r')
