@@ -77,7 +77,7 @@ def merge_and_store_rat_episodic_metics(config_folder, config_number, sample_rat
 
 
     # note: the shortest path is constant for one configuration of rats, since starting positions are predefined
-    metrics_df['error_rate'] = metrics_df.steps / load_int_vector(config_folder + "r0-shortest_path.bin")[0]
+    metrics_df['error_rate'] = (metrics_df.steps / load_int_vector(config_folder + "r0-shortest_path.bin")[0]) - 1
 
     metrics_df.to_sql('rat_episodic_metrics', db, if_exists='append', index=False)
 
