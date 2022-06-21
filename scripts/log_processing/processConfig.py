@@ -19,13 +19,22 @@ def create_db_and_tables(config_folder):
     cursor = db.cursor()
 
     # create rat_runtimes
-    cursor.execute(" CREATE TABLE rat_runtimes "
-                   " ( config   INTEGER, "
-                   "   episode  INTEGER, "
-                   "   rat      INTEGER, "
-                   "   steps       REAL, "
-                   "   error_rate  REAL, " # extra steps ratio
+    cursor.execute(" CREATE TABLE rat_episodic_metrics "
+                   " ( config        INTEGER, "
+                   "   episode       INTEGER, "
+                   "   rat           INTEGER, "
+                   "   steps         REAL, "
+                   "   error_rate    REAL, " # extra steps ratio
                    "   PRIMARY KEY ( config, episode, rat ) "
+                   " ) "  # removed WITHOUT ROWID since sqlite version on circe does not support it
+                   )
+
+    cursor.execute(" CREATE TABLE rat_metrics "
+                   " ( config        INTEGER, "
+                   "   rat           INTEGER, "
+                   "   seed          INTEGER, "
+                   "   learning_time INTEGER, "
+                   "   PRIMARY KEY ( config, rat ) "
                    " ) "  # removed WITHOUT ROWID since sqlite version on circe does not support it
                    )
 
@@ -49,60 +58,56 @@ def create_db_and_tables(config_folder):
     cursor.execute(summary_schema.format("rat_summaries_steps"))
     cursor.execute(summary_schema.format("rat_summaries_error_rate"))
 
-    seed_table_schema = """
-        CREATE TABLE rat_seeds
-                     ( config   INTEGER,
-                       rat      INTEGER,
-                       seed     INTEGER, 
-                       PRIMARY KEY ( config, rat )
-                     )  
-    """
-    cursor.execute(seed_table_schema)
-
     return db
 
 
-def merge_and_store_rat_runtimes(config_folder, config_number, sample_rate, db):
-    """ Merges the run times of all rats in the config into a pandas data frame"""
-    # get number of rats and starting locations in this experiment:
+def merge_and_store_rat_episodic_metics(config_folder, config_number, sample_rate, num_rats, num_episodes, db):
+    """ Merges the episodic metrics (such as run times) of all rats in the config into a pandas data frame"""
 
-    num_rats             = len(glob.glob(config_folder + "r*-dummy.bin"))
-    total_episodes       = read_vector_size(config_folder + "r0-steps.bin")
-    sample_episodes      = np.arange(total_episodes, step=sample_rate, dtype=np.uint16)
+    sample_episodes = np.arange(num_episodes, step=sample_rate, dtype=np.uint16)
+    file_steps      = config_folder + "r{}-steps.bin"
 
     # create columns of the final data frame:
-    runtimes_df = pd.DataFrame({
+    metrics_df = pd.DataFrame({
         'config'  : config_number,
         'episode' : np.tile( sample_episodes, num_rats),
-        'rat'     : np.repeat(np.arange(num_rats, dtype=np.uint8), len(sample_episodes))
+        'rat'     : np.repeat(np.arange(num_rats, dtype=np.uint8), len(sample_episodes)),
+        'steps'   : np.concatenate([ load_int_vector(file_steps.format(r))[sample_episodes]  for r in range(num_rats)]) # this can be a very big number
     })
 
 
-    file_name = config_folder + "r{}-steps.bin"
-    print(sample_episodes)
-    print(num_rats)
-    runtimes_df['steps'] = np.concatenate([ load_int_vector(file_name.format(r))[sample_episodes]  for r in range(num_rats)]) # this can be a very big number
+    # note: the shortest path is constant for one configuration of rats, since starting positions are predefined
+    metrics_df['error_rate'] = metrics_df.steps / load_int_vector(config_folder + "r0-shortest_path.bin")[0]
 
-    shortest_path = load_int_vector(config_folder + "r0-shortest_path.bin")[0] # note the shortest path is constant for one configuration of rats, since starting positions are predefined
-    runtimes_df['error_rate'] = runtimes_df.steps / shortest_path
+    metrics_df.to_sql('rat_episodic_metrics', db, if_exists='append', index=False)
 
-    runtimes_df.to_sql('rat_runtimes', db, if_exists='append', index=False)
+    return metrics_df
 
-    return runtimes_df
+def merge_and_store_rat_metrics(config_folder, config_number, num_rats, db):
+    """ Merges the metrics of all rats (such as learning times) in the config into a pandas data frame"""
 
-
-def merge_and_store_rat_seeds(config_folder, config_number, db):
     seed_file = config_folder + "r{}-seed.bin"
-    num_rats = len(glob.glob(config_folder + "r*-V0.bin"))
+    learning_time_file = config_folder + "r{}-learning_time.bin"
 
-    seeds = pd.DataFrame({
-        'config' : config_number,
-        'rat'    : np.arange(num_rats, dtype=np.uint8),
-        'seed'   : [ load_long_vector(seed_file.format(r))[0] for r in range(num_rats)]
+    # create columns of the final data frame:
+    rat_metrics_df = pd.DataFrame({
+        'config'        : config_number,
+        'rat'           : np.arange(num_rats, dtype=np.uint8),
+        'seed'          : [ load_long_vector(seed_file.format(r))[0] for r in range(num_rats)],
+        'learning_time' : [ load_int_vector(learning_time_file.format(r))[0]  for r in range(num_rats)]
     })
-    seeds.to_sql('rat_seeds', db, if_exists='append', index=False)
 
-    return seeds
+    print(num_rats)
+    print(config_number)
+    print(np.arange(num_rats, dtype=np.uint8))
+    print([ load_long_vector(seed_file.format(r))[0] for r in range(num_rats)])
+    print([ load_int_vector(learning_time_file.format(r))[0]  for r in range(num_rats)])
+
+    # save table
+    rat_metrics_df.to_sql('rat_metrics', db, if_exists='append', index=False)
+
+    # return the data frame
+    return rat_metrics_df
 
 
 def create_and_store_summaries(run_times, column, config_folder, db):
@@ -132,16 +137,19 @@ def process_config(base_folder, config, sample_rate):
     base_folder   = os.path.join(base_folder, '')
     config_folder = os.path.join(base_folder, 'configs', config, '')
     config_number = np.uint16(config[1:])  # drop letter c and parse number
+    num_rats      = len(glob.glob(config_folder + "r*-steps.bin"))
+    print(config_folder)
+    num_episodes  = read_vector_size(config_folder + "r0-steps.bin")
 
     # create database and tables to store results
     db = create_db_and_tables(config_folder)
 
     # merge results from all rats
-    all_run_times = merge_and_store_rat_runtimes(config_folder, config_number, sample_rate, db)
-    all_seeds     = merge_and_store_rat_seeds(config_folder, config_number, db)
+    episodic_metrics = merge_and_store_rat_episodic_metics(config_folder, config_number, sample_rate, num_rats, num_episodes, db)
+    rat_metrics      = merge_and_store_rat_metrics(config_folder, config_number, num_rats, db)
 
-    create_and_store_summaries(all_run_times, 'steps', config_folder, db)
-    create_and_store_summaries(all_run_times, 'error_rate', config_folder, db)
+    create_and_store_summaries(episodic_metrics, 'steps', config_folder, db)
+    create_and_store_summaries(episodic_metrics, 'error_rate', config_folder, db)
 
     print('TOTAL TIME: {}'.format(time.time() - t1))
     # current, peak = tracemalloc.get_traced_memory()
