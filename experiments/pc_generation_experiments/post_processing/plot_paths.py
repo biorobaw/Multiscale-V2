@@ -29,6 +29,8 @@ def format_threshold(config):
 def format_trace(config):
     return f't{float(config["traces"]):.1f}'
 
+def format_mix_name(config):
+    return config["mix_name"]
 
 def format_nx(config):
     return f'nx{int(config["numX"]):02d}'
@@ -62,6 +64,7 @@ def plot_config(experiment_folder, config, config_id):
     e_formatters = {
         '1': [format_maze, format_trace, format_scale],
         '2': [format_maze, format_pc_radii, format_threshold],
+        '2': [format_maze, format_mix_name],
         # '3': [format_maze, format_scale],
         # '4': [format_maze, lambda c: f's{c["pcSizes"]}', lambda c: f't{c["traces"]}'],
         # '5': [format_maze, format_trace, format_nx],
