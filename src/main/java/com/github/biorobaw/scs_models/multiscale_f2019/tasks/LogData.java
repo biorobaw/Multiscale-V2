@@ -89,7 +89,7 @@ public class LogData implements Script {
 		System.out.println("SHORTEST PATH:      " + shortest_path);
 		System.out.println("LEARNING TIME:      " + learning_time);
 		if(shortest_path!=-1)
-			System.out.println("EXTRA STEPS RATIO : " + (final_steps-shortest_path)/learning_time);
+			System.out.println("EXTRA STEPS RATIO : " + (float)(final_steps-shortest_path)/shortest_path);
 
 	}
 
