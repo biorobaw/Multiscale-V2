@@ -86,7 +86,7 @@ pc_generation_raddi_thresholds_DF   = pd.DataFrame(columns = ['key', 'pc_generat
 )
 pc_generation_active_layers_only_DF = dataFrame('pc_generation_active_layers_only', 'false')
 save_pcs_DF                         = dataFrame('save_pcs', 'true')
-traces_DF_DF                        = dataFrame('traces', '0')
+traces_DF_DF                        = dataFrame('traces', ",".join(['0']*4))
 
 
 # GENERATE FINAL DFs:
