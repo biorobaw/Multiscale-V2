@@ -37,7 +37,7 @@ RUN+=(E3)
 
 declare -A E1=( ["NAME"]=experiment1-pcGenerationThreshold  ["BATCH_SIZE"]=10 ["SAMPLE_RATE"]=1  )
 declare -A E2=( ["NAME"]=experiment2-optimalThreshold  ["BATCH_SIZE"]=10 ["SAMPLE_RATE"]=5  )
-declare -A E3=( ["NAME"]=experiment3-experiment3-multiscale  ["BATCH_SIZE"]=10 ["SAMPLE_RATE"]=5  )
+declare -A E3=( ["NAME"]=experiment3-multiscale  ["BATCH_SIZE"]=10 ["SAMPLE_RATE"]=5  )
 
 # E12[MIN_RAT]=60028
 # E12[MAX_RAT]=60028
