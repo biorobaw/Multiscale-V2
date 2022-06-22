@@ -843,6 +843,7 @@ public class MultiscaleModel extends Subject{
 				}
 
 				var ratio = xml.getFloatAttribute("pc_modulation_ratio");
+				System.out.println("PC Modulation ratio: " + ratio);
 				yield (closest_subgoal_distance) -> {
 					// This method assumes best distance is proportional to distance to closest subgoal
 					// proportionality ratio chosen based on
