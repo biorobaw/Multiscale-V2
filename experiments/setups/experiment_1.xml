@@ -13,6 +13,7 @@
 		pc_generation_method="none"
 		pc_generation_radii=""
 		pc_modulation_method="none"
+		pc_modulation_ratio="1"
 		independent_pcs="false"
 		save_pcs="false"
 	/>
@@ -48,6 +49,7 @@
 		pc_generation_method="$(pc_generation_method)"
 	    pc_generation_radii="$(pc_generation_radii)"
 		pc_modulation_method="$(pc_modulation_method)"
+		pc_modulation_ratio="$(pc_modulation_ratio)"
 		pcSizes="$(pcSizes)"
 		minX="$(minX)"
 		maxX="$(maxX)"

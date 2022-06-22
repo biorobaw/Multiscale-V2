@@ -158,10 +158,8 @@ public class MultiscaleModel extends Subject{
 		};
 
 		// PC layer modulation:
-		var pc_modulation_method = xml.getAttribute("pc_modulation_method");
-		System.out.println("PC modulation method: " + pc_modulation_method);
 		pc_modulator_array = Floats.constant(1, pcs.length); // Default modulator values
-		pc_modulator = choose_modulation_method(pc_modulation_method);
+		pc_modulator = choose_modulation_method(xml);
 		
 		// ======== TRACES =============================
 		
@@ -831,7 +829,10 @@ public class MultiscaleModel extends Subject{
 		return value;
 	}
 
-	PCmodulationInterface choose_modulation_method(String pc_modulation_method){
+	PCmodulationInterface choose_modulation_method(XML xml){
+		var pc_modulation_method = xml.getAttribute("pc_modulation_method");
+		System.out.println("PC modulation method: " + pc_modulation_method);
+
 		return switch (pc_modulation_method){
 			case "none" -> ( (closest_subgoal_distance) -> {});
 			case "method1" -> {
@@ -841,12 +842,12 @@ public class MultiscaleModel extends Subject{
 					System.exit(-1);
 				}
 
-				var sin22_5 = 1  ; // Math.sin(Math.toRadians(22.5));
+				var ratio = xml.getFloatAttribute("pc_modulation_ratio");
 				yield (closest_subgoal_distance) -> {
 					// This method assumes best distance is proportional to distance to closest subgoal
 					// proportionality ratio chosen based on
 					// the number of actions and areas where action should remain constant
-					var best_radius = closest_subgoal_distance * sin22_5;
+					var best_radius = closest_subgoal_distance * ratio;
 
 					// find field size closest to best radius:
 					Floats.constant(0,pc_modulator_array);

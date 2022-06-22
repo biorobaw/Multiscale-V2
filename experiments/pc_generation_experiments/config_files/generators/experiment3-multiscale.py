@@ -27,6 +27,7 @@ outputColumns = [
     "pc_files",
     "independent_pcs",
     "pc_modulation_method",
+    "pc_modulation_ratio",
     "pc_generation_radii",
     "pc_generation_method",
     "pc_generation_threshold",
@@ -71,17 +72,18 @@ maze_DF                 = generateMazeDF(dir_generative_mazes, ['M0.xml','M1.xml
 maze_DF['numEpisodes']  = maze_DF['numStartingPositions']*episodesPerStartingLocation
 pc_files_DF             = dataFrame('pc_files', ",".join([empty_maze]*4))
 independent_pcs_DF      = dataFrame('independent_pcs', 'false')
-pc_modulation_method_DF = dataFrame('pc_modulation_method', 'none')
+pc_modulation_method_DF = dataFrame('pc_modulation_method', 'method1')
+pc_modulation_ratio_DF  = dataFrame('pc_modulation_ratio', ['0.2','0.4','0.6','0.8','1.0'])
 pc_generation_method_DF = dataFrame('pc_generation_method', 'layer') # create one for each layer that is below the given threshold
 pc_generation_raddi_thresholds_DF   = pd.DataFrame(columns = ['key', 'pc_generation_radii', 'pc_generation_threshold', 'mix_name' ], # assume bests are 0.004, 0.3, 0.4, 0.6
     data = [
-        [0,     '0.08,024,0.4,0.56',    '0.001,0.001,0.001,0.001', 'max0'],
-        [0,     '0.08,024,0.4,0.56',    '0.004,0.1,0.1,0.1', 'max1'],
-        [0,     '0.08,024,0.4,0.56',    '0.004,0.2,0.2,0.2', 'max2'],
-        [0,     '0.08,024,0.4,0.56',    '0.004,0.3,0.3,0.3', 'max3'],
-        [0,     '0.08,024,0.4,0.56',    '0.004,0.3,0.4,0.4', 'max4'],
-        [0,     '0.08,024,0.4,0.56',    '0.004,0.3,0.4,0.5', 'max5'],
-        [0,     '0.08,024,0.4,0.56',    '0.004,0.3,0.4,0.6', 'max6'],
+        [0,     '0.08,0.24,0.4,0.56',    '0.001,0.001,0.001,0.001', 'max0'],
+        [0,     '0.08,0.24,0.4,0.56',    '0.004,0.1,0.1,0.1', 'max1'],
+        [0,     '0.08,0.24,0.4,0.56',    '0.004,0.2,0.2,0.2', 'max2'],
+        [0,     '0.08,0.24,0.4,0.56',    '0.004,0.3,0.3,0.3', 'max3'],
+        [0,     '0.08,0.24,0.4,0.56',    '0.004,0.3,0.4,0.4', 'max4'],
+        [0,     '0.08,0.24,0.4,0.56',    '0.004,0.3,0.4,0.5', 'max5'],
+        [0,     '0.08,0.24,0.4,0.56',    '0.004,0.3,0.4,0.6', 'max6'],
     ]
 )
 pc_generation_active_layers_only_DF = dataFrame('pc_generation_active_layers_only', 'false')
@@ -97,6 +99,7 @@ reduce_DFs = [
     pc_files_DF,
     independent_pcs_DF,
     pc_modulation_method_DF,
+    pc_modulation_ratio_DF,
     pc_generation_method_DF,
     pc_generation_raddi_thresholds_DF,
     pc_generation_active_layers_only_DF,
