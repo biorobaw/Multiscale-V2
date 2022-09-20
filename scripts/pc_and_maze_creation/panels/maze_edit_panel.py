@@ -18,6 +18,8 @@ from data.Feeder import Feeder
 from data.StartPos import StartPos
 from tools.path_planning.precision_planner import find_path, generate_maze_metrics
 import tools.path_planning.wavefront_planner as wave_planner 
+import tools.map_visibility.map_visibility2 as visibility_mapper
+import tools.closest_wall_distance as closest_wall_mapper
 from tools.subgoal_calculator import calculate_all_subgoal_distances
 from tools.image_generation import plot_optimal_paths, plot_subgoal_distances
 
@@ -403,6 +405,19 @@ class PanelMazeEdit(QWidget):
             calculate_all_subgoal_distances(folder)
         else:
             print('nothing to calculate')
+
+
+    def calculate_all_visibility_maps(self):
+        folder = QFileDialog().getExistingDirectory(self, 'Choose folder with mazes', '')
+        if folder is not None and folder != "":
+            visibility_mapper.map_visibility(folder)
+            # generate_maze_metrics(folder)
+
+    def calculate_all_closest_wall_distances(self):
+        folder = QFileDialog().getExistingDirectory(self, 'Choose folder with mazes', '')
+        if folder is not None and folder != "":
+            closest_wall_mapper.map_closest_wall_distances(folder)
+            # generate_maze_metrics(folder)
 
 
     def generate_all_maze_images(self):

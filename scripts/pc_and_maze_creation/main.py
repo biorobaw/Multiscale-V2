@@ -62,6 +62,8 @@ class MainWindow(QMainWindow):
         self.action_do_path_planner.triggered.connect(tab_maze.perform_path_planning)
         self.action_calculate_all_optimal_paths.triggered.connect(tab_maze.calculate_all_optimal_paths)
         self.action_calculate_subgoal_distances.triggered.connect(tab_maze.calculate_all_subgoal_distances)
+        self.action_calculate_visibility_maps.triggered.connect(tab_maze.calculate_all_visibility_maps)
+        self.action_calculate_closest_wall_distances.triggered.connect(tab_maze.calculate_all_closest_wall_distances)
         self.action_generate_maze_images.triggered.connect(tab_maze.generate_all_maze_images)
 
         self.action_create_layers.triggered.connect(tab_pcs.create_layers)
@@ -104,11 +106,15 @@ class MainWindow(QMainWindow):
         self.action_do_path_planner = QAction('Current maze path planning')
         self.action_calculate_all_optimal_paths = QAction('Calculate all optimal paths')
         self.action_calculate_subgoal_distances = QAction('Calculate subgoal distances')
+        self.action_calculate_visibility_maps   = QAction('Calculate visibility maps')
+        self.action_calculate_closest_wall_distances = QAction('Calculate closest wall distances')
         self.action_generate_maze_images = QAction('Generate maze images')
 
         self.menu_maze.addAction(self.action_do_path_planner)
         self.menu_maze.addAction(self.action_calculate_all_optimal_paths)
         self.menu_maze.addAction(self.action_calculate_subgoal_distances)
+        self.menu_maze.addAction(self.action_calculate_visibility_maps)
+        self.menu_maze.addAction(self.action_calculate_closest_wall_distances)
         self.menu_maze.addAction(self.action_generate_maze_images)
 
         # MENU: LAYERS 
