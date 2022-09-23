@@ -160,9 +160,9 @@ public class MultiscaleModel extends Subject{
 				yield ((layer, closest_subgoal) -> 0f);
 			}
 		};
-		var pc_distance_method =  xml.getAttribute("pc_generation_distance");
-		System.out.println("PC generation distance:  " + pc_distance_method);
-		pc_modulation_distance = switch(pc_distance_method){
+		var distance_option =  xml.getAttribute("pc_modulation_distance");
+		System.out.println("PC generation distance:  " + distance_option);
+		pc_modulation_distance = switch(distance_option){
 			case "subgoal" -> (() -> inputs.distance_to_closest_subgoal);
 			case "wall" -> (() -> inputs.distance_to_closest_wall);
 			default ->  {

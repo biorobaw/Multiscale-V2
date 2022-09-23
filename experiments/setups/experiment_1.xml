@@ -73,6 +73,7 @@
 	    pc_generation_radii="$(pc_generation_radii)"
 		pc_generation_distance="$(pc_generation_distance)"
 		pc_modulation_method="$(pc_modulation_method)"
+		pc_modulation_distance="$(pc_modulation_distance)"
 		pc_modulation_ratio="$(pc_modulation_ratio)"
 		pc_activate_only_visible="$(pc_activate_only_visible)"
 		pcSizes="$(pcSizes)"
