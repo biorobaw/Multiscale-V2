@@ -33,6 +33,7 @@ public class GUI {
 	public RobotDrawer rDrawer;
 	public FeederDrawer fDrawer;
 	public RobotDistanceRingDrawer distance2subgoalDrawer;
+	public PolygonDrawer polygonDrawer;
 
 	int numScales;
 	public PCDrawer[] pcDrawers;
@@ -111,8 +112,10 @@ public class GUI {
 		fDrawer = new FeederDrawer(0.1f);
 
 		distance2subgoalDrawer = new RobotDistanceRingDrawer(model.getRobot().getRobotProxy(),
-				() -> model.distance_sensors.getDistanceToClosestSubgoal());
-		
+				() -> model.pc_modulation_distance.get());
+
+		polygonDrawer = new PolygonDrawer(model.getRobot().getRobotProxy(),
+				() -> model.distance_sensors.getVisibilityPolygon());
 		
 		// PC drawers
 		pcDrawers = new PCDrawer[numScales];
@@ -173,8 +176,11 @@ public class GUI {
 		d.addDrawer("universe", "maze", wallDrawer );
 		d.addDrawer("universe", "feeders", fDrawer);
 		d.addDrawer("universe", "path", pathDrawer);
+//		d.addDrawer("universe", "large cells", pcDrawers[3]);
+//		d.addDrawer("universe", "midl cells", pcDrawers[2]);
 		d.addDrawer("universe", "cycle info", new CycleDataDrawer());
 		d.addDrawer("universe", "subgoal distance", distance2subgoalDrawer);
+		d.addDrawer("universe", "visibility polygon", polygonDrawer);
 		d.addDrawer("universe", "robot", rDrawer);
 		
 		// RUNTIMES
@@ -182,6 +188,7 @@ public class GUI {
 		
 		// PC PANELS
 		for (int i = 0; i < numScales; i++) {
+			d.addDrawer(panel_pc + i, "visibility  " + i, polygonDrawer);
 			d.addDrawer(panel_pc + i, "PC layer " + i, pcDrawers[i]);
 			d.addDrawer(panel_pc + i, "maze", wallDrawer);
 			d.addDrawer(panel_pc + i, "robot other", rDrawer);

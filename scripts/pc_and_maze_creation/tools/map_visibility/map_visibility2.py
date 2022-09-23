@@ -55,6 +55,8 @@ def find_visibility_polygon(walls, cx, cy, precision):
                 visibility = p
                 break
 
+    visibility = visibility.simplify(0.005)
+
 
 
     return visibility
@@ -83,18 +85,23 @@ def get_grid_and_coordinates(walls, precision):
 
 def save(file_name, min_x, num_x, min_y, num_y, all_polygons, walls, precision):
 
+    remaining = 5
     with open(file_name, 'bw') as f:
 
         # store grid information:
-        np.array( [ min_x, num_x, min_y, num_y ] ).astype(np.float32).tofile(f)
+        np.array( [ min_x, num_x, min_y, num_y, precision ] ).astype(np.float32).tofile(f)
 
         for i in range(num_y):
             for j in range(num_x):
                 # get polygon, for each polygon store the number of points followed by the points
                 if isinstance(all_polygons[i][j], Polygon):
                     polygon = np.array( all_polygons[i][j].exterior )
+                    polygon = polygon[:-1] # last point is the same as first point, thus remove it
                     np.array([len(polygon)]).astype(np.float32).tofile(f)
                     polygon.reshape(-1).astype(np.float32).tofile(f)
+                    if remaining > 0:
+                        print("Polygon: " , len(polygon), '\n', polygon)
+                        remaining-=1
                 else:
                     # if it is not a polygon, then grid i,j is within precision of an obstacle and it stores the id of the obstacle
                     # get obstacle and compute normalized vector of length 'precision'
@@ -162,7 +169,7 @@ pool = None
 def map_visibility(folder):
     debug = False
     if debug:
-        map_visibility_from_file('tools/samples', 'M304.xml')
+        map_visibility_from_file('tools/samples', 'M4.xml')
         # map_visibility_from_file('../../experiments/mazes/obstacles/', 'M304.xml')
         print('done')
     else:

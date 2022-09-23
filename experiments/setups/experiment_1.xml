@@ -5,6 +5,27 @@
 
 	<!-- removed seed="1008" from variables, seed="7461441196144289543" seed="-5156850241654287902"-->
 	<!-- These are default values, do not modify unless you know what you are doing-->
+	<!--
+	    certainty_threshold : defines when to stop using biases
+	    wall_bias_method : add bias to move towards walls
+	    	0 - no bias
+	    	1 - add small reward for reaching obstacle for first time
+	    	2 - add bias towards closest walls
+		pc generation threshold \in [0,1]: controls when pc get created
+		pc generation active layers only:  defines whether inactive layers create cells
+		pc generation method: method to decide radius of new cell:
+		      none -> if pcs are not being generated
+		      layer -> if the layer defines the radius (one radius per layer)
+		pc_generation_radii: defines the radius of each layer when pc generation method = layer
+		pc modulation method: defines method to modulate each layer (partially activate/deactivate)
+		      none -> all layers are active
+		      method1 -> use linear function pc_modulation_distance*pc_modulation_ratio to define optimal scale to be activated
+		                 only activates the layer with field sizes closest to optimal radius
+		pc_modulation_distance and ratio: see pc_modulation_method = method1
+		pc_activate_only_visible : restrict pc activation to cells whose center is withing the visible area.
+		independent_pcs : defines whether to use the regular pc implementation or the independent pc implementation
+
+	-->
 	<variables  PROJECT="com.github.biorobaw.scs_models.multiscale_f2019" numActions="8"
 		certainty_threshold="1"
 		wall_bias_method="0"
@@ -13,7 +34,9 @@
 		pc_generation_method="none"
 		pc_generation_radii=""
 		pc_modulation_method="none"
+		pc_modulation_distance="subgoal"
 		pc_modulation_ratio="1"
+		pc_activate_only_visible="false"
 		independent_pcs="false"
 		save_pcs="false"
 	/>
@@ -48,8 +71,10 @@
 		pc_generation_active_layers_only="$(pc_generation_active_layers_only)"
 		pc_generation_method="$(pc_generation_method)"
 	    pc_generation_radii="$(pc_generation_radii)"
+		pc_generation_distance="$(pc_generation_distance)"
 		pc_modulation_method="$(pc_modulation_method)"
 		pc_modulation_ratio="$(pc_modulation_ratio)"
+		pc_activate_only_visible="$(pc_activate_only_visible)"
 		pcSizes="$(pcSizes)"
 		minX="$(minX)"
 		maxX="$(maxX)"
@@ -59,7 +84,7 @@
 		numY="$(numY)"
 		v_traces="$(traces)"
 		q_traces="$(traces)"
-    	pc_bin_size="0.04"  
+    	pc_bin_size="0.04"
 		
 		discountFactor="0.95"
 		v_learningRate="0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4"

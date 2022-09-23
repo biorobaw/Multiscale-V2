@@ -3,6 +3,7 @@ package com.github.biorobaw.scs_models.multiscale_f2019.model.modules.b_state;
 import java.util.ArrayList;
 
 import com.github.biorobaw.scs.utils.math.Floats;
+import org.locationtech.jts.geom.*;
 
 
 /**
@@ -106,6 +107,7 @@ public class PlaceCellBins {
 		
 		
 		// create the actual bins
+		var geometry_factory = new GeometryFactory();
 		for(int i=0; i<xbins; i++)
 			for(int j=0; j<ybins; j++) {	
 				var size = aux_bins[i][j].size();
@@ -114,6 +116,7 @@ public class PlaceCellBins {
 				var b_ys = new float[size];
 				var b_rs = new float[size];
 				var b_ks = new float[size];
+				var b_centers = new Point[size];
 				
 				for(int k=0; k <size; k++) {
 					var id = aux_bins[i][j].get(k);
@@ -122,11 +125,13 @@ public class PlaceCellBins {
 					b_ys[k] = pcs.ys[id];
 					b_rs[k] = pcs.rs[id];
 					b_ks[k] = pcs.ks[id];
+					b_centers[k] = geometry_factory.createPoint(new Coordinate(b_xs[k], b_ys[k]));
 				}
-				pc_bins[i][j] = new PlaceCells(b_xs, b_ys, b_rs, b_ks, b_ids);
+				pc_bins[i][j] = new PlaceCells(b_xs, b_ys, b_rs, b_ks, b_ids, b_centers);
 				averageBinSize+=size;
 			}
 		averageBinSize/=(xbins*ybins);
+		System.out.println("Num bins: " + xbins * ybins);
 	}
 
 	public void storeOldBin(){
@@ -139,7 +144,7 @@ public class PlaceCellBins {
 	 * @param y The point's y coordinate
 	 * @return  returs the total activation of the active bin
 	 */
-	public float activateBin(float x, float y, float modulator) {
+	public float activateBin(float x, float y, float modulator, Polygon polygon) {
 		if( minx < x && x < maxx && miny < y && y < maxy ) {
 			active_x_id = (int)Math.floor((x-minx)/bin_size);
 			active_y_id = (int)Math.floor((y-miny)/bin_size);
@@ -153,7 +158,7 @@ public class PlaceCellBins {
 //		System.out.println("active " + active_x_id + " " + active_y_id + " " + x + " " + y + pc_bins.length + " " + pc_bins[0].length );
 //		System.out.println("x,y: " + x + " " + y +" " +  active_x_id + " " + active_y_id);
 //		System.out.println("active length: " + active_pcs.num_cells);
-		return active_pcs.activate(x, y, modulator);
+		return active_pcs.activate(x, y, modulator, polygon);
 	}
 	
 	/**

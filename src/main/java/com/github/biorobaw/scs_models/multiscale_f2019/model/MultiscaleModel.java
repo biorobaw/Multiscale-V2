@@ -26,9 +26,11 @@ import com.github.biorobaw.scs_models.multiscale_f2019.model.modules.c_rl.Obstac
 import com.github.biorobaw.scs_models.multiscale_f2019.model.modules.d_action.MotionBias;
 import com.github.biorobaw.scs_models.multiscale_f2019.robot.modules.distance_sensing.MySCSDistanceSensor;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
+import org.locationtech.jts.geom.Polygon;
 
 import java.util.Random;
 import java.util.Vector;
+import java.util.function.Supplier;
 
 public class MultiscaleModel extends Subject{
 
@@ -36,6 +38,8 @@ public class MultiscaleModel extends Subject{
 	public float[] pc_generation_threshold;
 	public String pc_generation_method;
 	public boolean pc_generation_active_layers_only;
+	public Supplier<Float> pc_modulation_distance;
+	public boolean pc_activate_only_visible;
 
 	// Model Parameters: RL
 	public float[] v_traceDecay;
@@ -156,6 +160,19 @@ public class MultiscaleModel extends Subject{
 				yield ((layer, closest_subgoal) -> 0f);
 			}
 		};
+		var pc_distance_method =  xml.getAttribute("pc_generation_distance");
+		System.out.println("PC generation distance:  " + pc_distance_method);
+		pc_modulation_distance = switch(pc_distance_method){
+			case "subgoal" -> (() -> inputs.distance_to_closest_subgoal);
+			case "wall" -> (() -> inputs.distance_to_closest_wall);
+			default ->  {
+				System.out.println("ERROR: PC generation distance not implemented");
+				System.exit(-1);
+				yield (() -> 0f);
+			}
+		};
+		pc_activate_only_visible = xml.getBooleanAttribute("pc_activate_only_visible");
+		System.out.println("Activate only visible PCs: " + pc_activate_only_visible);
 
 		// PC layer modulation:
 		pc_modulator_array = Floats.constant(1, pcs.length); // Default modulator values
@@ -484,6 +501,8 @@ public class MultiscaleModel extends Subject{
 		private float reward;
 		private float[] distances;
 		private float distance_to_closest_subgoal;
+		private float distance_to_closest_wall;
+		private Polygon visibility_polygon =null ;
 
 		void get() {
 			pos = slam.getPosition();
@@ -505,14 +524,18 @@ public class MultiscaleModel extends Subject{
 				distances[i] = ego_distances[(i + id0) % numActions];
 			}
 			distance_to_closest_subgoal = distance_sensors.getDistanceToClosestSubgoal();
+			distance_to_closest_wall = distance_sensors.getDistanceToClosestWall();
+			if (pc_activate_only_visible){
+				visibility_polygon = distance_sensors.getVisibilityPolygon();
+			}
 		}
 	}
 
 	void updatePlaceCells(){
 		var pos = inputs.pos;
-		var distance_to_closest_subgoal = inputs.distance_to_closest_subgoal;
+		var modulator_distance = pc_modulation_distance.get();
 
-		pc_modulator.calculate_layer_modulators(distance_to_closest_subgoal);
+		pc_modulator.calculate_layer_modulators(modulator_distance);
 		float totalActivity =0;
 		for(int i=0; i<num_layers; i++) {
 
@@ -522,23 +545,23 @@ public class MultiscaleModel extends Subject{
 
 			// If there are no pcs with activity above threshold, create a new pc
 			var modulator = pc_modulator_array[i];
-			var max_active = bins_i.activateBin((float) pos.getX(), (float) pos.getY(), modulator);
+			var max_active = bins_i.activateBin((float) pos.getX(), (float) pos.getY(), modulator, inputs.visibility_polygon);
 			if( max_active < pc_generation_threshold[i] && (!pc_generation_active_layers_only || modulator > 0) ) {
-				addCellToLayer(i, (float)pos.getX(), (float)pos.getY(), distance_to_closest_subgoal, 0, Floats.constant(0,numActions));
-				bins_i.activateBin((float) pos.getX(), (float) pos.getY(), modulator) ;
+				addCellToLayer(i, (float)pos.getX(), (float)pos.getY(), modulator_distance, 0, Floats.constant(0,numActions));
+				bins_i.activateBin((float) pos.getX(), (float) pos.getY(), modulator, inputs.visibility_polygon) ;
 			}
 			totalActivity += pc_bins[i].active_pcs.total_a;
 		}
 		for(int i=0; i<num_layers; i++) pc_bins[i].active_pcs.normalize(totalActivity);
 	}
 
-	void addCellToLayer(int layer, float x, float y, float closest_subgoal, float initial_v, float[] initial_q ){
+	void addCellToLayer(int layer, float x, float y, float generation_distance, float initial_v, float[] initial_q ){
 
 		// TODO: as pcs are now generated incrementally, current data structures are very inefficient.
 		// Note: this does not seem to have a great impact on the code, but it does on the gui
 
 		// Choose x, y, r and id
-		float r = pc_generator.choose_radius(layer, closest_subgoal);
+		float r = pc_generator.choose_radius(layer, generation_distance);
 		int id = pcs[layer].num_cells;
 
 		// Add cell to layer and bins

@@ -56,12 +56,12 @@ def get_grid_and_coordinates(walls, precision):
 
 
 
-def save(file_name, min_x, num_x, min_y, num_y, all_distances):
+def save(file_name, min_x, num_x, min_y, num_y, precision, all_distances):
 
     with open(file_name, 'bw') as f:
 
         # store grid information:
-        np.array( [ min_x, num_x, min_y, num_y ] ).astype(np.float32).tofile(f)
+        np.array( [ min_x, num_x, min_y, num_y, precision ] ).astype(np.float32).tofile(f)
         all_distances.reshape(-1).astype(np.float32).tofile(f)
 
 
@@ -107,7 +107,7 @@ def map_distances_from_file(folder, maze_file):
     # SAVE DISTANCES
     save_name = full_path.replace('.xml', '_closest_wall_distances.bin')
     print('Saving ', save_name)
-    save(save_name, min_x, num_x, min_y, num_y, all_distances)
+    save(save_name, min_x, num_x, min_y, num_y, PRECISION, all_distances)
 
     # PLOT DISTANCE MAP FOR DEBUGGING
     plot_name = full_path.replace('.xml', '_closest_wall_distances.png')

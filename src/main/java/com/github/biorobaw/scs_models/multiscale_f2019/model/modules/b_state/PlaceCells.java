@@ -13,6 +13,9 @@ import com.github.biorobaw.scs.experiment.Experiment;
 import com.github.biorobaw.scs.utils.files.CSVReader;
 import com.github.biorobaw.scs.utils.files.XML;
 import com.github.biorobaw.scs.utils.math.Floats;
+import org.locationtech.jts.geom.*;
+
+import javax.swing.plaf.synth.SynthTextAreaUI;
 
 /**
  * Class to operate with place cells.
@@ -40,10 +43,14 @@ public class PlaceCells {
 	public float[] as; // the activation of each cell in the set
 	public float[] r2s;// precalculated r squared values
 	public float[] ns; // normalized activation
-	
+
+	public Point[] centers; // another copy of the centers to be used for with jts library
+
 	public float total_a; // the total activation of the layer (the sum)
 	public float max_a = 0;
-	
+
+	GeometryFactory geometry_factory = new GeometryFactory();
+
 	/**
 	 * Load place cells from a csv file with columns: x, y, r
 	 * @param pc_file
@@ -63,6 +70,8 @@ public class PlaceCells {
 		r2s = new float[num_cells]; // precalculated r squared values
 		as  = new float[num_cells]; // the activation of each cell in the set
 		ns  = new float[num_cells]; // normalized activation
+
+		centers = new Point[num_cells];
 		
 		
 		// get column names:
@@ -86,7 +95,9 @@ public class PlaceCells {
 			
 			float r_tolerance = rs[id] + numerical_error_tolerance;
 			r2s[id] = r_tolerance*r_tolerance;
-			ks[id] = (float) Math.log(min_activation)/r2s[id];			
+			ks[id] = (float) Math.log(min_activation)/r2s[id];
+
+			centers[id] = geometry_factory.createPoint(new Coordinate(xs[id],ys[id]));
 			
 		}
 	}
@@ -104,6 +115,8 @@ public class PlaceCells {
 		as  = new float[] {}; // the activation of each cell in the set
 		r2s = new float[] {}; // precalculated r squared values
 		ns  = new float[] {}; // normalized activation
+
+		centers = new Point[] {};
 	}
 	
 	/**
@@ -205,6 +218,7 @@ public class PlaceCells {
 		r2s = new float[num_cells];
 		ids = new int[num_cells];
 		ns = new float[num_cells];
+		centers = new Point[num_cells];
 		
 		float r2 = (radius+numerical_error_tolerance)*(radius+numerical_error_tolerance);
 		float k = (float) Math.log(min_activation)/r2;
@@ -221,6 +235,7 @@ public class PlaceCells {
 				ks[id] = k;
 				r2s[id] = r2;
 				ids[id] = id;
+				centers[id] = geometry_factory.createPoint(new Coordinate(xs[id],ys[id]));
 			}
 		}
 	}
@@ -233,12 +248,13 @@ public class PlaceCells {
 	 * @param ks constant of the activation equation of each pc
 	 * @param ids id of each pc
 	 */
-	public PlaceCells(float[] xs, float[] ys, float[] rs, float[] ks, int[] ids) {
+	public PlaceCells(float[] xs, float[] ys, float[] rs, float[] ks, int[] ids, Point[] centers) {
 		this.xs = xs;
 		this.ys = ys;
 		this.rs = rs;
 		this.ks = ks;
 		this.ids = ids;
+		this.centers = centers;
 		
 		num_cells = xs.length;
 		as  = new float[num_cells];
@@ -261,9 +277,10 @@ public class PlaceCells {
 		var rs  = ArrayUtils.addAll(left.rs,  right.rs);
 		var ks  = ArrayUtils.addAll(left.ks,  right.ks);
 		var ids = ArrayUtils.addAll(left.ids, right.ids);
+		var centers = ArrayUtils.addAll(left.centers, right.centers);
 		for(int i=left.num_cells; i<left.num_cells + right.num_cells; i++)
 			ids[i]+=left.num_cells;
-		return new PlaceCells(xs, ys, rs, ks, ids);
+		return new PlaceCells(xs, ys, rs, ks, ids, centers);
 	}
 	
 	/**
@@ -289,7 +306,7 @@ public class PlaceCells {
 	}
 
 	public PlaceCells copyState(){
-		var new_pcs = new PlaceCells(this.xs, this.ys, this.rs, this.ks, this.ids);
+		var new_pcs = new PlaceCells(this.xs, this.ys, this.rs, this.ks, this.ids, this.centers);
 		Floats.copy(as, new_pcs.as);
 		Floats.copy(ns, new_pcs.ns);
 		new_pcs.total_a = total_a;
@@ -303,15 +320,23 @@ public class PlaceCells {
 	 * @param y The robot's current y coordinate
 	 * @return Returns the total activation of the set
 	 */
-	public float activate(float x, float y, float modulator) {
+	public float activate(float x, float y, float modulator, Polygon visibility) {
 		total_a = 0;
 		max_a = 0;
+
 		for(int i=0; i<num_cells; i++) {
+
 			var dx = xs[i] - x;
 			var dy = ys[i] - y;
 			var r2 = dx*dx + dy*dy;
 //			System.out.println("r2: " +r2 + " " + r2s[i] );
 			if(r2 <= r2s[i]) {
+
+				if(visibility!=null && !visibility.contains(centers[i])) {
+					as[i] = 0;
+					continue;
+				}
+
 				var a = (float)Math.exp(ks[i]*r2);
 				var a_modulated = modulator*a; // used for RL
 				as[i] = a_modulated;
@@ -481,6 +506,8 @@ public class PlaceCells {
 		ks = Floats.concat(ks, k);
 		as = Floats.concat(as, 1);
 		ns = Floats.concat(ns, 0);
+
+		centers = ArrayUtils.add(centers, geometry_factory.createPoint(new Coordinate(x,y)));
 
 	}
 }
