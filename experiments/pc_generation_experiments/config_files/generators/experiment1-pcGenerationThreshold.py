@@ -12,7 +12,7 @@ outputFile     = '../experiment1-pcGenerationThreshold.csv'     # relative to th
 # DESCRIPTION:
 
 # Generate place cells for an empty maze using different scales and pc generation thresholds
-# use 10 rats for each configuration.
+# use 20 rats for each configuration.
 
 
 # OUTPUT COLUMNS:
@@ -27,10 +27,12 @@ outputColumns = [
     "pc_files",
     "independent_pcs",
     "pc_modulation_method",
+    "pc_modulation_distance",
     "pc_generation_radii",
     "pc_generation_method",
     "pc_generation_threshold",
     "pc_generation_active_layers_only",
+    "pc_activate_only_visible",
     "save_pcs",
     "traces",
     "run_id",
@@ -69,10 +71,12 @@ maze_DF['numEpisodes']  = maze_DF['numStartingPositions']*episodesPerStartingLoc
 pc_files_DF             = dataFrame('pc_files', dir_layers + 'empty.csv')
 independent_pcs_DF      = dataFrame('independent_pcs', 'false')
 pc_modulation_method_DF = dataFrame('pc_modulation_method', 'none')
+pc_modulation_distance_DF = dataFrame('pc_modulation_distance', 'subgoal')
 pc_generation_method_DF = dataFrame('pc_generation_method', 'layer') # create one for each layer that is below the given threshold
 pc_generation_raddi_DF  = dataFrame('pc_generation_radii', [0.08, 0.24, 0.40, 0.56])
 pc_generation_thresholds_DF         = dataFrame('pc_generation_threshold', list(aux_r10*0.001) + list(aux_r10*0.01) + list(aux_r10*0.1) )
 pc_generation_active_layers_only_DF = dataFrame('pc_generation_active_layers_only', 'false')
+pc_activate_only_visible_DF         = dataFrame('pc_activate_only_visible','false')
 save_pcs_DF                         = dataFrame('save_pcs', 'true')
 traces_DF_DF                        = dataFrame('traces', '0')
 
@@ -85,10 +89,12 @@ reduce_DFs = [
     pc_files_DF,
     independent_pcs_DF,
     pc_modulation_method_DF,
+    pc_modulation_distance_DF,
     pc_generation_method_DF,
     pc_generation_raddi_DF,
     pc_generation_thresholds_DF,
     pc_generation_active_layers_only_DF,
+    pc_activate_only_visible_DF,
     save_pcs_DF,
     traces_DF_DF,
 ]

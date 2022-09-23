@@ -12,7 +12,7 @@ outputFile     = '../experiment3-multiscale.csv'     # relative to this folder
 # DESCRIPTION:
 
 # Generate place cells for an empty maze using different scales and pc generation thresholds
-# use 10 rats for each configuration.
+# use 20 rats for each configuration.
 
 
 # OUTPUT COLUMNS:
@@ -27,12 +27,14 @@ outputColumns = [
     "pc_files",
     "independent_pcs",
     "pc_modulation_method",
+    "pc_modulation_distance",
     "pc_modulation_ratio",
     "pc_generation_radii",
     "pc_generation_method",
     "pc_generation_threshold",
     "mix_name",
     "pc_generation_active_layers_only",
+    "pc_activate_only_visible",
     "save_pcs",
     "traces",
     "run_id",
@@ -73,20 +75,21 @@ maze_DF['numEpisodes']  = maze_DF['numStartingPositions']*episodesPerStartingLoc
 pc_files_DF             = dataFrame('pc_files', ",".join([empty_maze]*4))
 independent_pcs_DF      = dataFrame('independent_pcs', 'false')
 pc_modulation_method_DF = dataFrame('pc_modulation_method', 'method1')
+pc_modulation_distance_DF = dataFrame('pc_modulation_distance', 'subgoal')
 pc_modulation_ratio_DF  = dataFrame('pc_modulation_ratio', ['0.2','0.4','0.6','0.8','1.0'])
 pc_generation_method_DF = dataFrame('pc_generation_method', 'layer') # create one for each layer that is below the given threshold
 pc_generation_raddi_thresholds_DF   = pd.DataFrame(columns = ['key', 'pc_generation_radii', 'pc_generation_threshold', 'mix_name' ], # assume bests are 0.004, 0.3, 0.4, 0.6
     data = [
-        [0,     '0.08,0.24,0.4,0.56',    '0.001,0.001,0.001,0.001', 'max0'],
-        [0,     '0.08,0.24,0.4,0.56',    '0.004,0.1,0.1,0.1', 'max1'],
-        [0,     '0.08,0.24,0.4,0.56',    '0.004,0.2,0.2,0.2', 'max2'],
-        [0,     '0.08,0.24,0.4,0.56',    '0.004,0.3,0.3,0.3', 'max3'],
-        [0,     '0.08,0.24,0.4,0.56',    '0.004,0.3,0.4,0.4', 'max4'],
-        [0,     '0.08,0.24,0.4,0.56',    '0.004,0.3,0.4,0.5', 'max5'],
-        [0,     '0.08,0.24,0.4,0.56',    '0.004,0.3,0.4,0.6', 'max6'],
+        [0,     '0.08,0.24,0.4,0.56',    '0.001,0.001,0.001,0.001', 'mix0'],
+        [0,     '0.08,0.24,0.4,0.56',    '0.008,0.1,0.1,0.1', 'mix1'],
+        [0,     '0.08,0.24,0.4,0.56',    '0.008,0.2,0.2,0.2', 'mix2'],
+        [0,     '0.08,0.24,0.4,0.56',    '0.008,0.3,0.3,0.3', 'mix3'],
+        [0,     '0.08,0.24,0.4,0.56',    '0.008,0.3,0.4,0.4', 'mix4'],
+        [0,     '0.08,0.24,0.4,0.56',    '0.008,0.3,0.5,0.5', 'mix5'],
     ]
 )
 pc_generation_active_layers_only_DF = dataFrame('pc_generation_active_layers_only', 'false')
+pc_activate_only_visible_DF         = dataFrame('pc_activate_only_visible','false')
 save_pcs_DF                         = dataFrame('save_pcs', 'true')
 traces_DF_DF                        = dataFrame('traces', ",".join(['0']*4))
 
@@ -99,10 +102,12 @@ reduce_DFs = [
     pc_files_DF,
     independent_pcs_DF,
     pc_modulation_method_DF,
+    pc_modulation_distance_DF,
     pc_modulation_ratio_DF,
     pc_generation_method_DF,
     pc_generation_raddi_thresholds_DF,
     pc_generation_active_layers_only_DF,
+    pc_activate_only_visible_DF,
     save_pcs_DF,
     traces_DF_DF,
 ]
