@@ -68,6 +68,7 @@ def plot_config(experiment_folder, config, config_id):
         '1': [format_maze, format_trace, format_scale],
         '2': [format_maze, format_pc_radii, format_threshold],
         '3': [format_ratio, format_maze, format_mix_name],
+        '4': [format_ratio, format_maze, format_mix_name],
         # '3': [format_maze, format_scale],
         # '4': [format_maze, lambda c: f's{c["pcSizes"]}', lambda c: f't{c["traces"]}'],
         # '5': [format_maze, format_trace, format_nx],
