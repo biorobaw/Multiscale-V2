@@ -23,7 +23,7 @@ SCRIPT_5_PLOT_EXPERIMENT=$EXPERIMENT_FOLDER/post_processing/plot_experiments.py
 
 # EXPERIMENTS
 RUN=()
-RUN+=(E6)
+RUN+=(E7)
 
 # Each experiment requires parameters: 
 #	NAME : name of the experiment
@@ -41,6 +41,7 @@ declare -A E3=( ["NAME"]=experiment3-multiscale  ["BATCH_SIZE"]=10 ["SAMPLE_RATE
 declare -A E4=( ["NAME"]=experiment4-closestWallMultiscale  ["BATCH_SIZE"]=10 ["SAMPLE_RATE"]=5  )
 declare -A E5=( ["NAME"]=experiment5-visibilityOptimalThresholds  ["BATCH_SIZE"]=5 ["SAMPLE_RATE"]=5  )
 declare -A E6=( ["NAME"]=experiment6-visibilityMultiscale  ["BATCH_SIZE"]=2 ["SAMPLE_RATE"]=5  )
+declare -A E7=( ["NAME"]=experiment7-visibilityClosestWallMultiscale  ["BATCH_SIZE"]=2 ["SAMPLE_RATE"]=5  )
 
 # E12[MIN_RAT]=60028
 # E12[MAX_RAT]=60028
