@@ -40,7 +40,7 @@ declare -A E2=( ["NAME"]=experiment2-optimalThreshold  ["BATCH_SIZE"]=10 ["SAMPL
 declare -A E3=( ["NAME"]=experiment3-multiscale  ["BATCH_SIZE"]=10 ["SAMPLE_RATE"]=5  )
 declare -A E4=( ["NAME"]=experiment4-closestWallMultiscale  ["BATCH_SIZE"]=10 ["SAMPLE_RATE"]=5  )
 declare -A E5=( ["NAME"]=experiment5-visibilityOptimalThresholds  ["BATCH_SIZE"]=5 ["SAMPLE_RATE"]=5  )
-declare -A E5=( ["NAME"]=experiment6-visibilityMultiscale  ["BATCH_SIZE"]=2 ["SAMPLE_RATE"]=5  )
+declare -A E6=( ["NAME"]=experiment6-visibilityMultiscale  ["BATCH_SIZE"]=2 ["SAMPLE_RATE"]=5  )
 
 # E12[MIN_RAT]=60028
 # E12[MAX_RAT]=60028
