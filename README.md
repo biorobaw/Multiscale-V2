@@ -1,6 +1,6 @@
 # Multiscale-F2019
 
-This project expands our previous Multiscale model (found in repository scs, branch v2.1, under multiscale->src->edu->usf->ratsim->model->pablo->multiscale_memory).  
+This project expands our previous Multiscale model (found in repository scs, [branch v2.1](https://github.com/biorobaw/scs/tree/v2.1)).  
 Any questions can be directed at pablos@usf.edu
 
 # Requirements
