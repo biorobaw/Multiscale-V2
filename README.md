@@ -1,22 +1,23 @@
 # Multiscale-F2019
 
-This project expands our previous Multiscale model (found in repository scs, branch v2.1, under multiscale->src->edu->usf->ratsim->model->pablo->multiscale_memory).
+This project expands our previous Multiscale model (found in repository scs, branch v2.1, under multiscale->src->edu->usf->ratsim->model->pablo->multiscale_memory).  
+Any questions can be directed at pablos@usf.edu
 
 # Requirements
 
-- Java   (for running the simulations)      >= 15
-- Maven  (for compiling the code)           >= 3.8.1
-- Python (for plotting and post-processing) >= 3.7.3
-- Jupyter Notebook (plotting)               >= 6.4.4
-- Slurm (for running parallel simulations)  >= 21.08.8-2
-- Intellij 2021 (optional Jave IDE)
+- [Java](https://www.java.com/en/)   (for running the simulations)      >= 15
+- [Maven](https://maven.apache.org/)  (for compiling the code)           >= 3.8.1
+- [Python](https://www.python.org/) (for plotting and post-processing) >= 3.7.3
+- [Jupyter Notebook](https://jupyter.org/) (plotting)               >= 6.4.4
+- [Slurm](https://slurm.schedmd.com/documentation.html) (for running parallel simulations)  >= 21.08.8-2
+- [Intellij](https://www.jetbrains.com/idea/) (optional Jave IDE) 2021
 
 **Notes** 
 - The software has been tested with the versions specified above. 
 - Versions do not necessarily reflect actual requirements.
 - The software is configured to work with Intellij out of the box (hopefully :)), but other IDEs are possible.
 - Experiments were designed to be run with Slurm on [CIRCE](https://wiki.rc.usf.edu/index.php/CIRCE)  (USF's computer cluster). 
-- Running full experiments without access to CIRCE will require adapting the run scripts (see [Run instructions](#run-instructions)).
+- Running full experiments without access to CIRCE or Slurm cluster will require adapting the run scripts (see [Run instructions](#run-instructions)).
 
 # Installation
 
@@ -119,7 +120,7 @@ The latest configuration file is [experiment11-article2.csv](experiments/BICY202
     2. Choose option `Maven->Reload Project` from the dropdown list  
     3. If prompted, choose trust project  
     4. Repeat steps 2.1 - 2.3 for project `Multiscale-V2`
-3. Run the project either from Intellij's toolbars or press `shift+F10`
+3. Run default run configuration either from Intellij's toolbars or press `shift+F10`
 
 Notes:
 - Intellij will automatically compile the project using maven and run a predefined simulation.
@@ -142,8 +143,12 @@ java -cp target/Multiscale-F2019-1.0.0-SNAPSHOT-jar-with-dependencies.jar com.gi
 ```
 In the code above:
 - **`<CONFIG_FILE>`** should be replaced by the path to a configuration file (see [Configuration Files](#configuration-files)) 
-- **`<ROW>`** should be replaced by an integer corresponding to the individual to be simulated from the configuration file.
+- **`<ROW>`** should be replaced by an integer corresponding to the individual to be simulated from the configuration file.  
+The first individual is 0.
 - Full example: `java -cp target/Multiscale-F2019-1.0.0-SNAPSHOT-jar-with-dependencies.jar com.github.biorobaw.scs.Main experiments\BICY2020_modified\config_files\experiment1-traces.csv 0 experiments\BICY2020_modified\logs\test yes`
+- The last argument set to either 'yes' or 'no', indicates whether to create the logging folder structure or not.  
+When running a single rat we suggest setting it to 'yes'.  
+Scripts for running parallel simulations create the folder structure before simulations and set the argument to 'no' (see [Running a full experiment](#running-a-full-experiment)).
 
 
 ## Turning GUI on
@@ -153,8 +158,8 @@ To turn the GUI on, replace `DisplayNone` by `DisplayJavaFX` in the `display` el
 ## Running a full experiment
 
 To run a full experiment, all individuals in a configuration file have to be successfully executed.  
-To run simulations in parallel, we provide bash scripts that submit Slurm batch jobs (see [Project Structure](#project-structure)).  
-The scripts are meant to be executed in Circe (USF's cluster of computers) and may require adapting if running in another system.  
+To run simulations in parallel, we provide bash scripts that submit [Slurm](https://slurm.schedmd.com/documentation.html) batch jobs (see [Project Structure](#project-structure)).  
+The scripts are meant to be executed in [CIRCE](https://wiki.rc.usf.edu/index.php/CIRCE) (USF's cluster of computers) and may require adapting if running in another system.  
 Bash scripts should be run sequentially after completing each batch job.  
 
 To run an experiment execute the following code from the home folder:
@@ -188,7 +193,7 @@ jupyter-notebook.exe .\articl2.ipynb
 ```
 
 As a result of the process, a log folder will be generated in the experiment folder (see [Project Structure](#Project project-structure)).  
-After generating the results database, 
+The log folder should contain the results of the experiment with a sqlite database named `experiment_results.sqlite`.
 
 
 # TODO
